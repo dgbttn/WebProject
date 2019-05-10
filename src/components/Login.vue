@@ -20,48 +20,23 @@
 		</div>
 
 		<div class="content-bound">
+			<div class="tool-bar">
+				<div class="tool-control" v-on:click="openTool">
+					<i class="fa fa-th tool-icon"></i>
+					<span class="tool-name">QUẢN LÍ ĐƠN VỊ</span>
+				</div>
+				<div class="tool-control">
+					<i class="fa fa-user tool-icon"></i>
+					<span class="tool-name">TÀI KHOẢN GIẢNG VIÊN</span>
+				</div>
+				<div class="tool-control">
+					<i class="fa fa-tasks tool-icon"></i>
+					<span class="tool-name">LĨNH VỰC NGHIÊN CỨU</span>
+				</div>
+			</div>
+
 			<div class="container">
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
-				<p>aaaaaaaaaaaaaa</p>
+
 			</div>
 		</div>
 
@@ -94,7 +69,40 @@ export default {
 		background-color: #555273;
 		top: 0;
 		left: 0;
+		position: fixed;
 		color: #e2eff1;
+	}
+
+	.tool-bar {
+		background-color: #a3de83;
+		margin-top: 50px;
+		width: 300px;
+		height: 100%;
+		top: 0;
+		left: 0;
+		position: fixed;
+	}
+
+	.tool-control {
+		display: block;
+		background-color: inherit;
+		color: #feffe4;
+		cursor: pointer;
+		padding: 13px 5px;
+		transition: 0.2s;
+	}
+
+	.tool-name, .tool-icon {
+		font-size: 20px;
+		font-weight: 500;
+	}
+
+	.tool-control:hover, .tool-control:focus {
+		background-color: #2eb872;
+	}
+
+	.tool-icon {
+		margin: 0px 10px;
 	}
 
 	.navbar {
@@ -123,18 +131,12 @@ export default {
 	.account {
 		float: right;
 		margin-top: 1px;
+		background-color: inherit;
+		transition: 0.2s;
 	}
 
-	.account:hover {
+	.account:hover, .account:focus {
 		background-color: #65799b;
-	}
-
-	.content-bound {
-		background-color: #e2eff1;
-		margin-top: 50px;
-		width: 100%;
-		top: 0;
-		left: 0;
 	}
 
 	img {
@@ -154,6 +156,10 @@ export default {
 	    font-weight: 400;
 	    line-height: 1.5;
 	    text-align: left;
+	}
+
+	body {
+		background-color: #e2eff1;
 	}
 
 

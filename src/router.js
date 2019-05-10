@@ -16,5 +16,10 @@ export default new Router({
 			name: 'Comp',
 			component: Comp
 		},
+		{
+			path: '/about',
+			name: 'About',
+			component: About
+		},
 	]
 })
