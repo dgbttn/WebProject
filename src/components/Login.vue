@@ -21,22 +21,30 @@
 
 		<div class="content-bound">
 			<div class="tool-bar">
-				<div class="tool-control" v-on:click="openTool">
+				<div class="tool-control unit-control-btn" v-on:click="openTool('unit-control')">
 					<i class="fa fa-th tool-icon"></i>
 					<span class="tool-name">QUẢN LÍ ĐƠN VỊ</span>
 				</div>
-				<div class="tool-control">
+				<div class="tool-control teacher-account-btn" v-on:click="openTool('teacher-account')">
 					<i class="fa fa-user tool-icon"></i>
 					<span class="tool-name">TÀI KHOẢN GIẢNG VIÊN</span>
 				</div>
-				<div class="tool-control">
+				<div class="tool-control study-field-btn" v-on:click="openTool('study-field')">
 					<i class="fa fa-tasks tool-icon"></i>
 					<span class="tool-name">LĨNH VỰC NGHIÊN CỨU</span>
 				</div>
 			</div>
 
 			<div class="container">
-
+				<div class="unit-control content" id="unit-control">
+					<p>Unit Control.</p>
+				</div>
+				<div class="teacher-account content" id="teacher-account">
+					teacher-account
+				</div>
+				<div class="study-field content" id="study-field">
+					study-field
+				</div>
 			</div>
 		</div>
 
@@ -48,12 +56,25 @@ export default {
 	name: 'HomePage',
 	data() {
 		return {
-
+			opening: ''
 		}
 	},
 
 	methods: {
+		openTool(toolName) {
+			var i, tabs, contents;
 
+			contents = document.getElementsByClassName('content');
+			for (i=0; i<contents.length; i++)
+				contents[i].style.display = "none";
+
+			tabs = document.getElementsByClassName('tool-control');
+			for (i=0; i<tabs.length; i++)
+				tabs[i].className = tabs[i].className.replace(" active", "");
+
+			document.getElementById(toolName).style.display = "block";
+			document.getElementsByClassName(toolName+'-btn')[0].className += " active";
+		}
 	}
 }
 </script>
@@ -71,38 +92,6 @@ export default {
 		left: 0;
 		position: fixed;
 		color: #e2eff1;
-	}
-
-	.tool-bar {
-		background-color: #a3de83;
-		margin-top: 50px;
-		width: 300px;
-		height: 100%;
-		top: 0;
-		left: 0;
-		position: fixed;
-	}
-
-	.tool-control {
-		display: block;
-		background-color: inherit;
-		color: #feffe4;
-		cursor: pointer;
-		padding: 13px 5px;
-		transition: 0.2s;
-	}
-
-	.tool-name, .tool-icon {
-		font-size: 20px;
-		font-weight: 500;
-	}
-
-	.tool-control:hover, .tool-control:focus {
-		background-color: #2eb872;
-	}
-
-	.tool-icon {
-		margin: 0px 10px;
 	}
 
 	.navbar {
@@ -137,6 +126,54 @@ export default {
 
 	.account:hover, .account:focus {
 		background-color: #65799b;
+	}
+
+	.tool-bar {
+		background-color: #a3de83;
+		margin-top: 50px;
+		width: 280px;
+		height: 100%;
+		top: 0;
+		left: 0;
+		position: fixed;
+	}
+
+	.tool-control {
+		display: block;
+		background-color: inherit;
+		color: #feffe4;
+		cursor: pointer;
+		padding: 13px 10px;
+		transition: 0.2s;
+		font-size: 20px;
+		font-weight: 500;
+	}
+
+	.tool-control:hover{
+		background-color: #2eb872;
+	}
+
+	.tool-icon {
+		font-size: 25px;
+		vertical-align: middle;
+		height: 25px;
+		width: 25px;
+		margin: 0px 10px;
+		text-align: center;
+	}
+
+	.tool-bar div.active {
+		background-color: #fa4659;
+	}
+
+	.container {
+		margin-top: 50px;
+		margin-left: 280px;
+		transition: 0.2s;
+	}
+
+	.content {
+		display: none;
 	}
 
 	img {
