@@ -1,66 +1,79 @@
 <template>
-	<div class="container">
-		<div class="holder">
+	<app-root name="app-root">
+		<!-- <progress value="0" max="100">0%</progress> -->
 
-			<h1>Đăng nhập</h1>
+		<div class="header">
+			<nav class="navbar">
+				<div class="content-nav">
+					<div class="account">
+						<a href="#" class="nav-link account-content dropdown-account">
+							<img src="../image/avatar.jpg" alt="user_avatar" class="avatar">
 
-			<form class="form-horizontal" @submit.prevent="log" v-on:keyup.enter="log">
-				<div class="form-group">
-					<label class="control-label" for="username">Tên đăng nhập:</label>
-					<div v-bind:class="{ 'has-error' : errors.has('username') }">
-						<input name="username" v-model="username"  data-vv-delay="100" v-validate="'required|min:6'" class="form-control" type="text">
-						<span v-show="errors.has('username')" class="text-danger">{{ errors.first('username') }}</span>
+							<span class="account-name">Tung</span>
+
+							<i class="fa fa-chevron-down"></i>
+						</a>
+
 					</div>
 				</div>
-
-				<div class="form-group">
-					<label class="control-label" for="password">Mật khẩu:</label>
-					<div v-bind:class="{ 'has-error' : errors.has('password') }">
-						<input name="password" v-model="password" v-validate="'required|min:6'" class="form-control" type="password">
-						<span v-show="errors.has('password')" class="text-danger">{{ errors.first('password') }}</span>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="control-label" for="rule">Vai trò:</label>
-					<div class="">
-						<select class="form-control" name="rule" v-model="rule">
-							<option value="teacher">Giảng viên</option>
-							<option value="admin">Quản trị viên</option>
-						</select>
-					</div>
-				</div>
-			</form>
-
-			<center><a class="button" v-on:click="log">Đăng nhập</a></center>
-
+			</nav>
 		</div>
 
-	</div>
+		<div class="content-bound">
+			<div class="tool-bar">
+				<div class="tool-control unit-control-btn" v-on:click="openTool('unit-control')">
+					<i class="fa fa-th tool-icon"></i>
+					<span class="tool-name">QUẢN LÍ ĐƠN VỊ</span>
+				</div>
+				<div class="tool-control teacher-account-btn" v-on:click="openTool('teacher-account')">
+					<i class="fa fa-user tool-icon"></i>
+					<span class="tool-name">TÀI KHOẢN GIẢNG VIÊN</span>
+				</div>
+				<div class="tool-control study-field-btn" v-on:click="openTool('study-field')">
+					<i class="fa fa-tasks tool-icon"></i>
+					<span class="tool-name">LĨNH VỰC NGHIÊN CỨU</span>
+				</div>
+			</div>
+
+			<div class="container">
+				<div class="unit-control content" id="unit-control">
+					<p>Unit Control.</p>
+				</div>
+				<div class="teacher-account content" id="teacher-account">
+					teacher-account
+				</div>
+				<div class="study-field content" id="study-field">
+					study-field
+				</div>
+			</div>
+		</div>
+
+	</app-root>
 </template>
 
 <script>
 export default {
-	name: 'Login',
+	name: 'HomePage',
 	data() {
 		return {
-			username: '',
-			password: '',
-			rule: 'teacher'
+			opening: ''
 		}
 	},
 
 	methods: {
-		log() {
-			this.$validator.validateAll().then((result) => {
-				if (!result) {
-					alert('Đăng nhập thất bại.');
-					return;
-				}
-				else {
-					console.log(this.nickname + ' ' + this.password + ' ' + this.rule);
-				}
-			});
+		openTool(toolName) {
+			var i, tabs, contents;
+
+			contents = document.getElementsByClassName('content');
+			for (i=0; i<contents.length; i++)
+				contents[i].style.display = "none";
+
+			tabs = document.getElementsByClassName('tool-control');
+			for (i=0; i<tabs.length; i++)
+				tabs[i].className = tabs[i].className.replace(" active", "");
+
+			document.getElementById(toolName).style.display = "block";
+			document.getElementsByClassName(toolName+'-btn')[0].className += " active";
 		}
 	}
 }
@@ -69,122 +82,122 @@ export default {
 <style scoped>
 	@import "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css";
 	@import ""https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"";
+	@import "https://cdn.jsdelivr.net/npm/animate.css@3.5.1";
 
-	div {
-		display: block;
+	.header {
+		width: 100%;
+		height: 50px;
+		background-color: #555273;
+		top: 0;
+		left: 0;
+		position: fixed;
+		color: #e2eff1;
 	}
 
-	h1 {
-		font-size: 30px;
-		margin: 10px;
-		text-align: center;
-	}
-
-	label {
-		position: relative;
-	    min-height: 1px;
-	    padding-right: 15px;
-		display: inline-block;
-	    max-width: 100%;
-	    font-weight: 700;
-	}
-
-	.button {
-		color: #fff;
-	    background-color: #4eb14e;
-	    border-color: #46a046;
-
-		display: inline-block;
-	    padding: 6px 12px;
-	    margin-bottom: 0;
-	    font-size: 14px;
-	    font-weight: 450;
-	    line-height: 1.42857143;
-	    text-align: center;
-	    white-space: nowrap;
-	    vertical-align: middle;
-	    touch-action: manipulation;
-	    cursor: pointer;
-	    border: 2px solid transparent;
-	    border-radius: 4px;
-	}
-
-	.button:hover {
-		background-color: #46a046;
-	}
-
-	.button:active {
-		background-color: #3e8e3e;
-	}
-
-	.text-danger {
-		color: #a94442;
-		display: block;
-	    margin-top: 5px;
+	.navbar {
+	    border: 1px solid #e7e7e7;
 	    margin-bottom: 10px;
 	}
 
-	.form-horizontal .control-label {
-	    padding-top: 7px;
-	    margin-bottom: 5px;
-	    text-align: right;
+	/* buttons on navbar*/
+	.nav-link {
+		display: block;
+	    padding: .5rem 1rem;
+		color: inherit;
 	}
 
-	.form-group {
-		margin-right: -15px;
-	    margin-left: -15px;
-		margin-bottom: 15px;
+	.avatar {
+		width: 32px;
+		height: 32px;
+		border-radius: 50%!important;
 	}
 
-	.form-control:focus {
-	    border-color: #66afe9;
-	    outline: 0;
-	    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+	.account-name {
+		padding: .40rem!important;
+		margin: 0px 5px;
 	}
 
-	.form-control {
-	    display: block;
-	    width: 100%;
-	    height: 34px;
-	    padding: 6px 12px;
-	    font-size: 14px;
+	.account {
+		float: right;
+		margin-top: 1px;
+		background-color: inherit;
+		transition: 0.2s;
+	}
+
+	.account:hover, .account:focus {
+		background-color: #65799b;
+	}
+
+	.tool-bar {
+		background-color: #a3de83;
+		margin-top: 50px;
+		width: 280px;
+		height: 100%;
+		top: 0;
+		left: 0;
+		position: fixed;
+	}
+
+	.tool-control {
+		display: block;
+		background-color: inherit;
+		color: #feffe4;
+		cursor: pointer;
+		padding: 13px 10px;
+		transition: 0.2s;
+		font-size: 20px;
 		font-weight: 500;
-	    line-height: 1.42857143;
-	    color: #555;
-	    background-color: #fff;
-	    border: 1px solid #ccc;
-	    border-radius: 4px;
 	}
 
-	.has-error .form-control {
-	    border-color: #a94442;
-	    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+	.tool-control:hover{
+		background-color: #2eb872;
 	}
 
-	input, button {
-		text-rendering: auto;
-	    margin: 0em;
-	    font: 400 13.3333px Arial;
+	.tool-icon {
+		font-size: 25px;
+		vertical-align: middle;
+		height: 25px;
+		width: 25px;
+		margin: 0px 10px;
+		text-align: center;
+	}
+
+	.tool-bar div.active {
+		background-color: #fa4659;
 	}
 
 	.container {
-		background-color: #fff;
+		margin-top: 50px;
+		margin-left: 280px;
+		transition: 0.2s;
+	}
+
+	.content {
+		display: none;
+	}
+
+	img {
+	    vertical-align: middle;
+	    border-style: none;
+		margin: 0px 5px;
+	}
+
+	a {
+		text-decoration: none;
+	}
+
+	*{
 		font-family: 'Montserrat', sans-serif;
-		display: grid;
-		grid-template-rows: auto;
-		padding-top: 50px;
-		justify-items: center;
+		box-sizing: border-box;
+		font-size: 1rem;
+	    font-weight: 400;
+	    line-height: 1.5;
+	    text-align: left;
 	}
 
-	.holder {
-		width: 300px;
+	body {
+		background-color: #e2eff1;
 	}
 
-	* {
-		font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-	    font-size: 14px;
-		color: #333333;
-	    background-color: #fff;
-	    box-sizing: border-box;
-	}
+
 </style>

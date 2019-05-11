@@ -6,21 +6,21 @@
 		</nav>
 
 		<router-view/> -->
-		<Login/>
+		<HomePage/>
 	</div>
 </template>
 
 <script>
 import Comp from './components/Comp.vue'
-import Login from './components/Login.vue'
 import HomePage from './components/HomePage.vue'
+import Login from './components/Login.vue'
 
 export default {
 	name: 'app',
 	components: {
 		Comp,
-		Login,
-		HomePage
+		HomePage,
+		Login
 	}
 }
 </script>
