@@ -37,7 +37,7 @@
 
 			<div class="container">
 				<div class="unit-control content" id="unit-control">
-					<p>Unit Control.</p>
+					<UnitControl />
 				</div>
 				<div class="teacher-account content" id="teacher-account">
 					teacher-account
@@ -52,8 +52,13 @@
 </template>
 
 <script>
+import UnitControl from './homepage/UnitControl.vue'
+
 export default {
 	name: 'HomePage',
+	components: {
+		UnitControl
+	},
 	data() {
 		return {
 			opening: ''
@@ -131,7 +136,7 @@ export default {
 	.tool-bar {
 		background-color: #a3de83;
 		margin-top: 50px;
-		width: 280px;
+		width: 300px;
 		height: 100%;
 		top: 0;
 		left: 0;
@@ -145,7 +150,7 @@ export default {
 		cursor: pointer;
 		padding: 13px 10px;
 		transition: 0.2s;
-		font-size: 20px;
+		font-size: 18px;
 		font-weight: 500;
 	}
 
@@ -167,8 +172,8 @@ export default {
 	}
 
 	.container {
-		margin-top: 50px;
-		margin-left: 280px;
+		margin-top: 70px;
+		margin-left: 320px;
 		transition: 0.2s;
 	}
 
@@ -187,12 +192,7 @@ export default {
 	}
 
 	*{
-		font-family: 'Montserrat', sans-serif;
-		box-sizing: border-box;
-		font-size: 1rem;
-	    font-weight: 400;
 	    line-height: 1.5;
-	    text-align: left;
 	}
 
 	body {

@@ -1,16 +1,11 @@
 <template>
 	<div id="app">
-		<!-- <nav>
-			<router-link to="/">Home</router-link>
-			<router-link to="/about">About</router-link>
-		</nav>
-
-		<router-view/> -->
 		<HomePage/>
 	</div>
 </template>
 
 <script>
+
 import Comp from './components/Comp.vue'
 import HomePage from './components/HomePage.vue'
 import Login from './components/Login.vue'
