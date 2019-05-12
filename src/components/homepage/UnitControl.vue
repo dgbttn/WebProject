@@ -20,13 +20,14 @@
 					<th>Điện thoại</th>
 					<th> </th>
 				</tr>
-				<tr v-for="(unit, index) in list">
-					<td>{{index}}</td>
-					<td>{{ unit.name }}</td>
-					<td>{{ unit.type }}</td>
-					<td>{{ unit.address }}</td>
-					<td>{{ unit.phone }}</td>
-					<td>{{ unit.website }}</td>
+				<tr v-for="(unit, i) in list">
+					<td>{{i+1}}</td>
+					<td v-for="(content, key, j) in unit" @dblclick="editing=(i+'_'+j); editedValue=content;">
+						<label v-if="editing != (i+'_'+j)">{{ content }}</label>
+						<input type="text" v-else v-model="editedValue" autofocus v-focus="true"
+							   v-on:blur="valueEditing(i,key)"
+							   @keyup.enter="valueEditing(i,key)">
+					</td>
 				</tr>
 			</table>
 
@@ -41,7 +42,9 @@ export default {
 	name: 'UnitControl',
 	data() {
 		return {
-			list: []
+			list: [],
+			editing: '',
+			editedValue: null,
 		}
 	},
 
@@ -64,7 +67,10 @@ export default {
 				});
 		},
 
-
+		valueEditing(i,j) {
+			this.editing = '';
+			this.list[i][j] = this.editedValue;
+		}
 	}
 }
 </script>
@@ -94,6 +100,7 @@ export default {
 		text-align: left;
 		background-color: #4CAF50;
 		color: white;
+		font-size: 14px;
 	}
 
 	.table-bound td {

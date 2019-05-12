@@ -32,7 +32,7 @@
 				</div>
 			</form>
 
-			<center><a class="button" v-on:click="log">Đăng nhập</a></center>
+			<center><a class="button login-btn" v-on:click="log">Đăng nhập</a></center>
 
 		</div>
 
@@ -96,7 +96,7 @@ export default {
 
 		display: inline-block;
 	    padding: 6px 12px;
-	    margin-bottom: 0;
+	    margin: 10px 0px;
 	    font-size: 14px;
 	    font-weight: 450;
 	    line-height: 1.42857143;
@@ -161,7 +161,7 @@ export default {
 	    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
 	}
 
-	input, button {
+	input {
 		text-rendering: auto;
 	    margin: 0em;
 	    font: 400 13.3333px Arial;
