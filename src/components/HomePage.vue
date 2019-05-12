@@ -134,9 +134,9 @@ export default {
 	}
 
 	.tool-bar {
-		background-color: #a3de83;
+		background-color: #36AE88;
 		margin-top: 50px;
-		width: 300px;
+		width: 280px;
 		height: 100%;
 		top: 0;
 		left: 0;
@@ -146,20 +146,20 @@ export default {
 	.tool-control {
 		display: block;
 		background-color: inherit;
-		color: #feffe4;
+		color: #ffebd3;
 		cursor: pointer;
 		padding: 13px 10px;
 		transition: 0.2s;
-		font-size: 18px;
+		font-size: 16px;
 		font-weight: 500;
 	}
 
 	.tool-control:hover{
-		background-color: #2eb872;
+		background-color: #1c9770;
 	}
 
 	.tool-icon {
-		font-size: 25px;
+		font-size: 22px;
 		vertical-align: middle;
 		height: 25px;
 		width: 25px;
@@ -168,12 +168,12 @@ export default {
 	}
 
 	.tool-bar div.active {
-		background-color: #fa4659;
+		background-color: #b5525c ;
 	}
 
 	.container {
 		margin-top: 70px;
-		margin-left: 320px;
+		margin-left: 300px;
 		transition: 0.2s;
 	}
 

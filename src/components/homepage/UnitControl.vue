@@ -1,32 +1,53 @@
 <template >
 	<div class="content-bound">
-		<button type="button" name="button" v-on:click="initRandomList">haaaaaaaaa</button>
 
-		<!-- <ul>
-			<li v-for="unit in list">
-				{{ unit.name }}
-			</li>
-		</ul> -->
+		<span class="note">*Quyền quản trị viên</span>
+		<br>
 
-		</form>
+		<button type="button" v-on:click="initRandomList">Tạo mặc định</button>
+		<button type="button" class="add-btn" v-on:click="adding=true" @keyup.esc="addCancel">Thêm mới</button>
 
 		<div class="table-bound">
 			<table>
+				<col width="43px">
+				<col width="320px">
+				<col width="120px">
+				<col width="120px">
+				<col width="107px">
+				<col width="140px">
+
+				<tr v-if="adding" class="adding-form" @keyup.esc="addCancel" @keyup.enter="addUnit">
+					<td></td>
+					<td v-for="(content, key, index) in newUnit">
+						<input type="text" v-model="newUnit[key]">
+					</td>
+
+					<td class="confirm-domain">
+						<i class="fa fa-check-circle confirm-btn ok-btn" v-on:click="addUnit"></i>
+						<i class="fa fa-times-circle confirm-btn no-btn" v-on:click="addCancel"></i>
+					</td>
+				</tr>
+
 				<tr>
-					<th>STT</th>
+					<th class="stt">STT</th>
 					<th>Tên đơn vị</th>
 					<th>Loại đơn vị</th>
 					<th>Địa chỉ</th>
 					<th>Điện thoại</th>
-					<th> </th>
+					<th>Website</th>
 				</tr>
 				<tr v-for="(unit, i) in list">
-					<td>{{i+1}}</td>
-					<td v-for="(content, key, j) in unit" @dblclick="editing=(i+'_'+j); editedValue=content;">
+					<td class="stt">{{i+1}}</td>
+					<td v-for="(content, key, j) in unit" @dblclick="editing=(i+'_'+j); editedValue=content; editKey=key">
 						<label v-if="editing != (i+'_'+j)">{{ content }}</label>
-						<input type="text" v-else v-model="editedValue" autofocus v-focus="true"
-							   v-on:blur="valueEditing(i,key)"
-							   @keyup.enter="valueEditing(i,key)">
+						<input class="edit-input" type="text" v-else v-model="editedValue" v-focus
+								@keyup.esc="editCancel"
+							   	@keyup.enter="valueEditing(i,key)">
+					</td>
+					<td class="confirm-domain">
+						<i v-if="editing.startsWith(i+'_')" class="fa fa-check-circle confirm-btn ok-btn" v-on:click="valueEditing(i,)"></i>
+						<i v-if="editing.startsWith(i+'_')" class="fa fa-times-circle confirm-btn no-btn" v-on:click="editCancel()"></i>
+						<i v-if="!editing.startsWith(i+'_')"class="fa fa-trash-o confirm-btn del-btn" v-on:click="removeUnit(i)"></i>
 					</td>
 				</tr>
 			</table>
@@ -45,6 +66,9 @@ export default {
 			list: [],
 			editing: '',
 			editedValue: null,
+			editKey: null,
+			adding: false,
+			newUnit: {name: '',type: '',address: '',phone: '',website: ''},
 		}
 	},
 
@@ -67,9 +91,40 @@ export default {
 				});
 		},
 
-		valueEditing(i,j) {
+		valueEditing(i, j) {
+			j = (j|| this.editKey);
+			console.log(j);
 			this.editing = '';
 			this.list[i][j] = this.editedValue;
+		},
+
+		editCancel() {
+			this.editing = '';
+		},
+
+		addUnit() {
+			this.list.push(this.newUnit);
+			this.addCancel();
+		},
+
+		addCancel() {
+			this.adding = false;
+			this.newUnit = {name: '',type: '',address: '',phone: '',website: ''};
+		},
+
+		removeUnit(i) {
+			if(confirm("Bạn chắc chắn muốn xóa Đơn vị này chứ?")){
+				this.list.splice(i,1);
+			}
+
+		}
+	},
+
+	directives: {
+		focus: {
+			inserted: function(el) {
+				el.focus();
+			}
 		}
 	}
 }
@@ -79,31 +134,122 @@ export default {
 	@import "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css";
 	@import "https://cdn.jsdelivr.net/npm/animate.css@3.5.1";
 
+	.note {
+		font-size: 11px;
+		font-style: italic;
+		font: Verdana,sans-serif;
+		color: red;
+	}
+
+	button {
+		color: #fff;
+	    background-color: #4d79ff;
+	    border-color: #1a53ff;
+
+		display: inline-block;
+	    padding: 6px 12px;
+	    margin: 10px 10px;
+	    font-size: 14px;
+	    font-weight: bold;
+	    line-height: 1.42857143;
+	    text-align: center;
+	    white-space: nowrap;
+	    vertical-align: middle;
+	    touch-action: manipulation;
+	    cursor: pointer;
+	    border: 2px solid transparent;
+	    border-radius: 4px;
+
+		box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+	}
+
+	button:hover {
+		background-color: #3366ff;
+	}
+
+	button:active {
+		background-color: #1a53ff;
+	}
+
+	table {border-spacing: 0px;}
+
+	input {
+		width: 100%;
+		height: 28px;
+		box-sizing: border-box;
+		display: block;
+		padding: 6px 10px;
+		font-size: 14px;
+		line-height: 1.5;
+		border: 1px solid #ccc;
+	    border-radius: 4px;
+		text-rendering: auto;
+	    margin: 0em;
+	    font: 400 13.3333px Arial;
+	}
+
+	input:focus {
+		border-color: #66afe9;
+	    outline: 0;
+	    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+	}
+
 	.table-bound {
-		font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+		font-family: "Helvetica", sans-serif;
 		border-collapse: collapse;
-		width: 80%;
+		width: 95%;
 	}
 
 	.table-bound td, .table-bound th {
 		border: 1px solid #ddd;
-		padding: 8px;
+		padding: 6px 8px;
 	}
+
+	.table-bound tr td:nth-child(4) {text-align: center;}
 
 	.table-bound tr:nth-child(even){background-color: #f2f2f2;}
 
 	.table-bound tr:hover {background-color: #ddd;}
 
+	.table-bound tr td:nth-child(7){
+		background-color: #fff;
+		border: none;
+	}
+
 	.table-bound th {
-		padding-top: 12px;
-		padding-bottom: 12px;
-		text-align: left;
+		padding: 9px 0px;
+		text-align: center;
 		background-color: #4CAF50;
 		color: white;
 		font-size: 14px;
 	}
 
-	.table-bound td {
-		font-size: 14px;
+	.table-bound td {font-size: 13px;}
+
+	.adding-form {
+
 	}
+
+	.stt {text-align: center;}
+
+	.confirm-domain {
+		background-color: #fff;
+		height: 100%;
+		width: 100px;
+		padding: 8px;
+	}
+
+	.confirm-btn {
+		padding: 0px 5px;
+		vertical-align: middle;
+		cursor: pointer;
+		font-size: 22px;
+	}
+
+	.ok-btn 	  {color: #00e600;}
+	.ok-btn:hover {color: #00cc00;}
+	.no-btn		  {color: #e60000;}
+	.no-btn:hover {color: #cc0000;}
+	.del-btn      {color: #bfbfbf;}
+	.del-btn:hover{color: #b3b3b3;}
 </style>
