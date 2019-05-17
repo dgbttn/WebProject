@@ -4,17 +4,18 @@
 
 		<div class="header">
 			<nav class="navbar">
-				<div class="content-nav">
-					<div class="account">
-						<a href="#" class="nav-link account-content dropdown-account">
-							<img src="../image/avatar.jpg" alt="user_avatar" class="avatar">
+				<div class="task-icon">
+					<i class="fa fa-bars"></i>
+				</div>
 
-							<span class="account-name">Tung</span>
+				<div class="account">
+					<a href="#" class="nav-link account-content dropdown-account">
+						<img src="../image/avatar.jpg" alt="user_avatar" class="avatar">
 
-							<i class="fa fa-chevron-down"></i>
-						</a>
+						<span class="account-name">Tung</span>
 
-					</div>
+						<i class="fa fa-chevron-down"></i>
+					</a>
 				</div>
 			</nav>
 		</div>
@@ -40,7 +41,7 @@
 					<UnitControl />
 				</div>
 				<div class="teacher-account content" id="teacher-account">
-					teacher-account
+					<OfficerAccount />
 				</div>
 				<div class="study-field content" id="study-field">
 					study-field
@@ -53,11 +54,13 @@
 
 <script>
 import UnitControl from './homepage/UnitControl.vue'
+import OfficerAccount from './homepage/OfficerAccount.vue'
 
 export default {
 	name: 'HomePage',
 	components: {
-		UnitControl
+		UnitControl,
+		OfficerAccount
 	},
 	data() {
 		return {
@@ -71,11 +74,11 @@ export default {
 
 			contents = document.getElementsByClassName('content');
 			for (i=0; i<contents.length; i++)
-				contents[i].style.display = "none";
+			contents[i].style.display = "none";
 
 			tabs = document.getElementsByClassName('tool-control');
 			for (i=0; i<tabs.length; i++)
-				tabs[i].className = tabs[i].className.replace(" active", "");
+			tabs[i].className = tabs[i].className.replace(" active", "");
 
 			document.getElementById(toolName).style.display = "block";
 			document.getElementsByClassName(toolName+'-btn')[0].className += " active";
@@ -100,14 +103,14 @@ export default {
 	}
 
 	.navbar {
-	    border: 1px solid #e7e7e7;
-	    margin-bottom: 10px;
+		border: 1px solid #e7e7e7;
+		margin-bottom: 10px;
 	}
 
 	/* buttons on navbar*/
 	.nav-link {
 		display: block;
-	    padding: .5rem 1rem;
+		padding: .5rem 1rem;
 		color: inherit;
 	}
 
@@ -126,21 +129,39 @@ export default {
 		float: right;
 		margin-top: 1px;
 		background-color: inherit;
+	}
+
+	.navbar div:hover, div:focus {
+		background-color: #ffcd1f;
+		color: #455358;
+	}
+
+	.navbar div {
 		transition: 0.2s;
 	}
 
-	.account:hover, .account:focus {
-		background-color: #65799b;
+	.task-icon {
+		font-size: 22px;
+		float: left;
+		display: block;
+		padding: 8px 15px;
+		margin: 1px 5px;
+		width: 25px;
+		text-align: center;
+		color: inherit;
+		background-color: inherit;
+		cursor: pointer;
 	}
 
 	.tool-bar {
 		background-color: #36AE88;
 		margin-top: 50px;
-		width: 280px;
+		width: 20%;
 		height: 100%;
 		top: 0;
 		left: 0;
 		position: fixed;
+		box-shadow: 0 0.5rem 1.25rem 0 rgba(0,0,0,0.28)
 	}
 
 	.tool-control {
@@ -152,11 +173,10 @@ export default {
 		transition: 0.2s;
 		font-size: 16px;
 		font-weight: 500;
+		font-family: hurme_no2-webfont,-apple-system,BlinkMacSystemFont,sans-serif;
 	}
 
-	.tool-control:hover{
-		background-color: #1c9770;
-	}
+	.tool-control:hover {background-color: #1c9770;}
 
 	.tool-icon {
 		font-size: 22px;
@@ -169,35 +189,27 @@ export default {
 
 	.tool-bar div.active {
 		background-color: #b5525c ;
+		color: #ffcd1f;
 	}
 
 	.container {
 		margin-top: 70px;
-		margin-left: 300px;
+		margin-left: 22%;
 		transition: 0.2s;
 	}
 
-	.content {
-		display: none;
-	}
+	.content {display: none;}
 
 	img {
-	    vertical-align: middle;
-	    border-style: none;
+		vertical-align: middle;
+		border-style: none;
 		margin: 0px 5px;
 	}
 
-	a {
-		text-decoration: none;
-	}
+	a {text-decoration: none;}
 
 	*{
-	    line-height: 1.5;
+		line-height: 1.5;
 	}
-
-	body {
-		background-color: #e2eff1;
-	}
-
 
 </style>

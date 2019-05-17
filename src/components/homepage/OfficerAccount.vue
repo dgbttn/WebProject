@@ -1,66 +1,61 @@
-<template >
+<template>
 	<div class="content-bound">
-
 		<span class="note">*Quyền quản trị viên</span>
 		<br>
 
 		<button type="button" v-on:click="initRandomList">Tạo mặc định</button>
 		<button type="button" class="add-btn" v-on:click="adding=true" @keyup.esc="addCancel">Thêm mới</button>
+		<button type="button" class="search-btn" v-on:click="searching=true" @keyup.esc="searchCancel">Tìm kiếm</button>
 
 		<div class="table-bound">
 			<table>
-				<col width="43px">  <!-- STT -->
-				<col width="320px"> <!-- Tên đơn vị -->
-				<col width="120px"> <!-- Loại đơn vị -->
-				<col width="120px"> <!-- Địa chỉ -->
-				<col width="107px"> <!-- Điện thoại -->
-				<col width="140px"> <!-- Website -->
-
-				<tr v-if="adding" class="adding-form" @keyup.esc="addCancel" @keyup.enter="addUnit">
+				<tr v-if="adding" class="adding-form" @keyup.esc="addCancel" @keyup.enter="addOfficer">
 					<td></td>
-					<td v-for="(content, key,) in newUnit">
-						<input type="text" v-model="newUnit[key]">
+					<td v-for="(content, key,) in newOfficer">
+						<input type="text" v-model="newOfficer[key]">
 					</td>
 
 					<td class="confirm-domain">
-						<i class="fa fa-check-circle confirm-btn ok-btn" v-on:click="addUnit"></i>
+						<i class="fa fa-check-circle confirm-btn ok-btn" v-on:click="addOfficer"></i>
 						<i class="fa fa-times-circle confirm-btn no-btn" v-on:click="addCancel"></i>
 					</td>
 				</tr>
 
 				<tr>
 					<th class="stt">STT</th>
-					<th>Tên đơn vị</th>
-					<th>Loại đơn vị</th>
-					<th>Địa chỉ</th>
-					<th>Điện thoại</th>
-					<th>Website</th>
+					<th>Mã CB</th>
+					<th>Họ và tên</th>
+					<th>Tài khoản</th>
+					<th>VNU email</th>
+					<th>Loại CB</th>
+					<th>Học vị</th>
+					<th>Đơn vị công tác</th>
 				</tr>
-				<tr v-for="(unit, i) in list">
-					<td class="stt">{{i+1}}</td>
-					<td v-for="(content, key, j) in unit" @dblclick="editing=(i+'_'+j); editedValue=content; editKey=key">
+
+				<tr v-for="(officer, i) in list">
+					<td class="stt">{{ i+1 }}</td>
+					<td v-for="(content, key, j) in officer" @dblclick="editing=(i+'_'+j); editedValue=content; editKey=key">
 						<label v-if="editing != (i+'_'+j)">{{ content }}</label>
 						<input class="edit-input" type="text" v-else v-model="editedValue" v-focus
-						@keyup.esc="editCancel"
-						@keyup.enter="valueEditing(i,key)">
+								@keyup.esc="editCancel"
+								@keyup.enter="valueEditing(i,key)">
 					</td>
 					<td class="confirm-domain">
 						<i v-if="editing.startsWith(i+'_')" class="fa fa-check confirm-btn ok-btn" v-on:click="valueEditing(i,)"></i>
 						<i v-if="editing.startsWith(i+'_')" class="fa fa-times confirm-btn no-btn" v-on:click="editCancel()"></i>
-						<i v-if="!editing.startsWith(i+'_')" class="fa fa-trash confirm-btn del-btn" v-on:click="removeUnit(i)"></i>
+						<i v-if="!editing.startsWith(i+'_')"class="fa fa-trash confirm-btn del-btn" v-on:click="removeUnit(i)"></i>
 					</td>
 				</tr>
 			</table>
-
 		</div>
 	</div>
 </template>
 
 <script>
-import {Unit} from '../classes/Unit.js'
+import {OfficerAccount} from '../classes/OfficerAccount.js'
 
 export default {
-	name: 'UnitControl',
+	name: 'OfficerAccount',
 	data() {
 		return {
 			list: [],
@@ -68,27 +63,28 @@ export default {
 			editedValue: null,
 			editKey: null,
 			adding: false,
-			newUnit: {name: '',type: '',address: '',phone: '',website: ''},
+			newOfficer: {id:'', name:'', position:'', account:'', mail:'', degree:'', unit:''},
 		}
 	},
 
 	methods: {
 		initRandomList() {
-			var units = [];
-			units.push(new Unit("Bộ môn Các Hệ thống Thông tin", "Bộ môn", "", "", ""));
-			units.push(new Unit("Bộ môn Công nghệ Phần mềm", "Bộ môn", "", "", ""));
-			units.push(new Unit("Bộ môn Khoa học Máy tính", "Bộ môn", "", "", ""));
-			units.push(new Unit("Bộ môn Khoa học và Ký thuật Tính toán", "Bộ môn", "", "", ""));
-			units.push(new Unit("Bộ môn Mạng và Truyền thông Máy tính", "Bộ môn", "406-E3", "", ""));
+			var officers = [];
+			officers.push(new OfficerAccount("1231","Hồ Văn Canh","canhkas","jashdj@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ Công an"));
+			officers.push(new OfficerAccount("3643","Lê Phê Đô","ádasd","ádasdsa@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ Công an"));
+			officers.push(new OfficerAccount("345sd","Minh Châu","sdfv","ádwqr@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ Công an"));
+			officers.push(new OfficerAccount("ád34","Hồ Văn Cường","ádadasđ","gdfdfgdf@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ Công an"));
 
-			for (var i in units)
-			this.list.push({
-				name: units[i].name,
-				type: units[i].type,
-				address: units[i].address,
-				phone: units[i].phone,
-				website: units[i].website
-			});
+			for (var i in officers)
+				this.list.push({
+					id : officers[i].id,
+					name : officers[i].name,
+					position : officers[i].position,
+					account : officers[i].account,
+					mail : officers[i].mail,
+					degree : officers[i].degree,
+					unit : officers[i].unit
+				});
 		},
 
 		valueEditing(i, j) {
@@ -101,18 +97,18 @@ export default {
 			this.editing = '';
 		},
 
-		addUnit() {
-			this.list.push(this.newUnit);
+		addOfficer() {
+			this.list.push(this.newOfficer);
 			this.addCancel();
 		},
 
 		addCancel() {
 			this.adding = false;
-			this.newUnit = {name: '',type: '',address: '',phone: '',website: ''};
+			this.newOfficer = {id:'', name:'', position:'', account:'', mail:'', degree:'', unit:''};
 		},
 
 		removeUnit(i) {
-			if(confirm("Bạn chắc chắn muốn xóa Đơn vị này chứ?")){
+			if(confirm("Bạn chắc chắn muốn xóa Tài khoản Cán bộ này chứ?")){
 				this.list.splice(i,1);
 			}
 
@@ -141,22 +137,22 @@ export default {
 
 	button {
 		color: #fff;
-		background-color: #3366ff;
-		border-color: #1a53ff;
+	    background-color: #3366ff;
+	    border-color: #1a53ff;
 
 		display: inline-block;
-		padding: 6px 12px;
-		margin: 10px 10px;
-		font-size: 14px;
-		font-weight: bold;
-		line-height: 1.42857143;
-		text-align: center;
-		white-space: nowrap;
-		vertical-align: middle;
-		touch-action: manipulation;
-		cursor: pointer;
-		border: 2px solid transparent;
-		border-radius: 4px;
+	    padding: 6px 12px;
+	    margin: 10px 10px;
+	    font-size: 14px;
+	    font-weight: bold;
+	    line-height: 1.42857143;
+	    text-align: center;
+	    white-space: nowrap;
+	    vertical-align: middle;
+	    touch-action: manipulation;
+	    cursor: pointer;
+	    border: 2px solid transparent;
+	    border-radius: 4px;
 	}
 
 	button:hover {
@@ -200,13 +196,13 @@ export default {
 		padding: 6px 8px;
 	}
 
-	.table-bound tr td:nth-child(4) {text-align: center;}
+	/* .table-bound tr td:nth-child(4) {text-align: center;} */
 
 	.table-bound tr:nth-child(even){background-color: #f2f2f2;}
 
 	.table-bound tr:hover {background-color: #ddd;}
 
-	.table-bound tr td:nth-child(7){
+	.table-bound tr td:nth-child(9){
 		background-color: #fff;
 		border: none;
 	}
@@ -238,11 +234,10 @@ export default {
 	}
 
 	.ok-btn 	  {color: #00e600;}
-	/* .ok-btn:hover {color: #00cc00;} */
 	.no-btn		  {color: #e60000;}
-	/* .no-btn:hover {color: #cc0000;} */
 	.del-btn      {color: #b3b3b3;}
 	.del-btn:hover, .no-btn:hover, .ok-btn:hover {color: #ffcd1f;}
+
 
 	* {
 		transition: 0.2s;

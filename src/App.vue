@@ -1,6 +1,6 @@
 <template>
 	<div id="app">
-		<HomePage/>
+		<router-view/>
 	</div>
 </template>
 
@@ -13,9 +13,6 @@ import Login from './components/Login.vue'
 export default {
 	name: 'app',
 	components: {
-		Comp,
-		HomePage,
-		Login
 	}
 }
 </script>
@@ -25,7 +22,7 @@ export default {
 
 	body {
 		background-color: #fff;
-		font-family: 'Montserrat', sans-serif;
+		font-family: hurme_no2-webfont,-apple-system,BlinkMacSystemFont,sans-serif;
 	}
 
 </style>

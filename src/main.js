@@ -20,5 +20,6 @@ Validator.localize(dict);
 Validator.localize('en');
 
 new Vue({
+	router,
 	render: h => h(App),
 }).$mount('#app')
