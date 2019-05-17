@@ -9,6 +9,7 @@
 
 		<div class="table-bound">
 			<table>
+				<!-- Columns' width -->
 				<col width="43px">  <!-- STT -->
 				<col width="320px"> <!-- Tên đơn vị -->
 				<col width="120px"> <!-- Loại đơn vị -->
@@ -16,6 +17,7 @@
 				<col width="107px"> <!-- Điện thoại -->
 				<col width="140px"> <!-- Website -->
 
+				<!-- Adding Form -->
 				<tr v-if="adding" class="adding-form" @keyup.esc="addCancel" @keyup.enter="addUnit">
 					<td></td>
 					<td v-for="(content, key,) in newUnit">
@@ -28,6 +30,7 @@
 					</td>
 				</tr>
 
+				<!-- Content of Table -->
 				<tr>
 					<th class="stt">STT</th>
 					<th>Tên đơn vị</th>
@@ -102,6 +105,12 @@ export default {
 		},
 
 		addUnit() {
+			var len = 0;
+			for (var i in this.newUnit) len+= this.newUnit[i].length;
+			if (len==0) {
+				alert('Đơn vị mới chưa có thông tin nào.');
+				return;
+			}
 			this.list.push(this.newUnit);
 			this.addCancel();
 		},
@@ -164,7 +173,11 @@ export default {
 		color: #455358;
 	}
 
-	button:focus {outline: none;}
+	button:focus {
+		outline: none;
+		color: #fff;
+		background-color: #3366ff;
+	}
 
 	table {border-spacing: 0px;}
 
@@ -241,7 +254,7 @@ export default {
 	/* .ok-btn:hover {color: #00cc00;} */
 	.no-btn		  {color: #e60000;}
 	/* .no-btn:hover {color: #cc0000;} */
-	.del-btn      {color: #b3b3b3;}
+	.del-btn      {color: #455358;}
 	.del-btn:hover, .no-btn:hover, .ok-btn:hover {color: #ffcd1f;}
 
 	* {

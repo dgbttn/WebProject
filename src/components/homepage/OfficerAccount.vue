@@ -9,6 +9,17 @@
 
 		<div class="table-bound">
 			<table>
+				<!-- Columns' width -->
+				<col width="40px">  <!-- STT -->
+				<col width="90px">  <!-- Mã cán bộ -->
+				<col width="180px"> <!-- Họ và tên -->
+				<col width="100px"> <!-- Tài khoản -->
+				<col width="200px"> <!-- VNU email -->
+				<col width="120px"> <!-- Chức vụ -->
+				<col width="80px"> <!-- Học vị -->
+				<col width="180px"> <!-- Đơn vị công tác -->
+
+				<!-- Adding Form -->
 				<tr v-if="adding" class="adding-form" @keyup.esc="addCancel" @keyup.enter="addOfficer">
 					<td></td>
 					<td v-for="(content, key,) in newOfficer">
@@ -21,13 +32,14 @@
 					</td>
 				</tr>
 
+				<!-- Content of Table -->
 				<tr>
 					<th class="stt">STT</th>
 					<th>Mã CB</th>
 					<th>Họ và tên</th>
 					<th>Tài khoản</th>
 					<th>VNU email</th>
-					<th>Loại CB</th>
+					<th>Chức vụ</th>
 					<th>Học vị</th>
 					<th>Đơn vị công tác</th>
 				</tr>
@@ -43,7 +55,7 @@
 					<td class="confirm-domain">
 						<i v-if="editing.startsWith(i+'_')" class="fa fa-check confirm-btn ok-btn" v-on:click="valueEditing(i,)"></i>
 						<i v-if="editing.startsWith(i+'_')" class="fa fa-times confirm-btn no-btn" v-on:click="editCancel()"></i>
-						<i v-if="!editing.startsWith(i+'_')"class="fa fa-trash confirm-btn del-btn" v-on:click="removeUnit(i)"></i>
+						<i v-if="!editing.startsWith(i+'_')" class="fa fa-trash confirm-btn del-btn" v-on:click="removeUnit(i)"></i>
 					</td>
 				</tr>
 			</table>
@@ -98,6 +110,12 @@ export default {
 		},
 
 		addOfficer() {
+			var len = 0;
+			for (var i in this.newOfficer) len+= this.newOfficer[i].length;
+			if (len==0) {
+				alert('Cán bộ mới chưa có thông tin nào.');
+				return;
+			}
 			this.list.push(this.newOfficer);
 			this.addCancel();
 		},
@@ -196,7 +214,7 @@ export default {
 		padding: 6px 8px;
 	}
 
-	/* .table-bound tr td:nth-child(4) {text-align: center;} */
+	.table-bound tr td:nth-child(6), .table-bound tr td:nth-child(7) {text-align: center;}
 
 	.table-bound tr:nth-child(even){background-color: #f2f2f2;}
 
@@ -235,9 +253,8 @@ export default {
 
 	.ok-btn 	  {color: #00e600;}
 	.no-btn		  {color: #e60000;}
-	.del-btn      {color: #b3b3b3;}
+	.del-btn      {color: #455358;}
 	.del-btn:hover, .no-btn:hover, .ok-btn:hover {color: #ffcd1f;}
-
 
 	* {
 		transition: 0.2s;
