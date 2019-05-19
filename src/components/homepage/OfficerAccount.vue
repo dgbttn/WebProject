@@ -27,8 +27,12 @@
 					</td>
 
 					<td class="confirm-domain">
-						<i class="fa fa-check-circle confirm-btn ok-btn" v-on:click="addOfficer"></i>
-						<i class="fa fa-times-circle confirm-btn no-btn" v-on:click="addCancel"></i>
+						<i class="fa fa-check-circle confirm-btn ok-btn" v-on:click="addOfficer">
+							<span class="tooltip-text">Xác nhận</span>
+						</i>
+						<i class="fa fa-times-circle confirm-btn no-btn" v-on:click="addCancel">
+							<span class="tooltip-text">Hủy</span>
+						</i>
 					</td>
 				</tr>
 
@@ -53,9 +57,15 @@
 								@keyup.enter="valueEditing(i,key)">
 					</td>
 					<td class="confirm-domain">
-						<i v-if="editing.startsWith(i+'_')" class="fa fa-check confirm-btn ok-btn" v-on:click="valueEditing(i,)"></i>
-						<i v-if="editing.startsWith(i+'_')" class="fa fa-times confirm-btn no-btn" v-on:click="editCancel()"></i>
-						<i v-if="!editing.startsWith(i+'_')" class="fa fa-trash confirm-btn del-btn" v-on:click="removeUnit(i)"></i>
+						<i v-if="editing.startsWith(i+'_')" class="fa fa-check confirm-btn ok-btn" v-on:click="valueEditing(i,)">
+							<span class="tooltip-text">Xác nhận</span>
+						</i>
+						<i v-if="editing.startsWith(i+'_')" class="fa fa-times confirm-btn no-btn" v-on:click="editCancel()">
+							<span class="tooltip-text">Hủy</span>
+						</i>
+						<i v-if="!editing.startsWith(i+'_')" class="fa fa-trash confirm-btn del-btn" v-on:click="removeAccount(i)">
+							<span class="tooltip-text">Xóa</span>
+						</i>
 					</td>
 				</tr>
 			</table>
@@ -80,6 +90,7 @@ export default {
 	},
 
 	methods: {
+		// add some random accounts to the list
 		initRandomList() {
 			var officers = [];
 			officers.push(new OfficerAccount("1231","Hồ Văn Canh","canhkas","jashdj@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ Công an"));
@@ -98,17 +109,17 @@ export default {
 					unit : officers[i].unit
 				});
 		},
-
+		// edit the selected value after acceptance
 		valueEditing(i, j) {
 			j = (j|| this.editKey);
 			this.editing = '';
 			this.list[i][j] = this.editedValue;
 		},
-
+		// cancel editing value
 		editCancel() {
 			this.editing = '';
 		},
-
+		// add a new account to the list
 		addOfficer() {
 			var len = 0;
 			for (var i in this.newOfficer) len+= this.newOfficer[i].length;
@@ -119,13 +130,13 @@ export default {
 			this.list.push(this.newOfficer);
 			this.addCancel();
 		},
-
+		// cancel adding new account
 		addCancel() {
 			this.adding = false;
 			this.newOfficer = {id:'', name:'', position:'', account:'', mail:'', degree:'', unit:''};
 		},
-
-		removeUnit(i) {
+		// delete an account
+		removeAccount(i) {
 			if(confirm("Bạn chắc chắn muốn xóa Tài khoản Cán bộ này chứ?")){
 				this.list.splice(i,1);
 			}
@@ -249,7 +260,43 @@ export default {
 		vertical-align: middle;
 		cursor: pointer;
 		font-size: 22px;
+		position: relative;
 	}
+
+	.tooltip-text {
+		word-wrap: normal;
+		word-wrap: normal;
+		visibility: hidden;
+		width: auto;
+		background-color: #4257B2;
+		color: #fff;
+		text-align: center;
+		padding: 5px 5px;
+		position: absolute;
+		z-index: 1;
+		margin-left: -50%;
+		width: 100%;
+		top: 170%;
+		left: 35%;
+
+		font-family: hurme_no2-webfont,-apple-system,BlinkMacSystemFont,sans-serif;
+		font-size: 12px;
+		font-weight: 600;
+		transition: 0.2s;
+	}
+
+	.tooltip-text::after {
+		content: "";
+		position: absolute;
+		bottom: 100%;
+		left: 50%;
+		margin-left: -5px;
+		border-width: 5px;
+		border-style: solid;
+		border-color: transparent transparent #4257B2 transparent;
+	}
+
+	.confirm-btn:hover .tooltip-text {visibility: visible;}
 
 	.ok-btn 	  {color: #00e600;}
 	.no-btn		  {color: #e60000;}

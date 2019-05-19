@@ -51,6 +51,7 @@ export default {
 	},
 
 	methods: {
+		// login
 		log() {
 			// this.$validator.validateAll().then((result) => {
 			// 	if (!result) {

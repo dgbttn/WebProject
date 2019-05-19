@@ -12,7 +12,7 @@
 					<a href="#" class="nav-link account-content dropdown-account">
 						<img src="../image/avatar.jpg" alt="user_avatar" class="avatar">
 
-						<span class="account-name">Tung</span>
+						<span class="account-name">{{ username }}</span>
 
 						<i class="fa fa-chevron-down"></i>
 					</a>
@@ -44,7 +44,7 @@
 					<OfficerAccount />
 				</div>
 				<div class="study-field content" id="study-field">
-					study-field
+					<ResearchField />
 				</div>
 			</div>
 		</div>
@@ -55,20 +55,24 @@
 <script>
 import UnitControl from './homepage/UnitControl.vue'
 import OfficerAccount from './homepage/OfficerAccount.vue'
+import ResearchField from './homepage/ResearchField.vue'
 
 export default {
 	name: 'HomePage',
 	components: {
 		UnitControl,
-		OfficerAccount
+		OfficerAccount,
+		ResearchField
 	},
 	data() {
 		return {
-			opening: ''
+			username: 'Tung',
+
 		}
 	},
 
 	methods: {
+		// show the selected tool
 		openTool(toolName) {
 			var i, tabs, contents;
 
@@ -82,6 +86,7 @@ export default {
 
 			document.getElementById(toolName).style.display = "block";
 			document.getElementsByClassName(toolName+'-btn')[0].className += " active";
+
 		}
 	}
 }
