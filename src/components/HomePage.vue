@@ -30,7 +30,7 @@
 					<i class="fa fa-user tool-icon"></i>
 					<span class="tool-name">TÀI KHOẢN GIẢNG VIÊN</span>
 				</div>
-				<div class="tool-control study-field-btn" v-on:click="openTool('study-field')">
+				<div class="tool-control research-field-btn" v-on:click="openTool('research-field')">
 					<i class="fa fa-tasks tool-icon"></i>
 					<span class="tool-name">LĨNH VỰC NGHIÊN CỨU</span>
 				</div>
@@ -43,7 +43,7 @@
 				<div class="teacher-account content" id="teacher-account">
 					<OfficerAccount />
 				</div>
-				<div class="study-field content" id="study-field">
+				<div class="research-field content" id="research-field">
 					<ResearchField />
 				</div>
 			</div>

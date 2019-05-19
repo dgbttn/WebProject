@@ -108,8 +108,8 @@ export default {
 		// edit the selected value after acceptance
 		valueEditing(i, j) {
 			j = (j|| this.editKey);
-			this.editing = '';
 			this.list[i][j] = this.editedValue;
+			this.editCancel();
 		},
 		// cancel editing value
 		editCancel() {

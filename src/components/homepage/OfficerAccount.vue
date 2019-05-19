@@ -189,7 +189,11 @@ export default {
 		color: #455358;
 	}
 
-	button:focus {outline: none;}
+	button:focus {
+		outline: none;
+		color: #fff;
+		background-color: #3366ff;
+	}
 
 	table {border-spacing: 0px;}
 
