@@ -5,7 +5,8 @@
 		<br>
 
 		<button type="button" v-on:click="initRandomList">Tạo mặc định</button>
-		<button type="button" class="add-btn" v-on:click="adding=true" @keyup.esc="addCancel">Thêm mới</button>
+		<button type="button" class="add-btn" v-on:click="adding=true; searching=false" @keyup.esc="addCancel">Thêm mới</button>
+		<button type="button" class="search-btn" v-on:click="searching=true; adding=false;" @keyup.esc="searchCancel">Tìm kiếm</button>
 
 		<div class="table-bound">
 			<table>
@@ -18,17 +19,20 @@
 				<col width="140px"> <!-- Website -->
 
 				<!-- Adding Form -->
-				<tr v-if="adding" class="adding-form" @keyup.esc="addCancel" @keyup.enter="addUnit">
-					<td></td>
-					<td v-for="(content, key,) in newUnit">
+				<tr v-if="adding||searching" class="extend-form" @keyup.esc="formCancel" @keyup.enter="formAccept">
+					<td class="icon-domain">
+						<i class="fa fa-plus-square tool-icon" v-if="adding"></i>
+						<i class="fa fa-search tool-icon" v-if="searching"></i>
+					</td>
+					<td v-for="(content, key, j) in newUnit" v-if="j>0">
 						<input type="text" v-model="newUnit[key]">
 					</td>
 
 					<td class="confirm-domain">
-						<i class="fa fa-check-circle confirm-btn ok-btn" v-on:click="addUnit">
+						<i class="fa fa-check-circle confirm-btn ok-btn" v-on:click="formAccept">
 							<span class="tooltip-text">Xác nhận</span>
 						</i>
-						<i class="fa fa-times-circle confirm-btn no-btn" v-on:click="addCancel">
+						<i class="fa fa-times-circle confirm-btn no-btn" v-on:click="formCancel">
 							<span class="tooltip-text">Hủy</span>
 						</i>
 					</td>
@@ -45,7 +49,7 @@
 				</tr>
 				<tr v-for="(unit, i) in list">
 					<td class="stt">{{i+1}}</td>
-					<td v-for="(content, key, j) in unit" @dblclick="editing=(i+'_'+j); editedValue=content; editKey=key">
+					<td v-for="(content, key, j) in unit" v-if="j>0" @dblclick="editing=(i+'_'+j); editedValue=content; editKey=key">
 						<label v-if="editing != (i+'_'+j)">{{ content }}</label>
 						<input class="edit-input" type="text" v-else v-model="editedValue" v-focus
 						@keyup.esc="editCancel"
@@ -78,26 +82,35 @@ export default {
 		return {
 			rule: 'quản trị viên',
 			list: [],
+			list_clone: [],
 			editing: '',
 			editedValue: null,
 			editKey: null,
 			adding: false,
-			newUnit: {name: '',type: '',address: '',phone: '',website: ''},
+			searching: false,
+			searched: false,
+			newUnit: {id:'',name: '',type: '',address: '',phone: '',website: ''},
 		}
+	},
+
+	// Get data from server to this.list
+	created() {
+		/* INSERT CODE HERE */
 	},
 
 	methods: {
 		// add some random units to the list
 		initRandomList() {
 			var units = [];
-			units.push(new Unit("Bộ môn Các Hệ thống Thông tin", "Bộ môn", "", "", ""));
-			units.push(new Unit("Bộ môn Công nghệ Phần mềm", "Bộ môn", "", "", ""));
-			units.push(new Unit("Bộ môn Khoa học Máy tính", "Bộ môn", "", "", ""));
-			units.push(new Unit("Bộ môn Khoa học và Ký thuật Tính toán", "Bộ môn", "", "", ""));
-			units.push(new Unit("Bộ môn Mạng và Truyền thông Máy tính", "Bộ môn", "406-E3", "", ""));
+			units.push(new Unit("1","Bộ môn Các Hệ thống Thông tin", "Bộ môn", "", "", ""));
+			units.push(new Unit("2","Bộ môn Công nghệ Phần mềm", "Bộ môn", "", "", ""));
+			units.push(new Unit("3","Bộ môn Khoa học Máy tính", "Bộ môn", "", "", ""));
+			units.push(new Unit("4","Bộ môn Khoa học và Ký thuật Tính toán", "Bộ môn", "", "", ""));
+			units.push(new Unit("5","Bộ môn Mạng và Truyền thông Máy tính", "Bộ môn", "406-E3", "", ""));
 
 			for (var i in units)
 			this.list.push({
+				id: units[i].id,
 				name: units[i].name,
 				type: units[i].type,
 				address: units[i].address,
@@ -105,32 +118,83 @@ export default {
 				website: units[i].website
 			});
 		},
+
 		// edit the selected value after acceptance
 		valueEditing(i, j) {
 			j = (j|| this.editKey);
 			this.list[i][j] = this.editedValue;
 			this.editCancel();
 		},
+
 		// cancel editing value
 		editCancel() {
 			this.editing = '';
 		},
+
+		formAccept() {
+			console.log(this.adding);
+			console.log(this.searching);
+			if (this.adding) {
+				this.addUnit();
+				return;
+			}
+			else this.searchUnit();
+		},
+
+		formCancel() {
+			if (this.adding) this.addCancel()
+			else this.searchCancel();
+
+		},
+
 		// add new unit to the list
 		addUnit() {
 			var len = 0;
-			for (var i in this.newUnit) len+= this.newUnit[i].length;
+			for (var i in this.newUnit) len+= this.newUnit[i].trim().length;
 			if (len==0) {
 				alert('Đơn vị mới chưa có thông tin nào.');
 				return;
 			}
+			// this.newUnit.id = ...
 			this.list.push(this.newUnit);
 			this.addCancel();
 		},
+
 		// cancel adding new unit
 		addCancel() {
 			this.adding = false;
-			this.newUnit = {name: '',type: '',address: '',phone: '',website: ''};
+			this.newUnit = {id:'',name: '',type: '',address: '',phone: '',website: ''};
 		},
+
+		searchUnit() {
+			if (this.searched)
+				this.list = Array.from(Object.create(this.list_clone));
+			else
+				this.list_clone = Array.from(Object.create(this.list));
+
+			this.searched = true;
+			for (var i=0; i<this.list.length; i++) {
+				var unit = this.list[i];
+				var match = true;
+				for (var j in unit)
+					if (!unit[j].toLowerCase().includes(this.newUnit[j].toLowerCase())) {
+						match = false;
+						break;
+					}
+				if (!match) {
+					this.list.splice(i,1);
+					i--;
+				}
+			}
+		},
+
+		searchCancel() {
+			if (this.searched) this.list = Array.from(Object.create(this.list_clone));
+			this.searching = false;
+			this.searched = false;
+			this.newUnit = {id:'', name: '',type: '',address: '',phone: '',website: ''};
+		},
+
 		// delete an unit
 		removeUnit(i) {
 			if(confirm("Bạn chắc chắn muốn xóa Đơn vị này chứ?")){
@@ -236,6 +300,11 @@ export default {
 		border: none;
 	}
 
+	.table-bound tr:nth-child(1) td[class="icon-domain"] {
+		background-color: #fff;
+		border: none;
+	}
+
 	.table-bound th {
 		padding: 9px 0px;
 		text-align: center;
@@ -251,8 +320,22 @@ export default {
 	.confirm-domain {
 		background-color: #fff;
 		height: 100%;
-		width: 100px;
+		width: 70px;
 		padding: 8px;
+	}
+
+	.icon-domain {
+		background-color: #fff;
+		height: 100%;
+		padding: 8px;
+		text-align: center;
+	}
+
+	.tool-icon {
+		padding: 0px 2px;
+		vertical-align: middle;
+		font-size: 18px;
+		color: #455358;
 	}
 
 	.confirm-btn {
@@ -300,10 +383,9 @@ export default {
 
 	.ok-btn 	  {color: #00e600;}
 	.no-btn		  {color: #e60000;}
-	.del-btn      {color: #455358;}
+	.del-btn      {color: #455358; visibility: hidden;}
 	.del-btn:hover, .no-btn:hover, .ok-btn:hover {color: #ffcd1f;}
-
-
+	tr:hover td .del-btn {visibility: visible;}
 
 	* {
 		transition: 0.2s;

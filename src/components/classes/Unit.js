@@ -1,5 +1,6 @@
 export class Unit {
-	constructor(name, type, address, phone, website) {
+	constructor(id, name, type, address, phone, website) {
+		this.id = id;
 		this.name = name;
 		this.type = type;
 		this.address = address;

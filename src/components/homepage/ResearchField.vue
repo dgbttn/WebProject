@@ -34,6 +34,11 @@ export default {
 		}
 	},
 
+	// Get data to this.list
+	created() {
+		/* INSERT CODE HERE */
+	},
+
 	methods: {
 		initRandomTree() {
 			this.treeData = {
@@ -71,7 +76,7 @@ export default {
 		},
 
 		addItem(item) {
-			item.children.push({name: 'new item'});
+			item.children.push({name: 'New item'});
 		}
 	}
 }

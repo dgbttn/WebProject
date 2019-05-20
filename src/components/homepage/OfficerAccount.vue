@@ -1,11 +1,11 @@
 <template>
 	<div class="content-bound">
-		<span class="note">*Quyền quản trị viên</span>
+		<span class="note">*Quyền {{rule}}</span>
 		<br>
 
 		<button type="button" v-on:click="initRandomList">Tạo mặc định</button>
-		<button type="button" class="add-btn" v-on:click="adding=true" @keyup.esc="addCancel">Thêm mới</button>
-		<button type="button" class="search-btn" v-on:click="searching=true" @keyup.esc="searchCancel">Tìm kiếm</button>
+		<button type="button" class="add-btn" v-on:click="adding=true; searching=false" @keyup.esc="addCancel">Thêm mới</button>
+		<button type="button" class="search-btn" v-on:click="searching=true; adding=false;" @keyup.esc="searchCancel">Tìm kiếm</button>
 
 		<div class="table-bound">
 			<table>
@@ -16,21 +16,24 @@
 				<col width="100px"> <!-- Tài khoản -->
 				<col width="200px"> <!-- VNU email -->
 				<col width="120px"> <!-- Chức vụ -->
-				<col width="80px"> <!-- Học vị -->
+				<col width="80px">  <!-- Học vị -->
 				<col width="180px"> <!-- Đơn vị công tác -->
 
 				<!-- Adding Form -->
-				<tr v-if="adding" class="adding-form" @keyup.esc="addCancel" @keyup.enter="addOfficer">
-					<td></td>
+				<tr v-if="adding||searching" class="extend-form" @keyup.esc="formCancel" @keyup.enter="formAccept">
+					<td class="icon-domain">
+						<i class="fa fa-plus-square tool-icon" v-if="adding"></i>
+						<i class="fa fa-search tool-icon" v-if="searching"></i>
+					</td>
 					<td v-for="(content, key,) in newOfficer">
 						<input type="text" v-model="newOfficer[key]">
 					</td>
 
 					<td class="confirm-domain">
-						<i class="fa fa-check-circle confirm-btn ok-btn" v-on:click="addOfficer">
+						<i class="fa fa-check-circle confirm-btn ok-btn" v-on:click="formAccept">
 							<span class="tooltip-text">Xác nhận</span>
 						</i>
-						<i class="fa fa-times-circle confirm-btn no-btn" v-on:click="addCancel">
+						<i class="fa fa-times-circle confirm-btn no-btn" v-on:click="formCancel">
 							<span class="tooltip-text">Hủy</span>
 						</i>
 					</td>
@@ -80,13 +83,22 @@ export default {
 	name: 'OfficerAccount',
 	data() {
 		return {
+			rule: 'quản trị viên',
 			list: [],
+			list_clone: [],
 			editing: '',
 			editedValue: null,
 			editKey: null,
 			adding: false,
+			searching: false,
+			searched: false,
 			newOfficer: {id:'', name:'', position:'', account:'', mail:'', degree:'', unit:''},
 		}
+	},
+
+	// Get data from server to this.list
+	created() {
+		/* INSERT CODE HERE */
 	},
 
 	methods: {
@@ -109,16 +121,35 @@ export default {
 					unit : officers[i].unit
 				});
 		},
+
 		// edit the selected value after acceptance
 		valueEditing(i, j) {
 			j = (j|| this.editKey);
 			this.editing = '';
 			this.list[i][j] = this.editedValue;
 		},
+
 		// cancel editing value
 		editCancel() {
 			this.editing = '';
 		},
+
+		formAccept() {
+			console.log(this.adding);
+			console.log(this.searching);
+			if (this.adding) {
+				this.addOfficer();
+				return;
+			}
+			else this.searchOfficer();
+		},
+
+		formCancel() {
+			if (this.adding) this.addCancel()
+			else this.searchCancel();
+
+		},
+
 		// add a new account to the list
 		addOfficer() {
 			var len = 0;
@@ -130,11 +161,42 @@ export default {
 			this.list.push(this.newOfficer);
 			this.addCancel();
 		},
+
 		// cancel adding new account
 		addCancel() {
 			this.adding = false;
 			this.newOfficer = {id:'', name:'', position:'', account:'', mail:'', degree:'', unit:''};
 		},
+
+		searchOfficer() {
+			if (this.searched)
+				this.list = Array.from(Object.create(this.list_clone));
+			else
+				this.list_clone = Array.from(Object.create(this.list));
+
+			this.searched = true;
+			for (var i=0; i<this.list.length; i++) {
+				var officer = this.list[i];
+				var match = true;
+				for (var j in officer)
+					if (!officer[j].toLowerCase().includes(this.newOfficer[j].toLowerCase())) {
+						match = false;
+						break;
+					}
+				if (!match) {
+					this.list.splice(i,1);
+					i--;
+				}
+			}
+		},
+
+		searchCancel() {
+			if (this.searched) this.list = Array.from(Object.create(this.list_clone));
+			this.searching = false;
+			this.searched = false;
+			this.newOfficer = {id:'', name:'', position:'', account:'', mail:'', degree:'', unit:''};
+		},
+
 		// delete an account
 		removeAccount(i) {
 			if(confirm("Bạn chắc chắn muốn xóa Tài khoản Cán bộ này chứ?")){
@@ -240,6 +302,11 @@ export default {
 		border: none;
 	}
 
+	.table-bound tr:nth-child(1) td[class="icon-domain"] {
+		background-color: #fff;
+		border: none;
+	}
+
 	.table-bound th {
 		padding: 9px 0px;
 		text-align: center;
@@ -255,9 +322,24 @@ export default {
 	.confirm-domain {
 		background-color: #fff;
 		height: 100%;
-		width: 100px;
+		width: 70px;
 		padding: 8px;
 	}
+
+	.icon-domain {
+		background-color: #fff;
+		height: 100%;
+		padding: 8px;
+		text-align: center;
+	}
+
+	.tool-icon {
+		padding: 0px 2px;
+		vertical-align: middle;
+		font-size: 18px;
+		color: #455358;
+	}
+
 
 	.confirm-btn {
 		padding: 0px 5px;
@@ -304,8 +386,9 @@ export default {
 
 	.ok-btn 	  {color: #00e600;}
 	.no-btn		  {color: #e60000;}
-	.del-btn      {color: #455358;}
+	.del-btn      {color: #455358; visibility: hidden;}
 	.del-btn:hover, .no-btn:hover, .ok-btn:hover {color: #ffcd1f;}
+	tr:hover td .del-btn {visibility: visible;}
 
 	* {
 		transition: 0.2s;
