@@ -57,22 +57,31 @@
 
 			<div class="show-field">
 				<label>{{ showLabel }}</label> <br>
-				<table>
-					<!-- Columns' width -->
-					<col width="43px">  <!-- STT -->
-					<col width="120px"> <!-- Học vị -->
-					<col width="320px"> <!-- Tên giảng viên -->
-					<col width="120px"> <!-- Đơn vị -->
 
-					<tr>
-						<th class="stt">STT</th>
-						<th>Học vị</th>
-						<th>Tên giảng viên</th>
-						<th>Đơn vị</th>
-					</tr>
+				<div class="table-bound">
+					<table>
+						<!-- Columns' width -->
+						<col width="43px">  <!-- STT -->
+						<col width="120px"> <!-- Học vị -->
+						<col width="200px"> <!-- Tên giảng viên -->
+						<col width="320px"> <!-- Đơn vị -->
 
-					
-				</table>
+						<tr>
+							<th class="stt">STT</th>
+							<th>Học vị</th>
+							<th>Tên giảng viên</th>
+							<th>Đơn vị</th>
+						</tr>
+
+						<tr v-for="(officer,i) in showOfficerList" v-on:click="selectOfficer(officer.id)">
+							<td class="stt">{{i+1}}</td>
+							<td>{{officer.degree}}</td>
+							<td>{{officer.name}}</td>
+							<td>{{officer.unit}}</td>
+						</tr>
+					</table>
+				</div>
+
 			</div>
 		</div>
 
@@ -80,6 +89,7 @@
 </template>
 
 <script>
+import {OfficerAccount} from './classes/OfficerAccount.js'
 
 export default {
 	name: 'GuestHome',
@@ -91,8 +101,10 @@ export default {
 			selectedUnit: -1,
 			selectedField: -1,
 			selectedFieldName: '',
+			selectedOfficer: -1,
 			unitList: [],
 			fieldList: [],
+			officerList: [],
 		}
 	},
 
@@ -109,7 +121,24 @@ export default {
 				return 'Danh sách Giảng viên quan tâm Lĩnh vực ' + this.selectedFieldName;
 			}
 			return '';
-		}
+		},
+
+		showOfficerList() {
+			var uList = [];
+
+			//unit
+			if (this.searchRule==0) {
+				if (this.selectedUnit<0) return uList;
+				for (var i in this.officerList)
+					if (this.officerList[i].unit == this.unitList[this.selectedUnit])
+						uList.push(this.officerList[i]);
+				return uList;
+			}
+
+			if (this.searchRule==1) {
+				return uList;
+			}
+		},
 	},
 
 	methods: {
@@ -117,6 +146,24 @@ export default {
 			this.unitList.push('Bộ môn các hệ thống thông tin');
 			this.unitList.push('Bộ môn Công nghệ phần mềm');
 			this.unitList.push('Bộ môn Khoa học máy tính');
+			this.unitList.push('Bộ Công an');
+
+			let officers = [];
+			officers.push(new OfficerAccount("1231","Hồ Văn Canh","canhkas","jashdj@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ Công an"));
+			officers.push(new OfficerAccount("3643","Lê Phê Đô","ádasd","ádasdsa@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ môn Công nghệ phần mềm"));
+			officers.push(new OfficerAccount("345sd","Minh Châu","sdfv","ádwqr@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ Công an"));
+			officers.push(new OfficerAccount("ád34","Hồ Văn Cường","ádadasđ","gdfdfgdf@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ Công an"));
+
+			for (var i in officers)
+				this.officerList.push({
+					id : officers[i].id,
+					name : officers[i].name,
+					position : officers[i].position,
+					account : officers[i].account,
+					mail : officers[i].mail,
+					degree : officers[i].degree,
+					unit : officers[i].unit
+				});
 		},
 
 		openSearchItem(index) {
@@ -147,7 +194,10 @@ export default {
 
 		selectUnit(i) {
 			this.selectedUnit = i;
-			console.log(this.selectedUnit);
+		},
+
+		selectOfficer(id) {
+			this.selectedOfficer = id;
 		}
 	}
 }
@@ -261,8 +311,8 @@ export default {
 
 	.search-container {
 		transition: 0.2;
-		/* border: 2px solid #f1efda; */
-		border: none;
+		border: 2px solid;
+		border-color: #d9e9f2 transparent #d9e9f2 #d9e9f2;
 		padding: 5px;
 		height: 380px;
 		overflow: auto;
@@ -276,6 +326,7 @@ export default {
 	::-webkit-scrollbar-track {
 		border: 1px solid #ff8080;
 		border-radius: 8px;
+
 	}
 
 	::-webkit-scrollbar-thumb {
@@ -304,16 +355,57 @@ export default {
 
 	.unit-list li:hover {color: #2d8386;}
 
-	.unit-list li.active {
-		font-weight: bold;
-	}
+	.unit-list li.active {font-weight: bold;}
 
 	.show-field {
 		display: inline-block;
-		margin-left: 40px;
+		margin-left: 60px;
 		margin-top: 10px;
 		text-align: left;
 	}
+
+	table {
+		border-spacing: 0px;
+		margin-top: 8px;
+	}
+
+	.table-bound {
+		font-family: "Helvetica", sans-serif;
+		border-collapse: collapse;
+		width: 100%;
+	}
+
+	.table-bound td, .table-bound th {
+		border: 1px solid #ddd;
+		padding: 6px 8px;
+	}
+
+	.table-bound tr td:nth-child(4) {text-align: center;}
+
+	.table-bound tr:nth-child(even){background-color: #f2f2f2;}
+
+	.table-bound tr:hover {
+		background-color: #ddd;
+		font-weight: bold;
+	}
+	.table-bound tr {cursor: pointer;}
+
+	.table-bound tr:nth-child(1) td[class="icon-domain"] {
+		background-color: #fff;
+		border: none;
+	}
+
+	.table-bound th {
+		padding: 9px 0px;
+		text-align: center;
+		background-color: #4CAF50;
+		color: white;
+		font-size: 14px;
+	}
+
+	.table-bound td {font-size: 13px;}
+
+	.stt {text-align: center;}
 
 	h1 {
 		font-size: 20px;

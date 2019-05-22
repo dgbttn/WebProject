@@ -26,7 +26,7 @@
 					<i class="fa fa-th tool-icon"></i>
 					<span class="tool-name">QUẢN LÍ ĐƠN VỊ</span>
 				</div>
-				<div class="tool-control teacher-account-btn" v-on:click="openTool('teacher-account')">
+				<div class="tool-control officer-account-btn" v-on:click="openTool('officer-account')">
 					<i class="fa fa-user tool-icon"></i>
 					<span class="tool-name">TÀI KHOẢN GIẢNG VIÊN</span>
 				</div>
@@ -40,7 +40,7 @@
 				<div class="unit-control content" id="unit-control">
 					<UnitControl />
 				</div>
-				<div class="teacher-account content" id="teacher-account">
+				<div class="officer-account content" id="officer-account">
 					<OfficerAccount />
 				</div>
 				<div class="research-field content" id="research-field">
@@ -67,7 +67,6 @@ export default {
 	data() {
 		return {
 			username: 'Tung',
-
 		}
 	},
 
@@ -93,8 +92,6 @@ export default {
 </script>
 
 <style scoped>
-	@import "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css";
-	@import ""https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"";
 	@import "https://cdn.jsdelivr.net/npm/animate.css@3.5.1";
 
 	.header {
@@ -195,6 +192,7 @@ export default {
 	.tool-bar div.active {
 		background-color: #b5525c ;
 		color: #ffcd1f;
+		border-left: 3px solid #ffcd1f;
 	}
 
 	.container {
