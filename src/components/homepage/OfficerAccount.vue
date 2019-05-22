@@ -92,16 +92,36 @@ export default {
 			adding: false,
 			searching: false,
 			searched: false,
-			newOfficer: {id:'', name:'', position:'', account:'', mail:'', degree:'', unit:''},
+			newOfficer: {id:'', name:'', account:'', mail:'', position:'', degree:'', unit:''},
 		}
 	},
 
 	// Get data from server to this.list
 	created() {
-		/* INSERT CODE HERE */
+		this.$http.get('http://localhost/uFaculty/Research/ResearchControl/getAll')
+				.then(function (data) {
+					var rawData = data.body.data;
+					var root = {id: 0, name: 'Root', children: []}
+					for (var idx in rawData) {
+						if (rawData[idx].parent_id == 0) {
+							root.children.push(this.recursive(rawData[idx],rawData));
+						}
+					}
+					this.treeData = root;
+				})
 	},
 
 	methods: {
+		recursive(rawNode, rawData) {
+			var node = {id: rawNode.research_id, name: rawNode.name, children: []}
+			for (var idx in rawData) {
+				if (rawData[idx].parent_id == rawNode.research_id) {
+					node.children.push(this.recursive(rawData[idx], rawData))
+				}
+			}
+			return node;
+		},
+		
 		// add some random accounts to the list
 		initRandomList() {
 			var officers = [];

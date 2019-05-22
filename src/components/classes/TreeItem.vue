@@ -40,7 +40,8 @@
 		<ul class="children-list" v-show="isOpen" v-if="isFolder">
 			<TreeItem class="item" v-for="(child, index) in item.children" :item="child"
 						@make-folder="$emit('make-folder', $event)"
-						@add-item="$emit('add-item', $event)">
+						@add-item="$emit('add-item', $event)"
+						@remove-item="$emit('remove-item', $event)">
 			</TreeItem>
 		</ul>
 	</li>
@@ -81,14 +82,22 @@ export default {
 		},
 
 		addItem() {
-			if (!this.isFolder) this.makeFolder();
-			this.isOpen = true;
-			this.$emit('add-item', this.item);
+			var url = 'http://localhost/uFaculty/Research/ResearchControl/create';
+			this.$http.post(url,{parent_id: this.item.id, name: 'New item'})
+					.then(function (data) {
+						if (!this.isFolder) this.makeFolder();
+						this.isOpen = true;
+						this.$emit('add-item', this.item);
+					})
 		},
 
 		editValue() {
-			this.item.name = editedValue;
-			this.editCancel();
+			var url = 'http://localhost/uFaculty/Research/ResearchControl/update';
+			this.$http.post(url,{id: this.item.id,name: this.item.name})
+					.then(function (data) {
+						this.item.name = this.editedValue;
+						this.editCancel();
+					})
 		},
 
 		editCancel() {
@@ -97,10 +106,7 @@ export default {
 
 		selfRemove() {
 			if(confirm("Bạn chắc chắn muốn xóa Mục này và các mục con của nó chứ?")){
-				this.item.children = [];
-				this.item.name = '';
-				this.item = null;
-				this.$destroy();
+				this.$emit('remove-item', this.item.id);
 			}
 		}
 	},

@@ -95,7 +95,19 @@ export default {
 
 	// Get data from server to this.list
 	created() {
-		/* INSERT CODE HERE */
+		this.$http.get('http://localhost/uFaculty/Faculty/FacultyControl/getAll')
+				.then(function (data) {
+					this.list = [];
+					for(var idx in data.body.data) {
+						var name= decodeURIComponent(escape(data.body.data[idx].name));
+						var address= decodeURIComponent(escape(data.body.data[idx].address));
+						var type= decodeURIComponent(escape(data.body.data[idx].type));
+						var id= data.body.data[idx].faculty_id;
+						var phone= data.body.data[idx].phone_number;
+						var website = data.body.data[idx].website;
+						this.list.push(new Unit(id,name,type,address,phone,website));
+					}
+				})
 	},
 
 	methods: {
@@ -121,9 +133,20 @@ export default {
 
 		// edit the selected value after acceptance
 		valueEditing(i, j) {
+			// client
 			j = (j|| this.editKey);
 			this.list[i][j] = this.editedValue;
 			this.editCancel();
+			// server
+			var url = 'http://localhost/uFaculty/Faculty/FacultyControl/update';
+			this.$http.post(url,{
+				id: this.list[i].id,
+				name: this.list[i].name,
+				type: this.list[i].type,
+				address: this.list[i].address,
+				phone: this.list[i].phone,
+				website: this.list[i].website
+			})
 		},
 
 		// cancel editing value
@@ -153,9 +176,19 @@ export default {
 				alert('Đơn vị mới chưa có thông tin nào.');
 				return;
 			}
-			// this.newUnit.id = ...
-			this.list.push(this.newUnit);
-			this.addCancel();
+
+			var url = 'http://localhost/uFaculty/Faculty/FacultyControl/create';
+			this.$http.post(url,{
+				name: this.newUnit.name,
+				type: this.newUnit.type,
+				address: this.newUnit.address,
+				phone: this.newUnit.phone,
+				website: this.newUnit.website
+			}).then(function (data) {
+				this.newUnit.id = data.body.id;
+				this.list.push(this.newUnit);
+				this.addCancel();
+			})
 		},
 
 		// cancel adding new unit
@@ -196,7 +229,12 @@ export default {
 		// delete an unit
 		removeUnit(i) {
 			if(confirm("Bạn chắc chắn muốn xóa Đơn vị này chứ?")){
-				this.list.splice(i,1);
+				var url = 'http://localhost/uFaculty/Faculty/FacultyControl/delete';
+				this.$http.post(url, {
+					id: this.list[i].id
+				}).then(function ($data) {
+					this.list.splice(i,1);
+				})
 			}
 
 		}
