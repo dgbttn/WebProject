@@ -1,4 +1,4 @@
-<template>
+c<template>
 	<li>
 		<div class="item-bound" :class="{bold: isOpen}">
 			<div class="item-btn" @click="toggle">
@@ -81,13 +81,27 @@ export default {
 		},
 
 		addItem() {
-			if (!this.isFolder) this.makeFolder();
-			this.isOpen = true;
-			this.$emit('add-item', this.item);
+			this.$http.post('http://localhost/uFaculty/Research/ResearchControl/create',{
+				parent_id: this.item.id,
+				name: 'New item'
+			}).then(function (data) {
+				console.log(data)
+				if (!this.isFolder) this.makeFolder();
+				this.isOpen = true;
+				this.$emit('add-item', this.item);
+				//console.log(this.list);
+			})
 		},
 
 		editValue() {
-			this.item.name = editedValue;
+			this.item.name = this.editedValue;
+			this.$http.post('http://localhost/uFaculty/Research/ResearchControl/update',{
+				id: this.item.id,
+				name: this.item.name
+			}).then(function (data) {
+						console.log(data)
+						//console.log(this.list);
+					})
 			this.editCancel();
 		},
 

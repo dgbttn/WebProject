@@ -135,6 +135,8 @@ export default {
 		},
 
 		formAccept() {
+			console.log(this.adding);
+			console.log(this.searching);
 			if (this.adding) {
 				this.addOfficer();
 				return;

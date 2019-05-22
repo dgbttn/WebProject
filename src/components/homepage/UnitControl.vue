@@ -16,7 +16,7 @@
 				<col width="120px"> <!-- Loại đơn vị -->
 				<col width="120px"> <!-- Địa chỉ -->
 				<col width="107px"> <!-- Điện thoại -->
-				<col width="200px"> <!-- Website -->
+				<col width="140px"> <!-- Website -->
 
 				<!-- Adding Form -->
 				<tr v-if="adding||searching" class="extend-form" @keyup.esc="formCancel" @keyup.enter="formAccept">
@@ -96,12 +96,40 @@ export default {
 	// Get data from server to this.list
 	created() {
 		/* INSERT CODE HERE */
+		this.$http.get('http://localhost/uFaculty/Faculty/FacultyControl/getAll')
+				.then(function (data) {
+					this.list = [];
+					for(var idx in data.body.data) {
+						var name= decodeURIComponent(escape(data.body.data[idx].name));
+						var address= decodeURIComponent(escape(data.body.data[idx].address));
+						var type= decodeURIComponent(escape(data.body.data[idx].type));
+						var id= data.body.data[idx].faculty_id;
+						var phone= data.body.data[idx].phone_number;
+						var website = data.body.data[idx].website;
+						this.list.push(new Unit(id,name,type,address,phone,website));
+					}
+					//console.log(this.list);
+				})
 	},
 
 	methods: {
 		// add some random units to the list
 		initRandomList() {
-			var units = [];
+			this.$http.get('http://localhost/uFaculty/Faculty/FacultyControl/getAll')
+					.then(function (data) {
+						this.list = [];
+						for(var idx in data.body.data) {
+							var name= decodeURIComponent(escape(data.body.data[idx].name));
+							var address= decodeURIComponent(escape(data.body.data[idx].address));
+							var type= decodeURIComponent(escape(data.body.data[idx].type));
+							var id= data.body.data[idx].faculty_id;
+							var phone= data.body.data[idx].phone_number;
+							var website = data.body.data[idx].website;
+							this.list.push(new Unit(id,name,type,address,phone,website));
+						}
+						//console.log(this.list);
+					})
+			/*var units = [];
 			units.push(new Unit("1","Bộ môn Các Hệ thống Thông tin", "Bộ môn", "", "", ""));
 			units.push(new Unit("2","Bộ môn Công nghệ Phần mềm", "Bộ môn", "", "", ""));
 			units.push(new Unit("3","Bộ môn Khoa học Máy tính", "Bộ môn", "", "", ""));
@@ -116,14 +144,28 @@ export default {
 				address: units[i].address,
 				phone: units[i].phone,
 				website: units[i].website
-			});
+			});*/
 		},
 
 		// edit the selected value after acceptance
 		valueEditing(i, j) {
+
 			j = (j|| this.editKey);
 			this.list[i][j] = this.editedValue;
 			this.editCancel();
+			console.log(this.list[i].website)
+			var url = 'http://localhost/uFaculty/Faculty/FacultyControl/update';
+			this.$http.post(url,{
+				id: this.list[i].id,
+				name: this.list[i].name,
+				type: this.list[i].type,
+				address: this.list[i].address,
+				phone: this.list[i].phone,
+				website: this.list[i].website
+			}).then(function (data) {
+				console.log(data);
+			})
+
 		},
 
 		// cancel editing value
@@ -132,6 +174,8 @@ export default {
 		},
 
 		formAccept() {
+			console.log(this.adding);
+			console.log(this.searching);
 			if (this.adding) {
 				this.addUnit();
 				return;
@@ -153,9 +197,22 @@ export default {
 				alert('Đơn vị mới chưa có thông tin nào.');
 				return;
 			}
+
+			var url = 'http://localhost/uFaculty/Faculty/FacultyControl/create';
+
+			this.$http.post(url,{
+				name: this.newUnit.name,
+				type: this.newUnit.type,
+				address: this.newUnit.address,
+				phone: this.newUnit.phone,
+				website: this.newUnit.website
+			}).then(function (data) {
+				console.log(data);
+				this.newUnit.id = data.body.id;
+				this.list.push(this.newUnit);
+				this.addCancel();
+			})
 			// this.newUnit.id = ...
-			this.list.push(this.newUnit);
-			this.addCancel();
 		},
 
 		// cancel adding new unit
@@ -196,7 +253,14 @@ export default {
 		// delete an unit
 		removeUnit(i) {
 			if(confirm("Bạn chắc chắn muốn xóa Đơn vị này chứ?")){
-				this.list.splice(i,1);
+				console.log(this.list[i]);
+				var url = 'http://localhost/uFaculty/Faculty/FacultyControl/delete';
+				this.$http.post(url, {
+					id: this.list[i].id
+				}).then(function ($data) {
+					this.list.splice(i,1);
+					console.log($data.body);
+				})
 			}
 
 		}

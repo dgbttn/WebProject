@@ -37,38 +37,44 @@ export default {
 	// Get data to this.list
 	created() {
 		/* INSERT CODE HERE */
+		this.$http.get('http://localhost/uFaculty/Research/ResearchControl/getAll')
+				.then(function (data) {
+					var rawData = data.body.data;
+					var root = {id: 0, name: 'Root', children: []}
+					for (var idx in rawData) {
+						if (rawData[idx].parent_id == 0) {
+							root.children.push(this.recursive(rawData[idx],rawData));
+						}
+					}
+					this.treeData = root;
+					//console.log(this.list);
+				})
 	},
 
 	methods: {
-		initRandomTree() {
-			this.treeData = {
-				name: 'My Tree',
-				children: [
-					{ name: 'hello' },
-					{ name: 'wat' },
-					{
-						name: 'child folder',
-						children: [
-							{
-								name: 'child folder',
-								children: [
-									{ name: 'hello' },
-									{ name: 'wat' }
-								]
-							},
-							{ name: 'hello' },
-							{ name: 'wat' },
-							{
-								name: 'child folder',
-								children: [
-									{ name: 'hello' },
-									{ name: 'wat' }
-								]
-							}
-						]
-					}
-				]
+		recursive(rawNode, rawData) {
+			var node = {id: rawNode.research_id, name: rawNode.name, children: []}
+			for (var idx in rawData) {
+				if (rawData[idx].parent_id == rawNode.research_id) {
+					node.children.push(this.recursive(rawData[idx], rawData))
+				}
 			}
+			return node;
+		},
+
+		initRandomTree() {
+			this.$http.get('http://localhost/uFaculty/Research/ResearchControl/getAll')
+					.then(function (data) {
+						var rawData = data.body.data;
+						var root = {id: 0, name: 'Root', children: []}
+						for (var idx in rawData) {
+							if (rawData[idx].parent_id == 0) {
+								root.children.push(this.recursive(rawData[idx],rawData));
+							}
+						}
+						this.treeData = root;
+						//console.log(this.list);
+					})
 		},
 
 		makeFolder(item) {
