@@ -16,7 +16,7 @@
 				<col width="120px"> <!-- Loại đơn vị -->
 				<col width="120px"> <!-- Địa chỉ -->
 				<col width="107px"> <!-- Điện thoại -->
-				<col width="140px"> <!-- Website -->
+				<col width="200px"> <!-- Website -->
 
 				<!-- Adding Form -->
 				<tr v-if="adding||searching" class="extend-form" @keyup.esc="formCancel" @keyup.enter="formAccept">
@@ -132,8 +132,6 @@ export default {
 		},
 
 		formAccept() {
-			console.log(this.adding);
-			console.log(this.searching);
 			if (this.adding) {
 				this.addUnit();
 				return;

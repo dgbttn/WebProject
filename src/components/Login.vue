@@ -34,6 +34,8 @@
 
 			<center><a class="button login-btn" v-on:click="log">Đăng nhập</a></center>
 
+			<center><a class="student-login-btn" v-on:click="guest_log">Tham gia với tư cách sinh viên</a></center>
+
 		</div>
 
 	</div>
@@ -64,130 +66,137 @@ export default {
 			// });
 
 			this.$router.push('/home');
+		},
+
+		guest_log() {
+			this.$router.push('/guest-home');
 		}
 	}
 }
 </script>
 
 <style scoped>
-@import "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css";
-@import ""https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"";
+	@import "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css";
+	@import ""https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"";
 
-div {
-	display: block;
-}
+	div {display: block;}
 
-h1 {
-	font-size: 30px;
-	margin: 10px;
-	text-align: center;
-}
+	h1 {
+		font-size: 30px;
+		margin: 10px;
+		text-align: center;
+	}
 
-label {
-	position: relative;
-	min-height: 1px;
-	padding-right: 15px;
-	display: inline-block;
-	max-width: 100%;
-	font-weight: 700;
-}
+	label {
+		position: relative;
+		min-height: 1px;
+		padding-right: 15px;
+		display: inline-block;
+		max-width: 100%;
+		font-weight: 700;
+	}
 
-.button {
-	color: #fff;
-	background-color: #4eb14e;
-	border-color: #46a046;
+	.button {
+		color: #fff;
+		background-color: #4eb14e;
+		border-color: #46a046;
 
-	display: inline-block;
-	padding: 6px 12px;
-	margin: 10px 0px;
-	font-size: 14px;
-	font-weight: 450;
-	line-height: 1.42857143;
-	text-align: center;
-	white-space: nowrap;
-	vertical-align: middle;
-	touch-action: manipulation;
-	cursor: pointer;
-	border: 2px solid transparent;
-	border-radius: 4px;
-}
+		display: inline-block;
+		padding: 6px 12px;
+		margin: 10px 0px;
+		font-size: 14px;
+		font-weight: 450;
+		line-height: 1.42857143;
+		text-align: center;
+		white-space: nowrap;
+		vertical-align: middle;
+		touch-action: manipulation;
+		cursor: pointer;
+		border: 2px solid transparent;
+		border-radius: 4px;
+	}
 
-.button:hover {
-	background-color: #46a046;
-}
+	.button:hover {	background-color: #46a046;}
 
-.button:active {
-	background-color: #3e8e3e;
-}
+	.button:active {background-color: #3e8e3e;}
 
-.text-danger {
-	color: #a94442;
-	display: block;
-	margin-top: 5px;
-	margin-bottom: 10px;
-}
+	.student-login-btn {
+		display: inline-block;
+		margin: 5px 0px;
+		color: #3366ff;
+		text-decoration: underline;
+		font-weight: bold;
+		cursor: pointer;
+	}
 
-.form-horizontal .control-label {
-	padding-top: 7px;
-	margin-bottom: 5px;
-	text-align: right;
-}
+	.student-login-btn:hover {color: #0040ff;}
 
-.form-group {
-	margin-right: -15px;
-	margin-left: -15px;
-	margin-bottom: 15px;
-}
+	.text-danger {
+		color: #a94442;
+		display: block;
+		margin-top: 5px;
+		margin-bottom: 10px;
+	}
 
-.form-control:focus {
-	border-color: #66afe9;
-	outline: 0;
-	box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
-}
+	.form-horizontal .control-label {
+		padding-top: 7px;
+		margin-bottom: 5px;
+		text-align: right;
+	}
 
-.form-control {
-	display: block;
-	width: 100%;
-	height: 34px;
-	padding: 6px 12px;
-	font-size: 14px;
-	font-weight: 500;
-	line-height: 1.42857143;
-	color: #555;
-	background-color: #fff;
-	border: 1px solid #ccc;
-	border-radius: 4px;
-}
+	.form-group {
+		margin-right: -15px;
+		margin-left: -15px;
+		margin-bottom: 15px;
+	}
 
-.has-error .form-control {
-	border-color: #a94442;
-	box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-}
+	.form-control:focus {
+		border-color: #66afe9;
+		outline: 0;
+		box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+	}
 
-input {
-	text-rendering: auto;
-	margin: 0em;
-	font: 400 13.3333px Arial;
-}
+	.form-control {
+		display: block;
+		width: 100%;
+		height: 34px;
+		padding: 6px 12px;
+		font-size: 14px;
+		font-weight: 500;
+		line-height: 1.42857143;
+		color: #555;
+		background-color: #fff;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+	}
 
-.container {
-	background-color: #fff;
-	font-family: 'Montserrat', sans-serif;
-	display: grid;
-	grid-template-rows: auto;
-	padding-top: 50px;
-	justify-items: center;
-}
+	.has-error .form-control {
+		border-color: #a94442;
+		box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+	}
 
-.holder {
-	width: 300px;
-}
+	input {
+		text-rendering: auto;
+		margin: 0em;
+		font: 400 13.3333px Arial;
+	}
 
-* {
-	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-	font-size: 14px;
-	color: #333333;
-	background-color: #fff;
-	box-sizing: border-box;
-}
+	.container {
+		background-color: #fff;
+		font-family: 'Montserrat', sans-serif;
+		display: grid;
+		grid-template-rows: auto;
+		padding-top: 50px;
+		justify-items: center;
+	}
+
+	.holder {width: 300px;}
+
+	* {
+		font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+		font-size: 14px;
+		color: #333333;
+		background-color: #fff;
+		box-sizing: border-box;
+	}
 </style>
