@@ -45,7 +45,7 @@
 							<li v-for="(unit, i) in unitList"
 								v-on:click="selectUnit(i)"
 								v-bind:class="{active: selectedUnit==i}">
-								{{unit}}
+								{{unit.name}}
 							</li>
 						</ul>
 					</div>
@@ -104,8 +104,38 @@ export default {
 			selectedOfficer: -1,
 			unitList: [],
 			fieldList: [],
-			officerList: [],
+			officerList: []
 		}
+	},
+
+	created() {
+		this.$http.get('http://localhost/uFaculty/Faculty/FacultyControl/getAll')
+				.then(function (data) {
+					this.unitList = [];
+					for(var i in data.body.data) {
+						this.unitList.push({
+							id: data.body.data[i].faculty_id,
+							name: decodeURIComponent(escape(data.body.data[i].name))
+						});
+					}
+				})
+
+
+		this.$http.get('http://localhost/uFaculty/Staff/StaffController/getAll')
+				.then(function (data) {
+					this.officerList = [];
+					for(var i in data.body.data) {
+						this.officerList.push({
+							id : data.body.data[i].staff_id,
+							name : decodeURIComponent(escape(data.body.data[i].full_name)),
+							position : decodeURIComponent(escape(data.body.data[i].staff_type)),
+							mail : decodeURIComponent(escape(data.body.data[i].vnu_email)),
+							degree : decodeURIComponent(escape(data.body.data[i].academic_title)),
+							unit_id : data.body.data[i].faculty_id,
+							account_id : data.body.data[i].account_id
+						});
+					}
+				})
 	},
 
 	computed: {
@@ -113,7 +143,7 @@ export default {
 			// unit
 			if (this.searchRule==0) {
 				if (this.selectedUnit<0) return '';
-				return 'Danh sách Giảng viên thuộc ' + this.unitList[this.selectedUnit];
+				return 'Danh sách Giảng viên thuộc ' + this.unitList[this.selectedUnit].name;
 			}
 			// field
 			else {
@@ -129,9 +159,13 @@ export default {
 			//unit
 			if (this.searchRule==0) {
 				if (this.selectedUnit<0) return uList;
-				for (var i in this.officerList)
-					if (this.officerList[i].unit == this.unitList[this.selectedUnit])
-						uList.push(this.officerList[i]);
+				for (var i in this.officerList) {
+					if (this.officerList[i].unit_id == this.unitList[this.selectedUnit].id) {
+						var chosenOne = this.officerList[i];
+						chosenOne.unit = this.unitList[this.selectedUnit].name;
+						uList.push(chosenOne);
+					}
+				}
 				return uList;
 			}
 

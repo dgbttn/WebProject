@@ -95,7 +95,7 @@ export default {
 
 	// Get data from server to this.list
 	created() {
-		this.$http.get('http://localhost/uFaculty/Faculty/FacultyControl/getAll')
+		this.$http.get('http://localhost/uFaculty/Faculty/FacultyControl/getAllUetOwner')
 				.then(function (data) {
 					this.list = [];
 					for(var idx in data.body.data) {
@@ -185,7 +185,7 @@ export default {
 				phone: this.newUnit.phone,
 				website: this.newUnit.website
 			}).then(function (data) {
-				this.newUnit.id = data.body.id;
+				this.newUnit.id = data.body.data[0].faculty_id;
 				this.list.push(this.newUnit);
 				this.addCancel();
 			})
