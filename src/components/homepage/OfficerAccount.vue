@@ -53,7 +53,7 @@
 
 				<tr v-for="(officer, i) in list">
 					<td class="stt">{{ i+1 }}</td>
-					<td v-for="(content, key, j) in officer" @dblclick="editing=(i+'_'+j); editedValue=content; editKey=key">
+					<td v-for="(content, key, j) in officer" v-if="j<7" @dblclick="editing=(i+'_'+j); editedValue=content; editKey=key">
 						<label v-if="editing != (i+'_'+j)">{{ content }}</label>
 						<input class="edit-input" type="text" v-else v-model="editedValue" v-focus
 								@keyup.esc="editCancel"
@@ -92,7 +92,7 @@ export default {
 			adding: false,
 			searching: false,
 			searched: false,
-			newOfficer: {id:'', name:'', account:'', mail:'', position:'', degree:'', unit:''},
+			newOfficer: {staff_number:'', name:'', account:'', mail:'', position:'', degree:'', unit:''},
 		}
 	},
 
@@ -105,14 +105,15 @@ export default {
 					this.list = [];
 					for(var idx in data.body.data) {
 						this.list.push({
-							id : data.body.data[idx].staff_number,
-							name : decodeURIComponent(escape(data.body.data[idx].full_name)),
+							staff_number : data.body.data[idx].staff_number,
+							full_name : decodeURIComponent(escape(data.body.data[idx].full_name)),
 							account : data.body.data[idx].username,
-							mail : data.body.data[idx].vnu_email,
-							position : decodeURIComponent(escape(data.body.data[idx].staff_type)),
-							degree : decodeURIComponent(escape(data.body.data[idx].academic_title)),
+							vnu_email : data.body.data[idx].vnu_email,
+							staff_type : decodeURIComponent(escape(data.body.data[idx].staff_type)),
+							academic_title : decodeURIComponent(escape(data.body.data[idx].academic_title)),
 							unit : decodeURIComponent(escape(data.body.data[idx].name)),
-							account_id: data.body.data[idx].account_id
+							account_id: data.body.data[idx].account_id,
+							staff_id: data.body.data[idx].staff_id
 						});
 					}
 					//console.log(account_id);
@@ -146,14 +147,13 @@ export default {
 			j = (j|| this.editKey);
 			this.editing = '';
 			this.list[i][j] = this.editedValue;
-			//console.log(this.list[i]);
 			var url = 'http://localhost/uFaculty/staff/StaffController/adminEditStaff';
 			this.$http.post(url,{
-				staff_id: this.list[i].id,
-				full_name: this.list[i].name,
-				vnu_email: this.list[i].account,
-				staff_type: this.list[i].mail,
-				academic_title: this.list[i].degree
+				staff_id: this.list[i].staff_id,
+				full_name: this.list[i].full_name,
+				vnu_email: this.list[i].vnu_email,
+				staff_type: this.list[i].staff_type,
+				academic_title: this.list[i].academic_title
 			}).then(function (data) {
 				console.log(data);
 			})
@@ -228,8 +228,14 @@ export default {
 		// delete an account
 		removeAccount(i) {
 			if(confirm("Bạn chắc chắn muốn xóa Tài khoản Cán bộ này chứ?")){
-				this.list.splice(i,1);
-				console.log(this.list.splice(i,1));
+				var url = 'http://localhost/uFaculty/account/AccountController/deleteUser';
+				this.$http.post(url,{
+					account_id: this.list[i].account_id
+				}).then(function (data) {
+					console.log(data);
+					this.list.splice(i,1);
+				})
+
 			}
 
 		}

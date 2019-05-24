@@ -39,7 +39,7 @@ export default {
 		this.$http.get('http://localhost/uFaculty/Research/ResearchControl/getAll')
 				.then(function (data) {
 					var rawData = data.body.data;
-					var root = {id: 0, name: 'Root', children: []}
+					var root = {id: 0, name: 'Lĩnh vực nghiên cứu', children: []}
 					for (var idx in rawData) {
 						if (rawData[idx].parent_id == 0) {
 							root.children.push(this.recursive(rawData[idx],rawData));
@@ -96,11 +96,9 @@ export default {
 			Vue.set(item, 'children', []);
 		},
 
-		addItem(item, data) {
+		addItem(data) {
 			//generate id
-			console.log(item)
-			console.log(data.newID)
-			item.children.push({id: data.newID, name: 'New item'});
+			data.item.children.push({id: data.id, name: 'New item'});
 		},
 
 		findParents(node, id) {

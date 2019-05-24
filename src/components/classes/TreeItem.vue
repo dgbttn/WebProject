@@ -82,12 +82,12 @@ export default {
 		},
 
 		addItem() {
+			if (!this.isFolder) this.makeFolder();
+			this.isOpen = true;
 			var url = 'http://localhost/uFaculty/Research/ResearchControl/create';
 			this.$http.post(url,{parent_id: this.item.id, name: 'New item'})
 					.then(function (data) {
-						if (!this.isFolder) this.makeFolder();
-						this.isOpen = true;
-						this.$emit('add-item', this.item, {newID: data.body.data[0].research_id});
+						this.$emit('add-item', {item: this.item, id: data.body.data[0].research_id});
 					})
 		},
 

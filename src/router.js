@@ -1,10 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-import About from './components/About.vue'
 import HomePage from './components/HomePage.vue'
 import Login from './components/Login.vue'
 import GuestHome from './components/GuestHome.vue'
+import OfficerHome from './components/OfficerHome.vue'
 
 Vue.use(Router)
 
@@ -25,6 +25,11 @@ export default new Router({
 			path: '/guest-home',
 			name: 'GuestHome',
 			component: GuestHome
+		},
+		{
+			path: '/staff-home',
+			name: 'OfficerHome',
+			component: OfficerHome
 		},
 		{
 			path: '*',
