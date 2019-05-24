@@ -27,7 +27,7 @@
 			<button type="button" v-on:click="initRandomList">Tạo mặc định</button>
 		</div>
 
-		<div v-show="useMode==0" class="container">
+		<div class="container">
 			<div v-if="true" class="info-container">
 				<div class="name">
 					<i class="fa fa-user"></i>
@@ -64,12 +64,20 @@
 						</div>
 					</div>
 				</div>
+
+				<img class="officer-image" v-bind:src="avatar_src">
 			</div>
 
+			<br>
+
 			<div class="interested-field">
-				<span class="big-field-title" v-on:click="changeUseMode(2)">
+				<span class="big-field-title">
 					Lĩnh vực quan tâm
 				</span>
+				<span class="sec-field-title">
+					Tất cả lĩnh vực
+				</span>
+				<br>
 
 				<div class="name-field">
 					<ul class="field-list">
@@ -80,79 +88,74 @@
 				</div>
 
 				<div class="show-field">
-					<ul class="field-list">
-						<li v-for="field in officerInfo.interestedFields">
-							{{field}}
-						</li>
-					</ul>
+
 				</div>
 			</div>
 
 			<div class="research-topic">
-				<span class="big-field-title" v-on:click="changeUseMode(1)">
+				<i class="fa fa-plus-square confirm-btn add-btn" v-on:click="addTopic">
+					<span class="tooltip-text">Thêm</span>
+				</i>
+				<span class="big-field-title">
 					Chủ đề nghiên cứu
 				</span>
-				<div class="show-field">
+				<span class="sec-field-title">
+					Mô tả
+				</span>
+
+				<div v-if="selectedTopic>-1" class="confirm-domain">
+					<i v-if="topicEditing" class="fa fa-check confirm-btn ok-btn" v-on:click="editTopic">
+						<span class="tooltip-text">Xác nhận</span>
+					</i>
+					<i v-if="topicEditing" class="fa fa-times confirm-btn no-btn" v-on:click="topicEditCancel">
+						<span class="tooltip-text">Hủy</span>
+					</i>
+					<i v-if="!topicEditing" class="fa fa-pencil confirm-btn topic-edit-btn"
+						v-on:click="topicEditing = true;
+									topicEditedValue = {
+										name: officerInfo.researchTopics[selectedTopic].name,
+										description: officerInfo.researchTopics[selectedTopic].description
+									};">
+						<span class="tooltip-text">Sửa</span>
+					</i>
+					<i v-if="!topicEditing" class="fa fa-trash confirm-btn del-btn"
+						v-on:click="removeTopic(selectedTopic)">
+						<span class="tooltip-text">Xóa</span>
+					</i>
+				</div>
+
+				<br>
+				<div class="name-field">
 					<ul class="topic-list">
-						<li	v-for="topic in officerInfo.researchTopics">
-							{{topic.name}}
+						<li	v-for="(topic,i) in officerInfo.researchTopics" class="topic-name"
+							v-on:click= "selectTopic(i)">
+							<span v-if="!topicEditing||selectedTopic!=i"
+									@dblclick="topicEditing = true;
+										selectTopic(i);
+										topicEditedValue = {
+											name: officerInfo.researchTopics[i].name,
+											description: officerInfo.researchTopics[i].description
+										};">
+								{{topic.name}}
+							</span>
+							<input v-else type="text" v-model="topicEditedValue.name" v-focus
+									@keyup.enter = "editTopic"
+									@keyup.esc = "topicEditCancel">
 						</li>
 					</ul>
 				</div>
+
+				<div class="show-field">
+					<div class="content-show" v-if="selectedTopic>=0">
+						<span v-if="!topicEditing" @dblclick="topicEditing = true;
+							topicEditedValue = {
+								name: officerInfo.researchTopics[selectedTopic].name,
+								description: officerInfo.researchTopics[selectedTopic].description
+							};">{{officerInfo.researchTopics[selectedTopic].description}}</span>
+						<textarea v-else rows="17" cols="80" v-model="topicEditedValue.description"></textarea>
+					</div>
+				</div>
 			</div>
-		</div>
-
-		<div v-show="useMode==1" class="edit-research-topic">
-			<div class="table-bound">
-				<table>
-					<col width="43px">
-					<col width="260px">
-					<col width="660px">
-
-					<tr>
-						<th class="stt">STT</th>
-						<th>Tên chủ đề</th>
-						<th>Mô tả</th>
-					</tr>
-
-					<tr v-for="(topic,i) in officerInfo.researchTopics" @dblclick="topicEditing=i; topicEditedValue={name: topic.name, description: topic.description};">
-						<td class="stt">{{i+1}}</td>
-						<td>
-							<label v-if="topicEditing!=i">{{topic.name}}</label>
-							<input v-else v-model="topicEditedValue.name"
-							 		@keyup.enter = "editTopic"
-									@keyup.esc = "topicEditCancel">
-						</td>
-						<td>
-							<label v-if="topicEditing!=i">{{topic.description}}</label>
-							<input v-else v-model="topicEditedValue.description" v-focus
-									@keyup.enter = "editTopic"
-									@keyup.esc = "topicEditCancel">
-							</input>
-						</td>
-
-						<td class="confirm-domain">
-							<i v-if="topicEditing==i" class="fa fa-check confirm-btn ok-btn" v-on:click="editTopic">
-								<span class="tooltip-text">Xác nhận</span>
-							</i>
-							<i v-if="topicEditing==i" class="fa fa-times confirm-btn no-btn" v-on:click="topicEditCancel">
-								<span class="tooltip-text">Hủy</span>
-							</i>
-							<i v-if="topicEditing!=i" class="fa fa-pencil confirm-btn topic-edit-btn"
-								v-on:click="topicEditing=i; topicEditedValue={name: topic.name, description: topic.description};">
-								<span class="tooltip-text">Sửa</span>
-							</i>
-							<i v-if="topicEditing!=i" class="fa fa-trash confirm-btn del-btn"
-								v-on:click="removeTopic(i)">
-								<span class="tooltip-text">Xóa</span>
-							</i>
-						</td>
-					</tr>
-				</table>
-			</div>
-		</div>
-
-		<div v-show="useMode==2" class="edit-interested-field">
 
 		</div>
 	</app-root>
@@ -165,12 +168,14 @@ export default {
 		return {
 			titles: ['THÔNG TIN GIẢNG VIÊN', 'chỉnh sửa chủ đề nghiên cứu', 'chỉnh sửa lĩnh vực quan tâm'],
 			username: 'Giảng viên',
+			avatar_src: require('../image/officer_avatar.jpg'),
 			officerInfo: {},
 			editing: '',
 			editedValue: '',
-			useMode: 0, //0 for info, 1 for edit topics, 2 for edit fields
-			topicEditing: -1,
+			selectedTopic: -1,
+			topicEditing: false,
 			topicEditedValue: {},
+			topicAdding: false,
 
 		}
 	},
@@ -303,8 +308,21 @@ export default {
 			this.useMode = mode;
 		},
 
+		selectTopic(i) {
+			if (this.selectedTopic>-1)
+				document.getElementsByClassName('topic-name')[this.selectedTopic].className =
+				document.getElementsByClassName('topic-name')[this.selectedTopic].className.replace(" active", "");
+			this.selectedTopic = i;
+			if (i<0) return;
+			document.getElementsByClassName('topic-name')[i].className += " active";
+		},
+
 		editTopic() {
-			this.officerInfo.researchTopics[this.topicEditing] = {
+			if (!this.topicEditedValue.name) {
+				alert('Chủ đề này chưa có tên.');
+				return;
+			}
+			this.officerInfo.researchTopics[this.selectedTopic] = {
 				name: this.topicEditedValue.name,
 				description: this.topicEditedValue.description
 			};
@@ -312,13 +330,27 @@ export default {
 		},
 
 		topicEditCancel() {
-			this.topicEditing = -1;
+			if (this.topicAdding) {
+				this.officerInfo.researchTopics.splice(this.selectedTopic,1);
+				this.selectTopic(-1);
+				this.topicAdding = false;
+			}
+			this.topicEditing = false;
 		},
 
 		removeTopic(index) {
 			if (confirm("Bạn chắc chắn muốn xóa Chủ đề này chứ?")) {
 				this.officerInfo.researchTopics.splice(index,1);
+				this.selectTopic(-1);
 			}
+		},
+
+		addTopic() {
+			this.officerInfo.researchTopics.push({name: '', description: ''});
+			this.topicEditing = true;
+			this.topicAdding = true;
+			this.topicEditedValue = {name: '', description: ''};
+			this.selectTopic(this.officerInfo.researchTopics.length - 1);
 		}
 	},
 
@@ -393,7 +425,7 @@ export default {
 
 	.navbar div {transition: 0.2s;}
 
-	img {
+	.avatar {
 		vertical-align: middle;
 		border-style: none;
 		margin: 0px 5px;
@@ -424,9 +456,9 @@ export default {
 	.container {margin: 25px 50px 0px 50px;}
 
 	.info-container {
-		margin: 20px 40px 20px 40px;
+		margin: 20px 60px 20px 60px;
 		left: 0;
-		width: 55%;
+		width: 70%;
 	}
 
 	.name {
@@ -438,7 +470,7 @@ export default {
 	.name i, .name label {margin: 0px 5px;}
 
 	.details {
-		display: block;
+		display: inline-block;
 		padding: 5px 0px 5px 35px;
 		color: #455358;
 		font-size: 14px;
@@ -461,10 +493,16 @@ export default {
 
 	.detail-value {word-break: break-all;}
 
-	input {
+	.officer-image {
+		display: inline-block;
+		max-height: 260px;
+		float: right;
+		border: 1px solid gray;
+	}
+
+	input, textarea {
 		display: inline-block;
 		width: 90%;
-		height: 28px;
 		box-sizing: border-box;
 		margin-left: 5px;
 		padding: 6px 10px;
@@ -476,7 +514,7 @@ export default {
 		font: 400 13.3333px Arial;
 	}
 
-	input:focus {
+	input:focus, textarea:focus {
 		border-color: #66afe9;
 		outline: 0;
 		box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
@@ -494,7 +532,7 @@ export default {
 		padding: 0px 5px;
 		vertical-align: middle;
 		cursor: pointer;
-		font-size: 20px;
+		font-size: 22px;
 		position: relative;
 		display: inline-block;
 	}
@@ -535,41 +573,82 @@ export default {
 	.ok-btn   {color: #00e600;}
 	.no-btn	  {color: #e60000;}
 	.edit-btn {color: #0099cc; visibility: hidden;}
-	.topic-edit-btn {color: #0099cc; visibility: hidden;}
-	.del-btn  {color: #455358; visibility: hidden;}
+	.topic-edit-btn {color: #0099cc;}
+	.del-btn  {color: #455358;}
 	.edit-btn:hover, .ok-btn:hover, .no-btn:hover, .del-btn:hover, .topic-edit-btn:hover {color: #ffcd1f;}
 	i:hover .tooltip-text {visibility: visible;}
-	tr:hover td .del-btn, tr:hover td .topic-edit-btn {visibility: visible;}
+
+	.add-btn {
+		padding: 0px 10px;
+		margin-left: -39px;
+		color: #1FA67A;
+	}
 
 	.bold {font-weight: bold; color: black;}
 
 	.research-topic {
-		margin: 20px 40px 20px 40px;
+		padding: 20px 40px 20px 40px;
 	}
 
 	.interested-field {
-		margin: 20px 40px 20px 40px;
+		padding: 20px 40px 20px 40px;
 	}
 
-	.container div span.big-field-title {
-		font-size: 16px;
+	.big-field-title {
+		font-size: 17px;
 		font-weight: bold;
 		background-color: #ffcccc;
-		color: #3E5252;
 		border-top: 3px solid #ff4d4d;
 		padding: 7px 15px;
 		display: inline-block;
-		cursor: pointer;
+		width: 274px;
+		vertical-align: middle;
+		text-align: center;
 	}
 
-	.container div span.big-field-title:hover {background-color: #ffb3b3;}
+	.sec-field-title {
+		font-size: 17px;
+		font-weight: bold;
+		padding: 7px 15px;
+		display: inline-block;
+		width: 60%;
+		overflow: hidden;
+		vertical-align: middle;
+		text-align: center;
+		border-top: 3px solid #ff8a5c;
+		background-color: #ffc8b3;
+	}
 
-	.show-field {
+	.name-field {
 		transition: 0.2s;
 		border: 2px solid;
-		border-color: #ffcccc transparent transparent #ffcccc;
-		padding: 5px;
-		overflow: auto;
+		border-color: #ffcccc #ffcccc #ffcccc #ffcccc;
+		width: 300px;
+		height: 300px;
+		background-color: #f8f8f8;
+		overflow-y: auto;
+		display: inline-block;
+	}
+
+	.show-field {
+		display: inline-block;
+		height: 300px;
+		width: 60%;
+		overflow-y: auto;
+		background-color: #f8f8f8;
+		border: 2px solid;
+		border-color: #ffc8b3 #ffc8b3 #ffc8b3 #ffc8b3;
+		padding: 0px 13px;
+	}
+
+	.content-show {
+		display: block;
+		padding: 15px 10px 10px 20px;
+		font-size: 14px;
+	}
+
+	.content-show span {
+		white-space: pre-wrap;
 	}
 
 	::-webkit-scrollbar {
@@ -589,51 +668,32 @@ export default {
 
 	::-webkit-scrollbar-thumb:hover {background: #3EB3F6;}
 
-	table {
-		border-spacing: 0px;
-		margin-top: 8px;
+	ul {
+		margin: 0px;
+		padding: 0px;
+		list-style-type: none;
 	}
 
-	.table-bound {
-		font-family: "Helvetica", sans-serif;
-		border-collapse: collapse;
-		width: 80%;
-		margin-left: 10%;
-	}
-
-	.table-bound td, .table-bound th {
-		border: 1px solid #ddd;
-		padding: 6px 8px;
-	}
-
-	.table-bound tr td:nth-child(4){
-		background-color: #fff;
-		border: none;
-		vertical-align: middle;
-	}
-
-	.table-bound tr:nth-child(even){background-color: #f2f2f2;}
-
-	.table-bound tr:hover {background-color: #ddd;}
-
-	.table-bound tr:nth-child(1) td[class="icon-domain"] {
-		background-color: #fff;
-		border: none;
-	}
-
-	.table-bound th {
-		padding: 9px 8px;
-		text-align: center;
-		background-color: #4CAF50;
-		color: white;
+	ul li {
+		padding: 13px 20px;
+		background-color: #E0EDF4;
+		cursor: pointer;
 		font-size: 14px;
+		color: #3E5252;
 	}
 
-	.table-bound td {font-size: 13px;}
+	ul li:hover {
+		background-color: #fff9b3;
+	}
 
-	.stt {text-align: center;}
+	.topic-list li.active {
+		border-left: 3px solid #ffcd1f;
+		background-color: #fff9b3;
+		font-weight: bold;
+		font-size: 15px;
+	}
 
 	* {
-		line-height: 1.5;
+		line-height: 1.3;
 	}
 </style>
