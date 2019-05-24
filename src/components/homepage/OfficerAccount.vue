@@ -53,7 +53,7 @@
 
 				<tr v-for="(officer, i) in list">
 					<td class="stt">{{ i+1 }}</td>
-					<td v-for="(content, key, j) in officer" @dblclick="editing=(i+'_'+j); editedValue=content; editKey=key">
+					<td v-for="(content, key, j) in officer" v-if="j<7" @dblclick="editing=(i+'_'+j); editedValue=content; editKey=key">
 						<label v-if="editing != (i+'_'+j)">{{ content }}</label>
 						<input class="edit-input" type="text" v-else v-model="editedValue" v-focus
 								@keyup.esc="editCancel"
@@ -92,61 +92,71 @@ export default {
 			adding: false,
 			searching: false,
 			searched: false,
-			newOfficer: {id:'', name:'', account:'', mail:'', position:'', degree:'', unit:''},
+			newOfficer: {staff_number:'', name:'', account:'', mail:'', position:'', degree:'', unit:''},
 		}
 	},
 
 	// Get data from server to this.list
 	created() {
-		this.$http.get('http://localhost/uFaculty/Research/ResearchControl/getAll')
+		/* INSERT CODE HERE */
+		this.$http.get('http://localhost/uFaculty/staff/StaffController/adminListStaff')
 				.then(function (data) {
-					var rawData = data.body.data;
-					var root = {id: 0, name: 'Root', children: []}
-					for (var idx in rawData) {
-						if (rawData[idx].parent_id == 0) {
-							root.children.push(this.recursive(rawData[idx],rawData));
-						}
+					console.log(data);
+					this.list = [];
+					for(var idx in data.body.data) {
+						this.list.push({
+							staff_number : data.body.data[idx].staff_number,
+							full_name : decodeURIComponent(escape(data.body.data[idx].full_name)),
+							account : data.body.data[idx].username,
+							vnu_email : data.body.data[idx].vnu_email,
+							staff_type : decodeURIComponent(escape(data.body.data[idx].staff_type)),
+							academic_title : decodeURIComponent(escape(data.body.data[idx].academic_title)),
+							unit : decodeURIComponent(escape(data.body.data[idx].name)),
+							account_id: data.body.data[idx].account_id,
+							staff_id: data.body.data[idx].staff_id
+						});
 					}
-					this.treeData = root;
+					//console.log(account_id);
 				})
 	},
 
 	methods: {
-		recursive(rawNode, rawData) {
-			var node = {id: rawNode.research_id, name: rawNode.name, children: []}
-			for (var idx in rawData) {
-				if (rawData[idx].parent_id == rawNode.research_id) {
-					node.children.push(this.recursive(rawData[idx], rawData))
-				}
-			}
-			return node;
-		},
-		
 		// add some random accounts to the list
 		initRandomList() {
-			var officers = [];
-			officers.push(new OfficerAccount("1231","Hồ Văn Canh","canhkas","jashdj@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ Công an"));
-			officers.push(new OfficerAccount("3643","Lê Phê Đô","ádasd","ádasdsa@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ Công an"));
-			officers.push(new OfficerAccount("345sd","Minh Châu","sdfv","ádwqr@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ Công an"));
-			officers.push(new OfficerAccount("ád34","Hồ Văn Cường","ádadasđ","gdfdfgdf@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ Công an"));
-
-			for (var i in officers)
-				this.list.push({
-					id : officers[i].id,
-					name : officers[i].name,
-					position : officers[i].position,
-					account : officers[i].account,
-					mail : officers[i].mail,
-					degree : officers[i].degree,
-					unit : officers[i].unit
-				});
+			this.$http.get('http://localhost/uFaculty/staff/StaffController/adminListStaff')
+					.then(function (data) {
+						//console.log(data);
+						this.list = [];
+						for(var idx in data.body.data) {
+							var full_name= decodeURIComponent(escape(data.body.data[idx].full_name));
+							var staff_type= decodeURIComponent(escape(data.body.data[idx].staff_type));
+							var academic_title= decodeURIComponent(escape(data.body.data[idx].academic_title));
+							var staff_id= data.body.data[idx].staff_id;
+							var vnu_email= data.body.data[idx].vnu_email;
+							var unit = decodeURIComponent(escape(data.body.data[idx].name));
+							var account = data.body.data[idx].username;
+							this.list.push(new OfficerAccount(staff_id,full_name,account,vnu_email,staff_type,academic_title,unit));
+						}
+						//console.log(full_name);
+					});
 		},
+
 
 		// edit the selected value after acceptance
 		valueEditing(i, j) {
 			j = (j|| this.editKey);
 			this.editing = '';
 			this.list[i][j] = this.editedValue;
+			var url = 'http://localhost/uFaculty/staff/StaffController/adminEditStaff';
+			this.$http.post(url,{
+				staff_id: this.list[i].staff_id,
+				full_name: this.list[i].full_name,
+				vnu_email: this.list[i].vnu_email,
+				staff_type: this.list[i].staff_type,
+				academic_title: this.list[i].academic_title
+			}).then(function (data) {
+				console.log(data);
+			})
 		},
 
 		// cancel editing value
@@ -218,7 +228,14 @@ export default {
 		// delete an account
 		removeAccount(i) {
 			if(confirm("Bạn chắc chắn muốn xóa Tài khoản Cán bộ này chứ?")){
-				this.list.splice(i,1);
+				var url = 'http://localhost/uFaculty/account/AccountController/deleteUser';
+				this.$http.post(url,{
+					account_id: this.list[i].account_id
+				}).then(function (data) {
+					console.log(data);
+					this.list.splice(i,1);
+				})
+
 			}
 
 		}

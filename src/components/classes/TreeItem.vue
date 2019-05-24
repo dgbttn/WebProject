@@ -82,18 +82,19 @@ export default {
 		},
 
 		addItem() {
+			if (!this.isFolder) this.makeFolder();
+			this.isOpen = true;
 			var url = 'http://localhost/uFaculty/Research/ResearchControl/create';
 			this.$http.post(url,{parent_id: this.item.id, name: 'New item'})
 					.then(function (data) {
-						if (!this.isFolder) this.makeFolder();
-						this.isOpen = true;
-						this.$emit('add-item', this.item);
+						this.$emit('add-item', {item: this.item, id: data.body.data[0].research_id});
 					})
 		},
 
 		editValue() {
+
 			var url = 'http://localhost/uFaculty/Research/ResearchControl/update';
-			this.$http.post(url,{id: this.item.id,name: this.item.name})
+			this.$http.post(url,{id: this.item.id,name: this.editedValue})
 					.then(function (data) {
 						this.item.name = this.editedValue;
 						this.editCancel();

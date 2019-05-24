@@ -39,7 +39,7 @@ export default {
 		this.$http.get('http://localhost/uFaculty/Research/ResearchControl/getAll')
 				.then(function (data) {
 					var rawData = data.body.data;
-					var root = {id: 0, name: 'Root', children: []}
+					var root = {id: 0, name: 'Lĩnh vực nghiên cứu', children: []}
 					for (var idx in rawData) {
 						if (rawData[idx].parent_id == 0) {
 							root.children.push(this.recursive(rawData[idx],rawData));
@@ -51,7 +51,7 @@ export default {
 
 	methods: {
 		recursive(rawNode, rawData) {
-			var node = {id: rawNode.research_id, name: rawNode.name, children: []}
+			var node = {id: rawNode.research_id, name: decodeURIComponent(escape(rawNode.name)), children: []}
 			for (var idx in rawData) {
 				if (rawData[idx].parent_id == rawNode.research_id) {
 					node.children.push(this.recursive(rawData[idx], rawData))
@@ -96,10 +96,9 @@ export default {
 			Vue.set(item, 'children', []);
 		},
 
-		addItem(item) {
+		addItem(data) {
 			//generate id
-
-			item.children.push({id: '', name: 'New item'});
+			data.item.children.push({id: data.id, name: 'New item'});
 		},
 
 		findParents(node, id) {
@@ -116,6 +115,12 @@ export default {
 		removeSubTree(node) {
 			for (var i in node.children)
 				this.removeSubTree(node.children[i]);
+			var url = 'http://localhost/uFaculty/Research/ResearchControl/delete';
+			this.$http.post(url, {
+				id: node.id
+			}).then(function ($data) {
+
+			})
 
 			// call remove node to server
 
