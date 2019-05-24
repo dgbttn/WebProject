@@ -10,7 +10,7 @@
 
 		<!-- the demo root element -->
 		<div class="tree-bound">
-			<TreeItem class="item" :item="treeData"
+			<TreeItem class="item" :item="treeData" :checkbox="false"
 				@make-folder="makeFolder"
 				@add-item="addItem"
 				@remove-item="removeItem">
@@ -36,17 +36,17 @@ export default {
 	},
 
 	created() {
-		this.$http.get('http://localhost/uFaculty/Research/ResearchControl/getAll')
-				.then(function (data) {
-					var rawData = data.body.data;
-					var root = {id: 0, name: 'Lĩnh vực nghiên cứu', children: []}
-					for (var idx in rawData) {
-						if (rawData[idx].parent_id == 0) {
-							root.children.push(this.recursive(rawData[idx],rawData));
-						}
-					}
-					this.treeData = root;
-				})
+		// this.$http.get('http://localhost/uFaculty/Research/ResearchControl/getAll')
+		// 		.then(function (data) {
+		// 			var rawData = data.body.data;
+		// 			var root = {id: 0, name: 'Root', children: []}
+		// 			for (var idx in rawData) {
+		// 				if (rawData[idx].parent_id == 0) {
+		// 					root.children.push(this.recursive(rawData[idx],rawData));
+		// 				}
+		// 			}
+		// 			this.treeData = root;
+		// 		})
 	},
 
 	methods: {
@@ -96,9 +96,11 @@ export default {
 			Vue.set(item, 'children', []);
 		},
 
-		addItem(data) {
+		addItem(item, data) {
 			//generate id
-			data.item.children.push({id: data.id, name: 'New item'});
+
+			// item.children.push({id: '', name: 'New item'});
+			item.children.push({id: data.newID, name: 'New item'});
 		},
 
 		findParents(node, id) {
@@ -115,14 +117,11 @@ export default {
 		removeSubTree(node) {
 			for (var i in node.children)
 				this.removeSubTree(node.children[i]);
+
 			var url = 'http://localhost/uFaculty/Research/ResearchControl/delete';
 			this.$http.post(url, {
 				id: node.id
-			}).then(function ($data) {
-
 			})
-
-			// call remove node to server
 
 			node.children = [];
 		},

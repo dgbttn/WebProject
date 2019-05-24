@@ -12,10 +12,13 @@
 						v-focus v-model="editedValue"
 						@keyup.esc="editCancel"
 						@keyup.enter="editValue">
-				</input>
 			</div>
 
-			<div v-if="!editing" class="tool-btn">
+			<div v-if="checkbox" class="select-btn">
+
+			</div>
+
+			<div v-if="!editing&&!checkbox" class="tool-btn">
 				<i class="fa fa-pencil edit-btn" v-on:click="editing=true; editedValue=item.name">
 					<span class="tooltip-text">Sửa</span>
 				</i>
@@ -27,7 +30,7 @@
 				</i>
 			</div>
 
-			<div v-if="editing" class="confirm-domain">
+			<div v-if="editing&&!checkbox" class="confirm-domain">
 				<i class="fa fa-check-circle confirm-btn ok-btn" v-on:click="editValue">
 					<span class="tooltip-text">Xác nhận</span>
 				</i>
@@ -38,7 +41,7 @@
 		</div>
 
 		<ul class="children-list" v-show="isOpen" v-if="isFolder">
-			<TreeItem class="item" v-for="(child, index) in item.children" :item="child"
+			<TreeItem class="item" v-for="(child, index) in item.children" :item="child" :checkbox="checkbox"
 						@make-folder="$emit('make-folder', $event)"
 						@add-item="$emit('add-item', $event)"
 						@remove-item="$emit('remove-item', $event)">
@@ -51,7 +54,8 @@
 export default {
 	name: 'TreeItem',
 	props: {
-		item: Object
+		item: Object,
+		checkbox: Boolean
 	},
 
 	data() {
@@ -82,23 +86,22 @@ export default {
 		},
 
 		addItem() {
-			if (!this.isFolder) this.makeFolder();
-			this.isOpen = true;
-			var url = 'http://localhost/uFaculty/Research/ResearchControl/create';
-			this.$http.post(url,{parent_id: this.item.id, name: 'New item'})
-					.then(function (data) {
-						this.$emit('add-item', {item: this.item, id: data.body.data[0].research_id});
-					})
+			// var url = 'http://localhost/uFaculty/Research/ResearchControl/create';
+			// this.$http.post(url,{parent_id: this.item.id, name: 'New item'})
+			// 		.then(function (data) {
+			// 			if (!this.isFolder) this.makeFolder();
+			// 			this.isOpen = true;
+			// 			this.$emit('add-item', this.item, {newID: data.body.data[0].research_id});
+			// 		})
 		},
 
 		editValue() {
-
-			var url = 'http://localhost/uFaculty/Research/ResearchControl/update';
-			this.$http.post(url,{id: this.item.id,name: this.editedValue})
-					.then(function (data) {
-						this.item.name = this.editedValue;
-						this.editCancel();
-					})
+			// var url = 'http://localhost/uFaculty/Research/ResearchControl/update';
+			// this.$http.post(url,{id: this.item.id,name: this.editedValue})
+			// 		.then(function (data) {
+			// 			this.item.name = this.editedValue;
+			// 			this.editCancel();
+			// 		})
 		},
 
 		editCancel() {
@@ -193,7 +196,6 @@ export default {
 	}
 
 	.tooltip-text {
-		word-wrap: normal;
 		word-wrap: normal;
 		visibility: hidden;
 		width: auto;

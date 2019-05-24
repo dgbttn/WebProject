@@ -52,8 +52,8 @@
 					<td v-for="(content, key, j) in unit" v-if="j>0" @dblclick="editing=(i+'_'+j); editedValue=content; editKey=key">
 						<label v-if="editing != (i+'_'+j)">{{ content }}</label>
 						<input class="edit-input" type="text" v-else v-model="editedValue" v-focus
-						@keyup.esc="editCancel"
-						@keyup.enter="valueEditing(i,key)">
+								@keyup.esc="editCancel"
+								@keyup.enter="valueEditing(i,key)">
 					</td>
 					<td class="confirm-domain">
 						<i v-if="editing.startsWith(i+'_')" class="fa fa-check confirm-btn ok-btn" v-on:click="valueEditing(i,)">
@@ -95,19 +95,19 @@ export default {
 
 	// Get data from server to this.list
 	created() {
-		this.$http.get('http://localhost/uFaculty/Faculty/FacultyControl/getAllUetOwner')
-				.then(function (data) {
-					this.list = [];
-					for(var idx in data.body.data) {
-						var name= decodeURIComponent(escape(data.body.data[idx].name));
-						var address= decodeURIComponent(escape(data.body.data[idx].address));
-						var type= decodeURIComponent(escape(data.body.data[idx].type));
-						var id= data.body.data[idx].faculty_id;
-						var phone= data.body.data[idx].phone_number;
-						var website = data.body.data[idx].website;
-						this.list.push(new Unit(id,name,type,address,phone,website));
-					}
-				})
+		// this.$http.get('http://localhost/uFaculty/Faculty/FacultyControl/getAllUetOwner')
+		// 		.then(function (data) {
+		// 			this.list = [];
+		// 			for(var idx in data.body.data) {
+		// 				var name= decodeURIComponent(escape(data.body.data[idx].name));
+		// 				var address= decodeURIComponent(escape(data.body.data[idx].address));
+		// 				var type= decodeURIComponent(escape(data.body.data[idx].type));
+		// 				var id= data.body.data[idx].faculty_id;
+		// 				var phone= data.body.data[idx].phone_number;
+		// 				var website = data.body.data[idx].website;
+		// 				this.list.push(new Unit(id,name,type,address,phone,website));
+		// 			}
+		// 		})
 	},
 
 	methods: {
@@ -138,15 +138,15 @@ export default {
 			this.list[i][j] = this.editedValue;
 			this.editCancel();
 			// server
-			var url = 'http://localhost/uFaculty/Faculty/FacultyControl/update';
-			this.$http.post(url,{
-				id: this.list[i].id,
-				name: this.list[i].name,
-				type: this.list[i].type,
-				address: this.list[i].address,
-				phone: this.list[i].phone,
-				website: this.list[i].website
-			})
+			// var url = 'http://localhost/uFaculty/Faculty/FacultyControl/update';
+			// this.$http.post(url,{
+			// 	id: this.list[i].id,
+			// 	name: this.list[i].name,
+			// 	type: this.list[i].type,
+			// 	address: this.list[i].address,
+			// 	phone: this.list[i].phone,
+			// 	website: this.list[i].website
+			// })
 		},
 
 		// cancel editing value
@@ -177,18 +177,18 @@ export default {
 				return;
 			}
 
-			var url = 'http://localhost/uFaculty/Faculty/FacultyControl/create';
-			this.$http.post(url,{
-				name: this.newUnit.name,
-				type: this.newUnit.type,
-				address: this.newUnit.address,
-				phone: this.newUnit.phone,
-				website: this.newUnit.website
-			}).then(function (data) {
-				this.newUnit.id = data.body.data[0].faculty_id;
-				this.list.push(this.newUnit);
-				this.addCancel();
-			})
+			// var url = 'http://localhost/uFaculty/Faculty/FacultyControl/create';
+			// this.$http.post(url,{
+			// 	name: this.newUnit.name,
+			// 	type: this.newUnit.type,
+			// 	address: this.newUnit.address,
+			// 	phone: this.newUnit.phone,
+			// 	website: this.newUnit.website
+			// }).then(function (data) {
+			// 	this.newUnit.id = data.body.data[0].faculty_id;
+			// 	this.list.push(this.newUnit);
+			// 	this.addCancel();
+			// })
 		},
 
 		// cancel adding new unit
@@ -229,12 +229,12 @@ export default {
 		// delete an unit
 		removeUnit(i) {
 			if(confirm("Bạn chắc chắn muốn xóa Đơn vị này chứ?")){
-				var url = 'http://localhost/uFaculty/Faculty/FacultyControl/delete';
-				this.$http.post(url, {
-					id: this.list[i].id
-				}).then(function ($data) {
-					this.list.splice(i,1);
-				})
+				// var url = 'http://localhost/uFaculty/Faculty/FacultyControl/delete';
+				// this.$http.post(url, {
+				// 	id: this.list[i].id
+				// }).then(function ($data) {
+				// 	this.list.splice(i,1);
+				// })
 			}
 
 		}
@@ -401,7 +401,6 @@ export default {
 		font-family: hurme_no2-webfont,-apple-system,BlinkMacSystemFont,sans-serif;
 		font-size: 12px;
 		font-weight: 600;
-		transition: 0.2s;
 	}
 
 	.tooltip-text::after {

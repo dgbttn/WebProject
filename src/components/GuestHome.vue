@@ -2,7 +2,7 @@
 	<app-root name="app-root">
 		<div class="header">
 			<nav class="navbar">
-				<div class="backward-btn">
+				<div v-show="useMode==1" class="backward-btn" v-on:click="back">
 					<a class="nav-link">
 						<i class="fa fa-chevron-left"></i>
 						<span>Back</span>
@@ -28,7 +28,7 @@
 			<button type="button" v-on:click="initRandomList">Tạo mặc định</button>
 		</div>
 
-		<div class="content-bound">
+		<div v-show="useMode==0" class="content-bound">
 			<div class="search-field">
 				<div class="tabs-navigation">
 					<span class="tab-item unit-search-btn active" v-on:click="openSearchItem(0)">
@@ -40,7 +40,7 @@
 				</div>
 
 				<div class="search-container">
-					<div class="search-content unit-search" id="unit-search">
+					<div v-show="searchRule==0" class="search-content unit-search">
 						<ul class="unit-list">
 							<li v-for="(unit, i) in unitList"
 								v-on:click="selectUnit(i)"
@@ -49,7 +49,7 @@
 							</li>
 						</ul>
 					</div>
-					<div class="search-content field-search" id="field-search">
+					<div v-show="searchRule==1" class="search-content field-search">
 
 					</div>
 				</div>
@@ -81,7 +81,49 @@
 						</tr>
 					</table>
 				</div>
+			</div>
+		</div>
 
+		<div v-show="useMode==1" class="officer-info">
+			<div class="info-container">
+				<div class="name">
+					<i class="fa fa-user"></i>
+					<label >{{infoList[4]}}. {{infoList[0]}}</label>
+				</div>
+
+				<div class="details">
+					<div class="detail-fields" v-for = "(field, i) in infoTitleList">
+						<i class="info-icon" :class="infoIconList[i]"></i>
+						<label >{{infoTitleList[i]}}:&nbsp{{infoList[i+1]}}</label>
+					</div>
+				</div>
+			</div>
+
+			<div class="research-topic">
+				<span class="big-field-title">
+					Chủ đề nghiên cứu
+				</span>
+				<div class="show-field">
+					<ul class="topic-list">
+						<li	v-for="topic in officerInfo.researchTopics">
+							{{topic.name}}
+						</li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="interested-field">
+				<span class="big-field-title">
+					Lĩnh vực quan tâm
+				</span>
+
+				<div class="show-field">
+					<ul class="field-list">
+						<li v-for="field in officerInfo.interestedFields">
+							{{field}}
+						</li>
+					</ul>
+				</div>
 			</div>
 		</div>
 
@@ -95,50 +137,55 @@ export default {
 	name: 'GuestHome',
 	data() {
 		return {
-			title:'Tìm kiếm giảng viên',
+			titles: ['Tìm kiếm giảng viên', 'Thông tin giảng viên'],
 			username: 'Sinh viên',
 			searchRule: 0, // =0 for unit, =1 for field
 			selectedUnit: -1,
 			selectedField: -1,
 			selectedFieldName: '',
 			selectedOfficer: -1,
+			officerInfo: {},
 			unitList: [],
 			fieldList: [],
-			officerList: []
+			officerList: [],
+			useMode: 0, //0 for search officers, 1 for show selected officer's info
+
 		}
 	},
 
 	created() {
-		this.$http.get('http://localhost/uFaculty/Faculty/FacultyControl/getAll')
-				.then(function (data) {
-					this.unitList = [];
-					for(var i in data.body.data) {
-						this.unitList.push({
-							id: data.body.data[i].faculty_id,
-							name: decodeURIComponent(escape(data.body.data[i].name))
-						});
-					}
-				})
-
-
-		this.$http.get('http://localhost/uFaculty/Staff/StaffController/getAll')
-				.then(function (data) {
-					this.officerList = [];
-					for(var i in data.body.data) {
-						this.officerList.push({
-							id : data.body.data[i].staff_id,
-							name : decodeURIComponent(escape(data.body.data[i].full_name)),
-							position : decodeURIComponent(escape(data.body.data[i].staff_type)),
-							mail : decodeURIComponent(escape(data.body.data[i].vnu_email)),
-							degree : decodeURIComponent(escape(data.body.data[i].academic_title)),
-							unit_id : data.body.data[i].faculty_id,
-							account_id : data.body.data[i].account_id
-						});
-					}
-				})
+		// this.$http.get('http://localhost/uFaculty/Faculty/FacultyControl/getAll')
+		// 		.then(function (data) {
+		// 			this.unitList = [];
+		// 			for(var i in data.body.data) {
+		// 				this.unitList.push({
+		// 					id: data.body.data[i].faculty_id,
+		// 					name: decodeURIComponent(escape(data.body.data[i].name))
+		// 				});
+		// 			}
+		// 		})
+		// this.$http.get('http://localhost/uFaculty/Staff/StaffController/getAll')
+		// 		.then(function (data) {
+		// 			this.officerList = [];
+		// 			for(var i in data.body.data) {
+		// 				this.officerList.push({
+		// 					id : data.body.data[i].staff_id,
+		// 					name : decodeURIComponent(escape(data.body.data[i].full_name)),
+		// 					position : decodeURIComponent(escape(data.body.data[i].staff_type)),
+		// 					mail : decodeURIComponent(escape(data.body.data[i].vnu_email)),
+		// 					degree : decodeURIComponent(escape(data.body.data[i].academic_title)),
+		// 					unit_id : data.body.data[i].faculty_id,
+		// 					account_id : data.body.data[i].account_id
+		// 				});
+		// 			}
+		// 		})
 	},
 
 	computed: {
+		title() {
+			return this.titles[this.useMode];
+		},
+
 		showLabel() {
 			// unit
 			if (this.searchRule==0) {
@@ -150,7 +197,6 @@ export default {
 				if (this.selectedField<0) return '';
 				return 'Danh sách Giảng viên quan tâm Lĩnh vực ' + this.selectedFieldName;
 			}
-			return '';
 		},
 
 		showOfficerList() {
@@ -159,69 +205,147 @@ export default {
 			//unit
 			if (this.searchRule==0) {
 				if (this.selectedUnit<0) return uList;
-				for (var i in this.officerList) {
+				for (var i in this.officerList)
 					if (this.officerList[i].unit_id == this.unitList[this.selectedUnit].id) {
 						var chosenOne = this.officerList[i];
 						chosenOne.unit = this.unitList[this.selectedUnit].name;
 						uList.push(chosenOne);
 					}
-				}
 				return uList;
 			}
 
+			// field
 			if (this.searchRule==1) {
 				return uList;
 			}
 		},
+
+		infoList() {
+			return [
+				this.officerInfo.name,
+				this.officerInfo.number,
+				this.officerInfo.position,
+				this.officerInfo.unit,
+				this.officerInfo.degree,
+				this.officerInfo.phone,
+				this.officerInfo.VNUmail,
+				this.officerInfo.otherMail,
+				this.officerInfo.website,
+				this.officerInfo.address
+			]
+		},
+
+		infoFields() {
+			return [
+				'name:',
+				'number',
+				'position',
+				'unit',
+				'degree',
+				'phone',
+				'VNUmail',
+				'otherMail',
+				'website',
+				'address'
+			]
+		},
+
+		infoTitleList() {
+			return [
+				'Mã cán bộ',
+				'Chức vụ',
+				'Đơn vị',
+				'Học hàm, học vị',
+				'Số điện thoại',
+				'VNU email',
+				'Email khác',
+				'Website',
+				'Địa chỉ'
+			]
+		},
+
+		infoIconList() {
+			return [
+				"fa fa-id-card-o",
+				"fa fa-briefcase",
+				"fa fa-flag",
+				"fa fa-graduation-cap",
+				"fa fa-phone",
+				"fa fa-envelope",
+				"fa fa-envelope-o",
+				"fa fa-paper-plane",
+				"fa fa-map-marker"
+			]
+		},
+
 	},
 
 	methods: {
 		initRandomList() {
-			this.unitList.push('Bộ môn các hệ thống thông tin');
-			this.unitList.push('Bộ môn Công nghệ phần mềm');
-			this.unitList.push('Bộ môn Khoa học máy tính');
-			this.unitList.push('Bộ Công an');
+			this.unitList.push({id: 1, name:'Bộ môn các hệ thống thông tin'});
+			this.unitList.push({id: 2, name:'Bộ môn Công nghệ phần mềm'});
+			this.unitList.push({id: 3, name:'Bộ môn Khoa học máy tính'});
+			this.unitList.push({id: 4, name:'Bộ Công an'});
 
 			let officers = [];
-			officers.push(new OfficerAccount("1231","Hồ Văn Canh","canhkas","jashdj@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ Công an"));
-			officers.push(new OfficerAccount("3643","Lê Phê Đô","ádasd","ádasdsa@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ môn Công nghệ phần mềm"));
-			officers.push(new OfficerAccount("345sd","Minh Châu","sdfv","ádwqr@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ Công an"));
-			officers.push(new OfficerAccount("ád34","Hồ Văn Cường","ádadasđ","gdfdfgdf@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ Công an"));
+			officers.push(new OfficerAccount("1231","Hồ Văn Canh","canhkas","jashdj@vnu.edu.vn","Giảng viên","Tiến sĩ",4));
+			officers.push(new OfficerAccount("3643","Lê Phê Đô","ádasd","ádasdsa@vnu.edu.vn","Giảng viên","Tiến sĩ",2));
+			officers.push(new OfficerAccount("345sd","Minh Châu","sdfv","ádwqr@vnu.edu.vn","Giảng viên","Tiến sĩ",4));
+			officers.push(new OfficerAccount("ád34","Hồ Văn Cường","ádadasđ","gdfdfgdf@vnu.edu.vn","Giảng viên","Tiến sĩ",4));
 
 			for (var i in officers)
 				this.officerList.push({
-					id : officers[i].id,
+					number : officers[i].number,
 					name : officers[i].name,
 					position : officers[i].position,
 					account : officers[i].account,
 					mail : officers[i].mail,
 					degree : officers[i].degree,
-					unit : officers[i].unit
+					unit_id : officers[i].unit,
 				});
+
+			this.officerInfo = {
+				name:'Lê Đình Thanh',
+				number:'12334',
+				position:'Giảng viên',
+				unit:'Phòng Thí nghiệm An toàn Thông tin',
+				degree:'TS',
+				phone:'0987654321',
+				VNUmail:'thanhld@vnu.edu.vn',
+				otherMail:'thanhld.vnuh@gmail.com',
+				website:'https://uet.vnu.edu.vn/~thanhld',
+				address:'Phòng 413 - E3',
+				staff_id: '',
+				researchTopics: [],
+				interestedFields: []
+			};
+
+			this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
+			this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
+			this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
+
+			this.officerInfo.interestedFields.push('Network security');
+			this.officerInfo.interestedFields.push('Web application security');
+			this.officerInfo.interestedFields.push('Web protocol security');
+			this.officerInfo.interestedFields.push('Web application security');
 		},
 
 		openSearchItem(index) {
 			let Ubtn = document.getElementsByClassName('unit-search-btn')[0];
 			let Fbtn = document.getElementsByClassName('field-search-btn')[0];
-			let Usf = document.getElementsByClassName('unit-search')[0];
-			let Fsf = document.getElementsByClassName('field-search')[0];
 
-			Fsf.style.display = "none";
 			Fbtn.className = Fbtn.className.replace(" active", "");
-			Usf.style.display = "none";
 			Ubtn.className = Ubtn.className.replace(" active", "");
 
 			this.searchRule = index;
 
 			// select unit
 			if (index==0) {
-				Usf.style.display = "block";
 				Ubtn.className += " active";
 			}
 
 			// select field
 			if (index==1) {
-				Fsf.style.display = "block";
 				Fbtn.className += " active";
 			}
 		},
@@ -232,6 +356,12 @@ export default {
 
 		selectOfficer(id) {
 			this.selectedOfficer = id;
+			// this.officerInfo = ....
+			this.useMode = 1;
+		},
+
+		back() {
+			this.useMode = 0;
 		}
 	}
 }
@@ -279,7 +409,6 @@ export default {
 		float: right;
 		margin-top: 1px;
 		background-color: inherit;
-		width: 180px;
 	}
 
 	.backward-btn {
@@ -301,7 +430,7 @@ export default {
 	.navbar div {transition: 0.2s;}
 
 	.title {
-		margin-top: 60px;
+		margin-top: 65px;
 		margin-left: 50px;
 		margin-right: 50px;
 	}
@@ -319,14 +448,14 @@ export default {
 	}
 
 	.search-field {
-		margin-top: 10px;
-		margin-left: 10px;
+		margin-top: 24px;
+		margin-left: 5%;
 		width: 35%;
-		float: left;
-		display: block;
+		left: 0;
+		position: fixed;
 	}
 
-	.tab-item {
+	.content-bound .tab-item {
 		font-size: 16px;
 		background-color: #f1efda;
 		padding: 10px 15px;
@@ -334,9 +463,9 @@ export default {
 		display: inline-block;
 	}
 
-	.tab-item:hover {background-color: #e3dfb5;}
+	.content-bound .tab-item:hover {background-color: #e3dfb5;}
 
-	.tabs-navigation span.active {
+	.content-bound .tabs-navigation span.active {
 		font-weight: bold;
 		background-color: #d9e9f2;
 		color: #3E5252;
@@ -344,7 +473,7 @@ export default {
 	}
 
 	.search-container {
-		transition: 0.2;
+		transition: 0.2s;
 		border: 2px solid;
 		border-color: #d9e9f2 transparent #d9e9f2 #d9e9f2;
 		padding: 5px;
@@ -360,7 +489,6 @@ export default {
 	::-webkit-scrollbar-track {
 		border: 1px solid #ff8080;
 		border-radius: 8px;
-
 	}
 
 	::-webkit-scrollbar-thumb {
@@ -372,7 +500,7 @@ export default {
 		background: #ff4d4d;
 	}
 
-	.unit-list {
+	.content-bound .unit-list {
 		list-style-type: none;
 		font-size: 14.5px;
 		padding-left: 30px;
@@ -381,19 +509,18 @@ export default {
 		margin: 0px 0px;
 	}
 
-	.unit-list li {
+	.content-bound .unit-list li {
 		margin: 1.5px 0px;
 		cursor: pointer;
 		color: #40bf9f;
 	}
 
-	.unit-list li:hover {color: #2d8386;}
+	.content-bound .unit-list li:hover {color: #2d8386;}
 
-	.unit-list li.active {font-weight: bold;}
+	.content-bound .unit-list li.active {font-weight: bold;}
 
-	.show-field {
-		display: inline-block;
-		margin-left: 60px;
+	.content-bound .show-field {
+		margin-left: 43%;
 		margin-top: 10px;
 		text-align: left;
 	}
@@ -442,8 +569,11 @@ export default {
 	.stt {text-align: center;}
 
 	h1 {
-		font-size: 20px;
+		font-size: 22px;
 		text-align: center;
+		font-family: "brandon-grotesque", "Brandon Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+		font-weight: 500;
+		text-transform: uppercase;
 	}
 
 	img {
@@ -453,6 +583,91 @@ export default {
 	}
 
 	a {text-decoration: none;}
+
+	.officer-info {
+		margin: 25px 50px 0px 50px;
+	}
+
+	.info-container {
+		margin-left: 40px;
+		left: 0;
+		width: 35%;
+		position: fixed;
+	}
+
+	.name {
+		font-size: 25px;
+		font-weight: bold;
+		color: #990000;
+	}
+
+	.name i, .name label {margin: 0px 5px;}
+
+	.details {
+		display: block;
+		padding: 5px 0px 5px 20px;
+		color: #455358;
+		font-size: 14px;
+	}
+
+	.detail-fields {margin-top: 3px;}
+
+	.info-icon {
+		padding: 0px 5px;
+		vertical-align: middle;
+		text-align: center;
+		width: 25px;
+		font-size: 18px;
+		display: inline-block;
+	}
+
+	.research-topic {margin-left: 38%;}
+
+	.interested-field {
+		margin-left: 70%;
+		margin-top: -42px;
+	}
+
+	.officer-info div span.big-field-title {
+		font-size: 16px;
+		font-weight: bold;
+		background-color: #ffcccc;
+		color: #3E5252;
+		border-top: 3px solid #ff4d4d;
+		padding: 7px 15px;
+		display: inline-block;
+		cursor: pointer;
+	}
+
+	.officer-info div span.big-field-title:hover {background-color: #ffb3b3;}
+
+	.officer-info .show-field {
+		transition: 0.2s;
+		border: 2px solid;
+		border-color: #ffcccc transparent transparent #ffcccc;
+		padding: 5px;
+		height: 55%;
+		width: 25%;
+		position: fixed;
+		overflow: auto;
+	}
+
+	.officer-info ::-webkit-scrollbar {
+		width: 8px;
+		height: 12px;
+	}
+
+	.officer-info ::-webkit-scrollbar-track {
+		border: 1px solid #3EB3F6;
+		border-radius: 8px;
+	}
+
+	.officer-info ::-webkit-scrollbar-thumb {
+		background: #85cff9;
+		border-radius: 8px;
+	}
+
+	.officer-info ::-webkit-scrollbar-thumb:hover {background: #3EB3F6;}
 
 	*{line-height: 1.5;}
 </style>
