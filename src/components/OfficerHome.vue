@@ -28,7 +28,7 @@
 		</div>
 
 		<div v-show="useMode==0" class="container">
-			<div class="info-container">
+			<div v-if="true" class="info-container">
 				<div class="name">
 					<i class="fa fa-user"></i>
 					<label >{{infoList[4]}}. {{infoList[0]}}</label>
@@ -66,28 +66,36 @@
 				</div>
 			</div>
 
+			<div class="interested-field">
+				<span class="big-field-title" v-on:click="changeUseMode(2)">
+					Lĩnh vực quan tâm
+				</span>
+
+				<div class="name-field">
+					<ul class="field-list">
+						<li v-for="field in officerInfo.interestedFields">
+							{{field}}
+						</li>
+					</ul>
+				</div>
+
+				<div class="show-field">
+					<ul class="field-list">
+						<li v-for="field in officerInfo.interestedFields">
+							{{field}}
+						</li>
+					</ul>
+				</div>
+			</div>
+
 			<div class="research-topic">
 				<span class="big-field-title" v-on:click="changeUseMode(1)">
 					Chủ đề nghiên cứu
 				</span>
 				<div class="show-field">
 					<ul class="topic-list">
-						<li	v-for="topic in researchTopics">
+						<li	v-for="topic in officerInfo.researchTopics">
 							{{topic.name}}
-						</li>
-					</ul>
-				</div>
-			</div>
-
-			<div class="interested-field">
-				<span class="big-field-title" v-on:click="changeUseMode(2)">
-					Lĩnh vực quan tâm
-				</span>
-
-				<div class="show-field">
-					<ul class="field-list">
-						<li v-for="field in interestedFields">
-							{{field}}
 						</li>
 					</ul>
 				</div>
@@ -107,7 +115,7 @@
 						<th>Mô tả</th>
 					</tr>
 
-					<tr v-for="(topic,i) in researchTopics" @dblclick="topicEditing=i; topicEditedValue={name: topic.name, description: topic.description};">
+					<tr v-for="(topic,i) in officerInfo.researchTopics" @dblclick="topicEditing=i; topicEditedValue={name: topic.name, description: topic.description};">
 						<td class="stt">{{i+1}}</td>
 						<td>
 							<label v-if="topicEditing!=i">{{topic.name}}</label>
@@ -158,14 +166,8 @@ export default {
 			titles: ['THÔNG TIN GIẢNG VIÊN', 'chỉnh sửa chủ đề nghiên cứu', 'chỉnh sửa lĩnh vực quan tâm'],
 			username: 'Giảng viên',
 			officerInfo: {},
-			infoFields: [],
-			infoTitleList: [],
-			infoIconList: [],
-			editable: [],
 			editing: '',
 			editedValue: '',
-			researchTopics: [],
-			interestedFields: [],
 			useMode: 0, //0 for info, 1 for edit topics, 2 for edit fields
 			topicEditing: -1,
 			topicEditedValue: {},
@@ -174,7 +176,7 @@ export default {
 	},
 
 	created() {
-		this.editable = [false, false, false, false, true, false, true, true, true];
+
 	},
 
 	computed:{
@@ -185,7 +187,7 @@ export default {
 		infoList() {
 			return [
 				this.officerInfo.name,
-				this.officerInfo.id,
+				this.officerInfo.number,
 				this.officerInfo.position,
 				this.officerInfo.unit,
 				this.officerInfo.degree,
@@ -195,7 +197,56 @@ export default {
 				this.officerInfo.website,
 				this.officerInfo.address
 			]
-		}
+		},
+
+		infoFields() {
+			return [
+				'name:',
+				'number',
+				'position',
+				'unit',
+				'degree',
+				'phone',
+				'VNUmail',
+				'otherMail',
+				'website',
+				'address'
+			]
+		},
+
+		infoTitleList() {
+			return [
+				'Mã cán bộ',
+				'Chức vụ',
+				'Đơn vị',
+				'Học hàm, học vị',
+				'Số điện thoại',
+				'VNU email',
+				'Email khác',
+				'Website',
+				'Địa chỉ'
+			]
+		},
+
+		infoIconList() {
+			return [
+				"fa fa-id-card-o",
+				"fa fa-briefcase",
+				"fa fa-flag",
+				"fa fa-graduation-cap",
+				"fa fa-phone",
+				"fa fa-envelope",
+				"fa fa-envelope-o",
+				"fa fa-paper-plane",
+				"fa fa-map-marker"
+			]
+		},
+
+		editable() {
+			return [false, false, false, false, true, false, true, true, true];
+		},
+
+
 	},
 
 	methods: {
@@ -215,7 +266,7 @@ export default {
 
 			this.officerInfo = {
 				name:'Lê Đình Thanh',
-				id:'12334',
+				number:'12334',
 				position:'Giảng viên',
 				unit:'Phòng Thí nghiệm An toàn Thông tin',
 				degree:'TS',
@@ -223,55 +274,20 @@ export default {
 				VNUmail:'thanhld@vnu.edu.vn',
 				otherMail:'thanhld.vnuh@gmail.com',
 				website:'https://uet.vnu.edu.vn/~thanhld',
-				address:'Phòng 413 - E3'
+				address:'Phòng 413 - E3',
+				staff_id: '',
+				researchTopics: [],
+				interestedFields: []
 			};
 
-			this.infoTitleList = [
-				'Mã cán bộ',
-				'Chức vụ',
-				'Đơn vị',
-				'Học hàm, học vị',
-				'Số điện thoại',
-				'VNU email',
-				'Email khác',
-				'Website',
-				'Địa chỉ'
-			];
+			this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
+			this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
+			this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
 
-			this.infoFields = [
-				'name:',
-				'id',
-				'position',
-				'unit',
-				'degree',
-				'phone',
-				'VNUmail',
-				'otherMail',
-				'website',
-				'address'
-			]
-
-
-			this.infoIconList = [
-				"fa fa-id-card-o",
-				"fa fa-briefcase",
-				"fa fa-flag",
-				"fa fa-graduation-cap",
-				"fa fa-phone",
-				"fa fa-envelope",
-				"fa fa-envelope-o",
-				"fa fa-paper-plane",
-				"fa fa-map-marker"
-			];
-
-			this.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
-			this.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
-			this.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
-
-			this.interestedFields.push('Network security');
-			this.interestedFields.push('Web application security');
-			this.interestedFields.push('Web protocol security');
-			this.interestedFields.push('Web application security');
+			this.officerInfo.interestedFields.push('Network security');
+			this.officerInfo.interestedFields.push('Web application security');
+			this.officerInfo.interestedFields.push('Web protocol security');
+			this.officerInfo.interestedFields.push('Web application security');
 		},
 
 		editValue() {
@@ -288,7 +304,7 @@ export default {
 		},
 
 		editTopic() {
-			this.researchTopics[this.topicEditing] = {
+			this.officerInfo.researchTopics[this.topicEditing] = {
 				name: this.topicEditedValue.name,
 				description: this.topicEditedValue.description
 			};
@@ -301,7 +317,7 @@ export default {
 
 		removeTopic(index) {
 			if (confirm("Bạn chắc chắn muốn xóa Chủ đề này chứ?")) {
-				this.researchTopics.splice(index,1);
+				this.officerInfo.researchTopics.splice(index,1);
 			}
 		}
 	},
@@ -408,10 +424,9 @@ export default {
 	.container {margin: 25px 50px 0px 50px;}
 
 	.info-container {
-		margin-left: 40px;
+		margin: 20px 40px 20px 40px;
 		left: 0;
-		width: 35%;
-		position: fixed;
+		width: 55%;
 	}
 
 	.name {
@@ -424,7 +439,7 @@ export default {
 
 	.details {
 		display: block;
-		padding: 5px 0px 5px 20px;
+		padding: 5px 0px 5px 35px;
 		color: #455358;
 		font-size: 14px;
 	}
@@ -528,11 +543,12 @@ export default {
 
 	.bold {font-weight: bold; color: black;}
 
-	.research-topic {margin-left: 38%;}
+	.research-topic {
+		margin: 20px 40px 20px 40px;
+	}
 
 	.interested-field {
-		margin-left: 70%;
-		margin-top: -42px;
+		margin: 20px 40px 20px 40px;
 	}
 
 	.container div span.big-field-title {
@@ -553,9 +569,6 @@ export default {
 		border: 2px solid;
 		border-color: #ffcccc transparent transparent #ffcccc;
 		padding: 5px;
-		height: 55%;
-		width: 25%;
-		position: fixed;
 		overflow: auto;
 	}
 
