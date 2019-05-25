@@ -13,9 +13,9 @@
 				<!-- Columns' width -->
 				<col width="43px">  <!-- STT -->
 				<col width="320px"> <!-- Tên đơn vị -->
-				<col width="120px"> <!-- Loại đơn vị -->
+				<col width="150px"> <!-- Loại đơn vị -->
 				<col width="120px"> <!-- Địa chỉ -->
-				<col width="107px"> <!-- Điện thoại -->
+				<col width="120px"> <!-- Điện thoại -->
 				<col width="200px"> <!-- Website -->
 
 				<!-- Adding Form -->
@@ -24,7 +24,23 @@
 						<i class="fa fa-plus-square tool-icon" v-if="adding"></i>
 						<i class="fa fa-search tool-icon" v-if="searching"></i>
 					</td>
-					<td v-for="(content, key, j) in newUnit" v-if="j>0">
+
+					<!-- <td v-for="(content, key, j) in newUnit" v-if="j>0">
+						<input type="text" v-model="newUnit[key]">
+					</td> -->
+
+					<td>
+						<input type="text" v-model="newUnit.name">
+					</td>
+
+					<td>
+						<select v-model="newUnit.type">
+							<option value="Bộ môn">Bộ môn</option>
+							<option value="Phòng thí nghiệm">Phòng thí nghiệm</option>
+						</select>
+					</td>
+
+					<td v-for="(content, key, j) in newUnit" v-if="j>2">
 						<input type="text" v-model="newUnit[key]">
 					</td>
 
@@ -47,22 +63,34 @@
 					<th>Điện thoại</th>
 					<th>Website</th>
 				</tr>
-				<tr v-for="(unit, i) in list">
+				<tr v-for="(unit, i) in list" @dblclick="selectToEdit(i)">
 					<td class="stt">{{i+1}}</td>
-					<td v-for="(content, key, j) in unit" v-if="j>0" @dblclick="editing=(i+'_'+j); editedValue=content; editKey=key">
-						<label v-if="editing != (i+'_'+j)">{{ content }}</label>
-						<input class="edit-input" type="text" v-else v-model="editedValue" v-focus
+
+					<td v-for="(content, key, j) in unit" v-if="j>0">
+						<label v-if="editing!=i">{{ content }}</label>
+
+						<input v-else-if="j!=2" class="edit-input" type="text" v-model="editedUnit[key]"
+								@keyup.esc="editCancel"
+								@keyup.enter="valueEditing(i)">
+
+						<select v-else class="edit-input" type="text" v-model="editedUnit.type"
 								@keyup.esc="editCancel"
 								@keyup.enter="valueEditing(i,key)">
+							<option value="Bộ môn">Bộ môn</option>
+							<option value="Phòng thí nghiệm">Phòng thí nghiệm</option>
+						</select>
 					</td>
 					<td class="confirm-domain">
-						<i v-if="editing.startsWith(i+'_')" class="fa fa-check confirm-btn ok-btn" v-on:click="valueEditing(i,)">
+						<i v-if="editing==i" class="fa fa-check confirm-btn ok-btn" v-on:click="valueEditing(i,)">
 							<span class="tooltip-text">Xác nhận</span>
 						</i>
-						<i v-if="editing.startsWith(i+'_')" class="fa fa-times confirm-btn no-btn" v-on:click="editCancel()">
+						<i v-if="editing==i" class="fa fa-times confirm-btn no-btn" v-on:click="editCancel()">
 							<span class="tooltip-text">Hủy</span>
 						</i>
-						<i v-if="!editing.startsWith(i+'_')" class="fa fa-trash confirm-btn del-btn" v-on:click="removeUnit(i)">
+						<i v-if="editing!=i" class="fa fa-pencil confirm-btn edit-btn" v-on:click="selectToEdit(i,-1)">
+							<span class="tooltip-text">Sửa</span>
+						</i>
+						<i v-if="editing!=i" class="fa fa-trash confirm-btn del-btn" v-on:click="removeUnit(i)">
 							<span class="tooltip-text">Xóa</span>
 						</i>
 					</td>
@@ -83,13 +111,13 @@ export default {
 			rule: 'quản trị viên',
 			list: [],
 			list_clone: [],
-			editing: '',
-			editedValue: null,
+			editing: -1,
+			editedUnit: null,
 			editKey: null,
 			adding: false,
 			searching: false,
 			searched: false,
-			newUnit: {id:'',name: '',type: '',address: '',phone: '',website: ''},
+			newUnit: {id:'',name: '',type: 'Bộ môn',address: '',phone: '',website: ''},
 		}
 	},
 
@@ -131,12 +159,33 @@ export default {
 			});
 		},
 
+		selectToEdit(i) {
+			this.editing = i;
+
+			this.editedUnit = {
+				id: this.list[i].id,
+				name: this.list[i].name,
+				type: this.list[i].type,
+				address: this.list[i].address,
+				phone: this.list[i].phone,
+				website: this.list[i].website
+			};
+		},
+
 		// edit the selected value after acceptance
-		valueEditing(i, j) {
+		valueEditing(i) {
 			// client
-			j = (j|| this.editKey);
-			this.list[i][j] = this.editedValue;
+			this.list[i] = {
+				id: this.editedUnit.id,
+				name: this.editedUnit.name,
+				type: this.editedUnit.type,
+				address: this.editedUnit.address,
+				phone: this.editedUnit.phone,
+				website: this.editedUnit.website
+			}
+			this.editedUnit = null;
 			this.editCancel();
+
 			// server
 			// var url = 'http://localhost/uFaculty/Faculty/FacultyControl/update';
 			// this.$http.post(url,{
@@ -151,7 +200,7 @@ export default {
 
 		// cancel editing value
 		editCancel() {
-			this.editing = '';
+			this.editing = -1;
 		},
 
 		formAccept() {
@@ -177,6 +226,11 @@ export default {
 				return;
 			}
 
+			if (!this.newUnit.name) {
+				alert('Đơn vị mới chưa có tên.');
+				return;
+			}
+
 			// var url = 'http://localhost/uFaculty/Faculty/FacultyControl/create';
 			// this.$http.post(url,{
 			// 	name: this.newUnit.name,
@@ -186,15 +240,17 @@ export default {
 			// 	website: this.newUnit.website
 			// }).then(function (data) {
 			// 	this.newUnit.id = data.body.data[0].faculty_id;
-			// 	this.list.push(this.newUnit);
-			// 	this.addCancel();
+				this.list.push(this.newUnit);
+				this.addCancel();
 			// })
+
+
 		},
 
 		// cancel adding new unit
 		addCancel() {
 			this.adding = false;
-			this.newUnit = {id:'',name: '',type: '',address: '',phone: '',website: ''};
+			this.newUnit = {id:'',name: '',type: 'Bộ môn',address: '',phone: '',website: ''};
 		},
 
 		searchUnit() {
@@ -223,7 +279,7 @@ export default {
 			if (this.searched) this.list = Array.from(Object.create(this.list_clone));
 			this.searching = false;
 			this.searched = false;
-			this.newUnit = {id:'', name: '',type: '',address: '',phone: '',website: ''};
+			this.newUnit = {id:'', name: '',type: 'Bộ môn',address: '',phone: '',website: ''};
 		},
 
 		// delete an unit
@@ -293,12 +349,12 @@ export default {
 
 	table {border-spacing: 0px;}
 
-	input {
+	input, select {
 		width: 100%;
-		height: 28px;
+		height: 30px;
 		box-sizing: border-box;
 		display: block;
-		padding: 6px 10px;
+		padding: 6px 6px;
 		font-size: 14px;
 		line-height: 1.5;
 		border: 1px solid #ccc;
@@ -322,7 +378,7 @@ export default {
 
 	.table-bound td, .table-bound th {
 		border: 1px solid #ddd;
-		padding: 6px 8px;
+		padding: 6px 10px;
 	}
 
 	.table-bound tr td:nth-child(4) {text-align: center;}
@@ -419,8 +475,9 @@ export default {
 	.ok-btn 	  {color: #00e600;}
 	.no-btn		  {color: #e60000;}
 	.del-btn      {color: #455358; visibility: hidden;}
-	.del-btn:hover, .no-btn:hover, .ok-btn:hover {color: #ffcd1f;}
-	tr:hover td .del-btn {visibility: visible;}
+	.edit-btn 	  {color: #3333cc; visibility: hidden;}
+	.del-btn:hover, .no-btn:hover, .ok-btn:hover, .edit-btn:hover  {color: #ffcd1f;}
+	tr:hover td .del-btn , tr:hover td .edit-btn {visibility: visible;}
 
 	* {
 		transition: 0.2s;

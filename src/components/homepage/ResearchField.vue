@@ -10,7 +10,7 @@
 
 		<!-- the demo root element -->
 		<div class="tree-bound">
-			<TreeItem class="item" :item="treeData" :checkbox="false"
+			<TreeItem class="item" :item="treeData"
 				@make-folder="makeFolder"
 				@add-item="addItem"
 				@remove-item="removeItem">
@@ -99,8 +99,8 @@ export default {
 		addItem(item, data) {
 			//generate id
 
-			// item.children.push({id: '', name: 'New item'});
-			item.children.push({id: data.newID, name: 'New item'});
+			item.children.push({id: '', name: 'New item'});
+			// item.children.push({id: data.newID, name: 'New item'});
 		},
 
 		findParents(node, id) {

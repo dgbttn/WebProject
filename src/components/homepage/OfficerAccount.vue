@@ -25,8 +25,14 @@
 						<i class="fa fa-plus-square tool-icon" v-if="adding"></i>
 						<i class="fa fa-search tool-icon" v-if="searching"></i>
 					</td>
-					<td v-for="(content, key,) in newOfficer">
+					<td v-for="(content, key, j) in newOfficer" v-if="j<6">
 						<input type="text" v-model="newOfficer[key]">
+					</td>
+
+					<td>
+						<select v-model="newOfficer.unit">
+							<option v-for="val in unitList" :value="val">{{val}}</option>
+						</select>
 					</td>
 
 					<td class="confirm-domain">
@@ -51,25 +57,34 @@
 					<th>Đơn vị công tác</th>
 				</tr>
 
-				<tr v-for="(officer, i) in list">
+				<tr v-for="(officer, i) in list" @dblclick="selectToEdit(i)">
 					<td class="stt">{{ i+1 }}</td>
-					<td v-for="(content, key, j) in officer" @dblclick="editing=(i+'_'+j); editedValue=content; editKey=key">
-						<label v-if="editing != (i+'_'+j)">{{ content }}</label>
-						<input class="edit-input" type="text" v-else v-model="editedValue" v-focus
+
+					<td v-for="(content, key, j) in officer" >
+						<label v-if="editing!=i">{{ content }}</label>
+						<input class="edit-input" type="text" v-else-if="j<6" v-model="editedOfficer[key]"
 								@keyup.esc="editCancel"
-								@keyup.enter="valueEditing(i,key)">
+								@keyup.enter="valueEditing(i)">
+						<select v-model="editedOfficer.unit" v-else>
+							<option v-for="val in unitList" :value="val">{{val}}</option>
+						</select>
 					</td>
+
 					<td class="confirm-domain">
-						<i v-if="editing.startsWith(i+'_')" class="fa fa-check confirm-btn ok-btn" v-on:click="valueEditing(i,)">
+						<i v-if="editing==i" class="fa fa-check confirm-btn ok-btn" v-on:click="valueEditing(i)">
 							<span class="tooltip-text">Xác nhận</span>
 						</i>
-						<i v-if="editing.startsWith(i+'_')" class="fa fa-times confirm-btn no-btn" v-on:click="editCancel()">
+						<i v-if="editing==i" class="fa fa-times confirm-btn no-btn" v-on:click="editCancel()">
 							<span class="tooltip-text">Hủy</span>
 						</i>
-						<i v-if="!editing.startsWith(i+'_')" class="fa fa-trash confirm-btn del-btn" v-on:click="removeAccount(i)">
+						<i v-if="editing!=i" class="fa fa-pencil confirm-btn edit-btn" v-on:click="selectToEdit(i,-1)">
+							<span class="tooltip-text">Sửa</span>
+						</i>
+						<i v-if="editing!=i" class="fa fa-trash confirm-btn del-btn" v-on:click="removeAccount(i)">
 							<span class="tooltip-text">Xóa</span>
 						</i>
 					</td>
+
 				</tr>
 			</table>
 		</div>
@@ -86,13 +101,13 @@ export default {
 			rule: 'quản trị viên',
 			list: [],
 			list_clone: [],
-			editing: '',
-			editedValue: null,
-			editKey: null,
+			editing: -1,
+			editedOfficer: null,
 			adding: false,
 			searching: false,
 			searched: false,
 			newOfficer: {id:'', name:'', account:'', mail:'', position:'', degree:'', unit:''},
+			unitList: [],
 		}
 	},
 
@@ -129,12 +144,20 @@ export default {
 				this.list.push({
 					id : officers[i].id,
 					name : officers[i].name,
-					position : officers[i].position,
 					account : officers[i].account,
 					mail : officers[i].mail,
+					position : officers[i].position,
 					degree : officers[i].degree,
 					unit : officers[i].unit
 				});
+
+			this.unitList = [
+				"Bộ môn Các Hệ thống Thông tin",
+				"Bộ môn Công nghệ Phần mềm",
+				"Bộ môn Khoa học Máy tính",
+				"Bộ môn Khoa học và Ký thuật Tính toán",
+				"Bộ môn Mạng và Truyền thông Máy tính"
+			];
 
 			// this.$http.get('http://localhost/uFaculty/staff/StaffController/adminListStaff')
 			// 		.then(function (data) {
@@ -154,25 +177,46 @@ export default {
 			// 		});
 		},
 
-		// edit the selected value after acceptance
-		valueEditing(i, j) {
-			j = (j|| this.editKey);
-			this.editing = '';
-			this.list[i][j] = this.editedValue;
+		selectToEdit(i) {
+			this.editing = i;
 
-			var url = 'http://localhost/uFaculty/staff/StaffController/adminEditStaff';
-			this.$http.post(url,{
-				staff_id: this.list[i].id,
-				full_name: this.list[i].name,
-				vnu_email: this.list[i].account,
-				staff_type: this.list[i].mail,
-				academic_title: this.list[i].degree
-			})
+			this.editedOfficer = {
+				id: this.list[i].id,
+				name: this.list[i].name,
+				account: this.list[i].account,
+				mail: this.list[i].mail,
+				position: this.list[i].position,
+				degree: this.list[i].degree,
+				unit: this.list[i].unit
+			};
+		},
+
+		// edit the selected value after acceptance
+		valueEditing(i) {
+			this.list[i] = {
+				id: this.editedOfficer.id,
+				name: this.editedOfficer.name,
+				account: this.editedOfficer.account,
+				mail: this.editedOfficer.mail,
+				position: this.editedOfficer.position,
+				degree: this.editedOfficer.degree,
+				unit: this.editedOfficer.unit
+			}
+			this.editedOfficer = null;
+			this.editCancel();
+			// var url = 'http://localhost/uFaculty/staff/StaffController/adminEditStaff';
+			// this.$http.post(url,{
+			// 	staff_id: this.list[i].id,
+			// 	full_name: this.list[i].name,
+			// 	vnu_email: this.list[i].account,
+			// 	staff_type: this.list[i].mail,
+			// 	academic_title: this.list[i].degree
+			// })
 		},
 
 		// cancel editing value
 		editCancel() {
-			this.editing = '';
+			this.editing = -1;
 		},
 
 		formAccept() {
@@ -191,10 +235,8 @@ export default {
 
 		// add a new account to the list
 		addOfficer() {
-			var len = 0;
-			for (var i in this.newOfficer) len+= this.newOfficer[i].length;
-			if (len==0) {
-				alert('Cán bộ mới chưa có thông tin nào.');
+			if (!(this.newOfficer.name&&this.newOfficer.id&&this.newOfficer.account)) {
+				alert('Cán bộ mới phải có đủ thông tin về Mã cán bộ, Họ và tên, Tài khoản.');
 				return;
 			}
 			this.list.push(this.newOfficer);
@@ -298,12 +340,12 @@ export default {
 
 	table {border-spacing: 0px;}
 
-	input {
+	input, select {
 		width: 100%;
-		height: 28px;
+		height: 30px;
 		box-sizing: border-box;
 		display: block;
-		padding: 6px 10px;
+		padding: 6px 6px;
 		font-size: 14px;
 		line-height: 1.5;
 		border: 1px solid #ccc;
@@ -313,7 +355,7 @@ export default {
 		font: 400 13.3333px Arial;
 	}
 
-	input:focus {
+	input:focus, select:focus {
 		border-color: #66afe9;
 		outline: 0;
 		box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
@@ -426,8 +468,9 @@ export default {
 	.ok-btn 	  {color: #00e600;}
 	.no-btn		  {color: #e60000;}
 	.del-btn      {color: #455358; visibility: hidden;}
-	.del-btn:hover, .no-btn:hover, .ok-btn:hover {color: #ffcd1f;}
-	tr:hover td .del-btn {visibility: visible;}
+	.edit-btn 	  {color: #3333cc; visibility: hidden;}
+	.del-btn:hover, .no-btn:hover, .ok-btn:hover, .edit-btn:hover {color: #ffcd1f;}
+	tr:hover td .del-btn, tr:hover td .edit-btn {visibility: visible;}
 
 	* {
 		transition: 0.2s;

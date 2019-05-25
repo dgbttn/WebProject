@@ -14,11 +14,7 @@
 						@keyup.enter="editValue">
 			</div>
 
-			<div v-if="checkbox" class="select-btn">
-
-			</div>
-
-			<div v-if="!editing&&!checkbox" class="tool-btn">
+			<div v-if="!editing" class="tool-btn">
 				<i class="fa fa-pencil edit-btn" v-on:click="editing=true; editedValue=item.name">
 					<span class="tooltip-text">Sửa</span>
 				</i>
@@ -30,7 +26,7 @@
 				</i>
 			</div>
 
-			<div v-if="editing&&!checkbox" class="confirm-domain">
+			<div v-if="editing" class="confirm-domain">
 				<i class="fa fa-check-circle confirm-btn ok-btn" v-on:click="editValue">
 					<span class="tooltip-text">Xác nhận</span>
 				</i>
@@ -41,7 +37,7 @@
 		</div>
 
 		<ul class="children-list" v-show="isOpen" v-if="isFolder">
-			<TreeItem class="item" v-for="(child, index) in item.children" :item="child" :checkbox="checkbox"
+			<TreeItem class="item" v-for="(child, index) in item.children" :item="child"
 						@make-folder="$emit('make-folder', $event)"
 						@add-item="$emit('add-item', $event)"
 						@remove-item="$emit('remove-item', $event)">
@@ -54,8 +50,7 @@
 export default {
 	name: 'TreeItem',
 	props: {
-		item: Object,
-		checkbox: Boolean
+		item: Object
 	},
 
 	data() {

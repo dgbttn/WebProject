@@ -128,14 +128,8 @@
 				<div class="name-field">
 					<ul class="topic-list">
 						<li	v-for="(topic,i) in officerInfo.researchTopics" class="topic-name"
-							v-on:click= "selectTopic(i)">
-							<span v-if="!topicEditing||selectedTopic!=i"
-									@dblclick="topicEditing = true;
-										selectTopic(i);
-										topicEditedValue = {
-											name: officerInfo.researchTopics[i].name,
-											description: officerInfo.researchTopics[i].description
-										};">
+							v-on:click= "selectTopic(i)" @dblclick="selectTopicToEdit(i)">
+							<span v-if="!topicEditing||selectedTopic!=i">
 								{{topic.name}}
 							</span>
 							<input v-else type="text" v-model="topicEditedValue.name" v-focus
@@ -145,13 +139,9 @@
 					</ul>
 				</div>
 
-				<div class="show-field">
+				<div class="show-field" @dblclick=" selectTopicToEdit(selectedTopic);">
 					<div class="content-show" v-if="selectedTopic>=0">
-						<span v-if="!topicEditing" @dblclick="topicEditing = true;
-							topicEditedValue = {
-								name: officerInfo.researchTopics[selectedTopic].name,
-								description: officerInfo.researchTopics[selectedTopic].description
-							};">{{officerInfo.researchTopics[selectedTopic].description}}</span>
+						<span v-if="!topicEditing" >{{officerInfo.researchTopics[selectedTopic].description}}</span>
 						<textarea v-else rows="17" cols="80" v-model="topicEditedValue.description"></textarea>
 					</div>
 				</div>
@@ -176,7 +166,6 @@ export default {
 			topicEditing: false,
 			topicEditedValue: {},
 			topicAdding: false,
-
 		}
 	},
 
@@ -308,7 +297,18 @@ export default {
 			this.useMode = mode;
 		},
 
+		selectTopicToEdit(i) {
+			if (this.topicEditing) return;
+			this.selectTopic(i);
+			this.topicEditing = true;
+			this.topicEditedValue = {
+				name: this.officerInfo.researchTopics[i].name,
+				description: this.officerInfo.researchTopics[i].description
+			};
+		},
+
 		selectTopic(i) {
+			if (this.topicEditing) return;
 			if (this.selectedTopic>-1)
 				document.getElementsByClassName('topic-name')[this.selectedTopic].className =
 				document.getElementsByClassName('topic-name')[this.selectedTopic].className.replace(" active", "");
@@ -330,11 +330,6 @@ export default {
 		},
 
 		topicEditCancel() {
-			if (this.topicAdding) {
-				this.officerInfo.researchTopics.splice(this.selectedTopic,1);
-				this.selectTopic(-1);
-				this.topicAdding = false;
-			}
 			this.topicEditing = false;
 		},
 
@@ -346,11 +341,8 @@ export default {
 		},
 
 		addTopic() {
-			this.officerInfo.researchTopics.push({name: '', description: ''});
-			this.topicEditing = true;
-			this.topicAdding = true;
-			this.topicEditedValue = {name: '', description: ''};
-			this.selectTopic(this.officerInfo.researchTopics.length - 1);
+			this.officerInfo.researchTopics.push({name: 'New Topic', description: ''});
+			this.selectTopicToEdit(this.officerInfo.researchTopics.length - 1);
 		}
 	},
 
