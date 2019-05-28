@@ -181,6 +181,13 @@ export default {
 		font: 400 13.3333px Arial;
 	}
 
+	option {
+		padding: 3px 0px;
+		-webkit-appearance: none;
+	    -moz-appearance: none;
+	    appearance: none;
+	}
+
 	.container {
 		background-color: #fff;
 		font-family: 'Montserrat', sans-serif;

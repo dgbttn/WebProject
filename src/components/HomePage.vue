@@ -4,7 +4,7 @@
 
 		<div class="header">
 			<nav class="navbar">
-				<div class="task-icon">
+				<div class="task-icon" v-on:click = "toggle">
 					<i class="fa fa-bars"></i>
 				</div>
 
@@ -24,15 +24,15 @@
 			<div class="tool-bar">
 				<div class="tool-control unit-control-btn" v-on:click="openTool('unit-control')">
 					<i class="fa fa-th tool-icon"></i>
-					<span class="tool-name">QUẢN LÍ ĐƠN VỊ</span>
+					<span v-if="!minimize" class="tool-name">QUẢN LÍ ĐƠN VỊ</span>
 				</div>
 				<div class="tool-control officer-account-btn" v-on:click="openTool('officer-account')">
 					<i class="fa fa-user tool-icon"></i>
-					<span class="tool-name">TÀI KHOẢN GIẢNG VIÊN</span>
+					<span v-if="!minimize" class="tool-name">TÀI KHOẢN GIẢNG VIÊN</span>
 				</div>
 				<div class="tool-control research-field-btn" v-on:click="openTool('research-field')">
 					<i class="fa fa-tasks tool-icon"></i>
-					<span class="tool-name">LĨNH VỰC NGHIÊN CỨU</span>
+					<span v-if="!minimize" class="tool-name">LĨNH VỰC NGHIÊN CỨU</span>
 				</div>
 			</div>
 
@@ -67,6 +67,7 @@ export default {
 	data() {
 		return {
 			username: 'Tung',
+			minimize: false,
 		}
 	},
 
@@ -86,6 +87,19 @@ export default {
 			document.getElementById(toolName).style.display = "block";
 			document.getElementsByClassName(toolName+'-btn')[0].className += " active";
 
+		},
+
+		toggle() {
+			if (!this.minimize) {
+				this.minimize = !this.minimize;
+				document.getElementsByClassName('tool-bar')[0].style.width = "65px";
+				document.getElementsByClassName('container')[0].style.marginLeft = "120px";
+				console.log(document.getElementsByClassName('container')[0].style.marginLeft);
+				return;
+			}
+			this.minimize = !this.minimize;
+			document.getElementsByClassName('container')[0].style.marginLeft = "22%";
+			document.getElementsByClassName('tool-bar')[0].style.width = "20%";
 		}
 	}
 }
@@ -139,6 +153,10 @@ export default {
 	}
 
 	.navbar div {
+		transition: 0.2s;
+	}
+
+	.content-bound {
 		transition: 0.2s;
 	}
 

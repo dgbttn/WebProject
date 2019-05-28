@@ -11,19 +11,18 @@
 			<table>
 				<!-- Columns' width -->
 				<col width="40px">  <!-- STT -->
-				<col width="90px">  <!-- Mã cán bộ -->
+				<col width="80px">  <!-- Mã cán bộ -->
 				<col width="180px"> <!-- Họ và tên -->
 				<col width="100px"> <!-- Tài khoản -->
-				<col width="200px"> <!-- VNU email -->
-				<col width="120px"> <!-- Chức vụ -->
-				<col width="80px">  <!-- Học vị -->
-				<col width="180px"> <!-- Đơn vị công tác -->
+				<col width="180px"> <!-- VNU email -->
+				<col width="110px"> <!-- Chức vụ -->
+				<col width="100px">  <!-- Học vị -->
+				<col width="250px"> <!-- Đơn vị công tác -->
 
 				<!-- Adding Form -->
-				<tr v-if="adding||searching" class="extend-form" @keyup.esc="formCancel" @keyup.enter="formAccept">
+				<tr v-if="adding" class="extend-form" @keyup.esc="addCancel" @keyup.enter="addOfficer">
 					<td class="icon-domain">
 						<i class="fa fa-plus-square tool-icon" v-if="adding"></i>
-						<i class="fa fa-search tool-icon" v-if="searching"></i>
 					</td>
 					<td v-for="(content, key, j) in newOfficer" v-if="j<6">
 						<input type="text" v-model="newOfficer[key]">
@@ -36,10 +35,47 @@
 					</td>
 
 					<td class="confirm-domain">
-						<i class="fa fa-check-circle confirm-btn ok-btn" v-on:click="formAccept">
+						<i class="fa fa-check-circle confirm-btn ok-btn" v-on:click="addOfficer">
 							<span class="tooltip-text">Xác nhận</span>
 						</i>
-						<i class="fa fa-times-circle confirm-btn no-btn" v-on:click="formCancel">
+						<i class="fa fa-times-circle confirm-btn no-btn" v-on:click="addCancel">
+							<span class="tooltip-text">Hủy</span>
+						</i>
+					</td>
+				</tr>
+
+				<!-- Searching Form -->
+				<tr v-if="searching" class="extend-form" @keyup.esc="searchCancel" @keyup.enter="searchOfficer">
+					<td class="icon-domain">
+						<i class="fa fa-search tool-icon" v-if="searching"></i>
+					</td>
+					<td v-for="(content, key, j) in newOfficer" v-if="j<4">
+						<input type="text" v-model="newOfficer[key]">
+					</td>
+
+					<td>
+						<select v-model="newOfficer.position">
+							<option v-for="pos in existedPositionList" :value="pos">{{pos}}</option>
+						</select>
+					</td>
+
+					<td>
+						<select v-model="newOfficer.degree">
+							<option v-for="deg in existedDegreeList" :value="deg">{{deg}}</option>
+						</select>
+					</td>
+
+					<td>
+						<select v-model="newOfficer.unit">
+							<option v-for="unit in existedUnitList" :value="unit">{{unit}}</option>
+						</select>
+					</td>
+
+					<td class="confirm-domain">
+						<i class="fa fa-check-circle confirm-btn ok-btn" v-on:click="searchOfficer">
+							<span class="tooltip-text">Xác nhận</span>
+						</i>
+						<i class="fa fa-times-circle confirm-btn no-btn" v-on:click="searchCancel">
 							<span class="tooltip-text">Hủy</span>
 						</i>
 					</td>
@@ -111,6 +147,20 @@ export default {
 		}
 	},
 
+	computed: {
+		existedPositionList() {
+			return [...new Set(this.list_clone.map(off => off.position))];
+		},
+
+		existedDegreeList() {
+			return [...new Set(this.list_clone.map(off => off.degree))];
+		},
+
+		existedUnitList() {
+			return [...new Set(this.list_clone.map(off => off.unit))];
+		}
+	},
+
 	// Get data from server to this.list
 	created() {
 		// this.$http.get('http://localhost/uFaculty/staff/StaffController/adminListStaff')
@@ -135,10 +185,10 @@ export default {
 		// add some random accounts to the list
 		initRandomList() {
 			var officers = [];
-			officers.push(new OfficerAccount("1231","Hồ Văn Canh","canhkas","jashdj@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ Công an"));
-			officers.push(new OfficerAccount("3643","Lê Phê Đô","ádasd","ádasdsa@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ Công an"));
-			officers.push(new OfficerAccount("345sd","Minh Châu","sdfv","ádwqr@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ Công an"));
-			officers.push(new OfficerAccount("ád34","Hồ Văn Cường","ádadasđ","gdfdfgdf@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ Công an"));
+			officers.push(new OfficerAccount("1231","Hồ Văn Canh","canhkas","jashdj@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ môn Các Hệ thống Thông tin"));
+			officers.push(new OfficerAccount("3643","Lê Phê Đô","ádasd","ádasdsa@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ môn Mạng và Truyền thông Máy tính"));
+			officers.push(new OfficerAccount("345sd","Minh Châu","sdfv","ádwqr@vnu.edu.vn","Giảng viên","PGS. TS","Bộ môn Khoa học Máy tính"));
+			officers.push(new OfficerAccount("ád34","Hồ Văn Cường","ádadasđ","gdfdfgdf@vnu.edu.vn","Quản lý","Tiến sĩ","Bộ môn Các Hệ thống Thông tin"));
 
 			for (var i in officers)
 				this.list.push({
@@ -158,6 +208,8 @@ export default {
 				"Bộ môn Khoa học và Ký thuật Tính toán",
 				"Bộ môn Mạng và Truyền thông Máy tính"
 			];
+
+			this.list_clone = Array.from(Object.create(this.list));
 
 			// this.$http.get('http://localhost/uFaculty/staff/StaffController/adminListStaff')
 			// 		.then(function (data) {
@@ -189,6 +241,8 @@ export default {
 				degree: this.list[i].degree,
 				unit: this.list[i].unit
 			};
+
+			console.log(this.editedOfficer.unit);
 		},
 
 		// edit the selected value after acceptance
