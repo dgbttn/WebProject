@@ -230,6 +230,8 @@ export default {
 		},
 
 		selectToEdit(i) {
+			if (this.searching) return;
+
 			this.editing = i;
 
 			this.editedOfficer = {
@@ -241,8 +243,6 @@ export default {
 				degree: this.list[i].degree,
 				unit: this.list[i].unit
 			};
-
-			console.log(this.editedOfficer.unit);
 		},
 
 		// edit the selected value after acceptance

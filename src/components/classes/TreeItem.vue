@@ -1,6 +1,6 @@
 <template>
 	<li>
-		<div class="item-bound" :class="{bold: isOpen}">
+		<div class="item-bound">
 			<div class="item-btn" @click="toggle">
 				<i v-if="!isOpen&&isFolder" class="fa fa-caret-right show-btn"></i>
 				<i v-if="isOpen&&isFolder" class="fa fa-caret-down show-btn"></i>
@@ -84,9 +84,9 @@ export default {
 			// var url = 'http://localhost/uFaculty/Research/ResearchControl/create';
 			// this.$http.post(url,{parent_id: this.item.id, name: 'New item'})
 			// 		.then(function (data) {
-			// 			if (!this.isFolder) this.makeFolder();
-			// 			this.isOpen = true;
-			// 			this.$emit('add-item', this.item, {newID: data.body.data[0].research_id});
+						if (!this.isFolder) this.makeFolder();
+						this.isOpen = true;
+						this.$emit('add-item', {item: this.item, id: '10'});
 			// 		})
 		},
 
@@ -94,8 +94,8 @@ export default {
 			// var url = 'http://localhost/uFaculty/Research/ResearchControl/update';
 			// this.$http.post(url,{id: this.item.id,name: this.editedValue})
 			// 		.then(function (data) {
-			// 			this.item.name = this.editedValue;
-			// 			this.editCancel();
+						this.item.name = this.editedValue;
+						this.editCancel();
 			// 		})
 		},
 
@@ -162,6 +162,7 @@ export default {
 		cursor: pointer;
 		width: 20px;
 		height: 20px;
+		margin-right: 5px;
 	}
 
 	.show-btn {

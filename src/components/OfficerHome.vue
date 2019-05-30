@@ -2,12 +2,6 @@
 	<app-root name="app-root">
 		<div class="header">
 			<nav class="navbar">
-				<div v-show="useMode" class="backward-btn" v-on:click="changeUseMode(0)">
-					<a class="nav-link">
-						<i class="fa fa-chevron-left"></i>
-						<span>Back</span>
-					</a>
-				</div>
 
 				<div class="account">
 					<a class="nav-link account-content dropdown-account">
@@ -29,38 +23,40 @@
 
 		<div class="container">
 			<div v-if="true" class="info-container">
-				<div class="name">
-					<i class="fa fa-user"></i>
-					<label >{{infoList[4]}}. {{infoList[0]}}</label>
-				</div>
+				<div class="info">
+					<div class="name">
+						<i class="fa fa-user"></i>
+						<label >{{infoList[4]}}. {{infoList[0]}}</label>
+					</div>
 
-				<div class="details">
-					<div class="detail-fields" v-for = "(field, i) in infoTitleList">
-						<div class="detail-label">
-							<i class="info-icon" :class="infoIconList[i]"></i>
-							<label :class="{bold: editing==i&&editable[i]}">{{infoTitleList[i]}}:&nbsp</label>
-						</div>
+					<div class="details">
+						<div class="detail-fields" v-for = "(field, i) in infoTitleList">
+							<div class="detail-label">
+								<i class="info-icon" :class="infoIconList[i]"></i>
+								<label :class="{bold: editing==i&&editable[i]}">{{infoTitleList[i]}}:&nbsp</label>
+							</div>
 
-						<div class="detail-value">
-							<label v-if="editing!=i||!editable[i]">{{infoList[i+1]}}</label>
-							<input v-else class="edit-input" type="text"
-									v-focus v-model="editedValue"
-									@keyup.esc="editCancel"
-									@keyup.enter="editValue">
-							</input>
-						</div>
+							<div class="detail-value">
+								<label v-if="editing!=i||!editable[i]">{{infoList[i+1]}}</label>
+								<input v-else class="edit-input" type="text"
+										v-focus v-model="editedValue"
+										@keyup.esc="editCancel"
+										@keyup.enter="editValue">
+								</input>
+							</div>
 
-						<div class="confirm-domain">
-							<i v-if="editing==i&&editable[i]" class="fa fa-check confirm-btn ok-btn" v-on:click="editValue">
-								<span class="tooltip-text">Xác nhận</span>
-							</i>
-							<i v-if="editing==i&&editable[i]" class="fa fa-times confirm-btn no-btn" v-on:click="editCancel">
-								<span class="tooltip-text">Hủy</span>
-							</i>
-							<i v-if="editable[i]&&editing!=i" class="fa fa-pencil-square confirm-btn edit-btn"
-								v-on:click="editing=i; editedValue=infoList[i+1]">
-								<span class="tooltip-text">Chỉnh sửa</span>
-							</i>
+							<div class="confirm-domain">
+								<i v-if="editing==i&&editable[i]" class="fa fa-check confirm-btn ok-btn" v-on:click="editValue">
+									<span class="tooltip-text">Xác nhận</span>
+								</i>
+								<i v-if="editing==i&&editable[i]" class="fa fa-times confirm-btn no-btn" v-on:click="editCancel">
+									<span class="tooltip-text">Hủy</span>
+								</i>
+								<i v-if="editable[i]&&editing!=i" class="fa fa-pencil-square confirm-btn edit-btn"
+									v-on:click="editing=i; editedValue=infoList[i+1]">
+									<span class="tooltip-text">Chỉnh sửa</span>
+								</i>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -88,7 +84,11 @@
 				</div>
 
 				<div class="show-field">
-
+					<div class="content-show">
+						<CheckTreeItem class="select-tree" :item="treeData"
+							@select="selectField">
+						</CheckTreeItem>
+					</div>
 				</div>
 			</div>
 
@@ -152,11 +152,16 @@
 </template>
 
 <script>
+import CheckTreeItem from './classes/CheckTreeItem.vue'
+
 export default {
 	name: 'OfficerHome',
+	components: {
+		CheckTreeItem
+	},
 	data() {
 		return {
-			titles: ['THÔNG TIN GIẢNG VIÊN', 'chỉnh sửa chủ đề nghiên cứu', 'chỉnh sửa lĩnh vực quan tâm'],
+			title: 'THÔNG TIN GIẢNG VIÊN',
 			username: 'Giảng viên',
 			avatar_src: require('../image/officer_avatar.jpg'),
 			officerInfo: {},
@@ -166,6 +171,8 @@ export default {
 			topicEditing: false,
 			topicEditedValue: {},
 			topicAdding: false,
+			treeData: {},
+			selectedFields: [],
 		}
 	},
 
@@ -174,9 +181,6 @@ export default {
 	},
 
 	computed:{
-		title() {
-			return this.titles[this.useMode];
-		},
 
 		infoList() {
 			return [
@@ -282,6 +286,36 @@ export default {
 			this.officerInfo.interestedFields.push('Web application security');
 			this.officerInfo.interestedFields.push('Web protocol security');
 			this.officerInfo.interestedFields.push('Web application security');
+
+			this.treeData = {
+				id: '1',
+				name: 'My Tree',
+				children: [
+					{ id: '2', name: 'An toàn thông tin' },
+					{ id: '3', name: 'Network security' },
+					{
+						id: '4', name: 'An toàn thông tin',
+						children: [
+							{
+								id: '5', name: 'Web application security',
+								children: [
+									{ id: '6', name: 'Mạng cảm biến không dây' },
+									{ id: '7', name: 'Web protocol security' }
+								]
+							},
+							{ id: '8', name: 'Mạng cảm biến không dây Network security' },
+							{ id: '9', name: 'Network security' },
+							{
+								id: '10', name: 'Web application security',
+								children: [
+									{ id: '11', name: 'Web protocol security' },
+									{ id: '12', name: 'Network security Web protocol security' }
+								]
+							}
+						]
+					}
+				]
+			}
 		},
 
 		editValue() {
@@ -293,13 +327,23 @@ export default {
 			this.editing = '';
 		},
 
-		changeUseMode(mode) {
-			this.useMode = mode;
+		unselectField(item) {
+
+		},
+
+		selectField(item) {
+			if (this.selectedFields.includes(item.id)) {
+				unselectField(item);
+				return;
+			}
+
+			
 		},
 
 		selectTopicToEdit(i) {
 			if (this.topicEditing) return;
 			this.selectTopic(i);
+			if (i<0) return;
 			this.topicEditing = true;
 			this.topicEditedValue = {
 				name: this.officerInfo.researchTopics[i].name,
@@ -399,17 +443,6 @@ export default {
 		background-color: inherit;
 	}
 
-	.backward-btn {
-		margin-top: 1px;
-		float: left;
-		width: 100px;
-	}
-
-	.backward-btn a i, .backward-btn a span {
-		margin: 0px 5px;
-		padding: 4px 0px;
-	}
-
 	.navbar div:hover, div:focus {
 		background-color: #ffcd1f;
 		color: #455358;
@@ -450,7 +483,20 @@ export default {
 	.info-container {
 		margin: 20px 60px 20px 60px;
 		left: 0;
-		width: 70%;
+	}
+
+	.info {
+		width: 55%;
+		display: inline-block;
+	}
+
+	.officer-image {
+		display: inline-block;
+		max-height: 260px;
+		/* float: right; */
+		border: 1px solid gray;
+		margin: 0% 5%;
+		max-width: 30%;
 	}
 
 	.name {
@@ -484,13 +530,6 @@ export default {
 	}
 
 	.detail-value {word-break: break-all;}
-
-	.officer-image {
-		display: inline-block;
-		max-height: 260px;
-		float: right;
-		border: 1px solid gray;
-	}
 
 	input, textarea {
 		display: inline-block;
@@ -635,7 +674,7 @@ export default {
 
 	.content-show {
 		display: block;
-		padding: 15px 10px 10px 20px;
+		padding: 15px 10px 10px 10px;
 		font-size: 14px;
 	}
 

@@ -50,7 +50,9 @@
 						</ul>
 					</div>
 					<div v-show="searchRule==1" class="search-content field-search">
-
+						<SelectTreeItem class="select-tree" :item="treeData"
+							@select = "selectField">
+						</SelectTreeItem>
 					</div>
 				</div>
 			</div>
@@ -132,21 +134,25 @@
 
 <script>
 import {OfficerAccount} from './classes/OfficerAccount.js'
+import SelectTreeItem from './classes/SelectTreeItem.vue'
 
 export default {
 	name: 'GuestHome',
+	components: {
+		SelectTreeItem
+	},
+
 	data() {
 		return {
 			titles: ['Tìm kiếm giảng viên', 'Thông tin giảng viên'],
 			username: 'Sinh viên',
 			searchRule: 0, // =0 for unit, =1 for field
 			selectedUnit: -1,
-			selectedField: -1,
-			selectedFieldName: '',
+			selectedField: null,
 			selectedOfficer: -1,
 			officerInfo: {},
 			unitList: [],
-			fieldList: [],
+			treeData: {name: 'sss', children: []},
 			officerList: [],
 			useMode: 0, //0 for search officers, 1 for show selected officer's info
 
@@ -194,8 +200,8 @@ export default {
 			}
 			// field
 			else {
-				if (this.selectedField<0) return '';
-				return 'Danh sách Giảng viên quan tâm Lĩnh vực ' + this.selectedFieldName;
+				if (!this.selectedField) return '';
+				return 'Danh sách Giảng viên quan tâm Lĩnh vực ' + this.selectedField.name;
 			}
 		},
 
@@ -216,6 +222,13 @@ export default {
 
 			// field
 			if (this.searchRule==1) {
+				if (!this.selectedField) return uList;
+				for (var i in this.officerList)
+					if (this.officerList[i].interestedFields.includes(this.selectedField.id)) {
+						var chosenOne = this.officerList[i];
+						chosenOne.unit = this.unitList.find(u => u.id == chosenOne.unit_id).name;
+						uList.push(chosenOne);
+					}
 				return uList;
 			}
 		},
@@ -282,11 +295,10 @@ export default {
 
 	methods: {
 		initRandomList() {
-			this.unitList.push({id: 1, name:'Bộ môn các hệ thống thông tin'});
-			this.unitList.push({id: 2, name:'Bộ môn Công nghệ phần mềm'});
 			this.unitList.push({id: 3, name:'Bộ môn Khoa học máy tính'});
 			this.unitList.push({id: 4, name:'Bộ Công an'});
-
+			this.unitList.push({id: 1, name:'Bộ môn các hệ thống thông tin'});
+			this.unitList.push({id: 2, name:'Bộ môn Công nghệ phần mềm'});
 			let officers = [];
 			officers.push(new OfficerAccount("1231","Hồ Văn Canh","canhkas","jashdj@vnu.edu.vn","Giảng viên","Tiến sĩ",4));
 			officers.push(new OfficerAccount("3643","Lê Phê Đô","ádasd","ádasdsa@vnu.edu.vn","Giảng viên","Tiến sĩ",2));
@@ -302,6 +314,7 @@ export default {
 					mail : officers[i].mail,
 					degree : officers[i].degree,
 					unit_id : officers[i].unit,
+					interestedFields: ['4','2']
 				});
 
 			this.officerInfo = {
@@ -328,6 +341,36 @@ export default {
 			this.officerInfo.interestedFields.push('Web application security');
 			this.officerInfo.interestedFields.push('Web protocol security');
 			this.officerInfo.interestedFields.push('Web application security');
+
+			this.treeData = {
+				id: '1',
+				name: 'My Tree',
+				children: [
+					{ id: '2', name: 'hello' },
+					{ id: '3', name: 'wat' },
+					{
+						id: '4', name: 'child folder',
+						children: [
+							{
+								id: '5', name: 'child folder',
+								children: [
+									{ id: '6', name: 'hello' },
+									{ id: '7', name: 'wat' }
+								]
+							},
+							{ id: '8', name: 'hello' },
+							{ id: '9', name: 'wat' },
+							{
+								id: '10', name: 'child folder',
+								children: [
+									{ id: '11', name: 'hello' },
+									{ id: '12', name: 'wat' }
+								]
+							}
+						]
+					}
+				]
+			}
 		},
 
 		openSearchItem(index) {
@@ -352,6 +395,16 @@ export default {
 
 		selectUnit(i) {
 			this.selectedUnit = i;
+		},
+
+		selectField(item) {
+			if (this.selectedField) {
+				let oldSelected = document.getElementById(this.selectedField.id);
+				oldSelected.className = oldSelected.className.replace(" selected", "");
+			}
+
+			document.getElementById(item.id).className += " selected";
+			this.selectedField = {id: item.id, name: item.name};
 		},
 
 		selectOfficer(id) {
@@ -476,9 +529,9 @@ export default {
 		transition: 0.2s;
 		border: 2px solid;
 		border-color: #d9e9f2 transparent #d9e9f2 #d9e9f2;
-		padding: 5px;
 		height: 380px;
 		overflow: auto;
+		padding: 15px 5px 5px 15px;
 	}
 
 	::-webkit-scrollbar {
@@ -503,9 +556,7 @@ export default {
 	.content-bound .unit-list {
 		list-style-type: none;
 		font-size: 14.5px;
-		padding-left: 30px;
-		padding-top: 5px;
-		padding-bottom: 5px;
+		padding: 5px 5px 5px 15px;
 		margin: 0px 0px;
 	}
 

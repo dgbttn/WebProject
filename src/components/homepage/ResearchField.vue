@@ -96,10 +96,10 @@ export default {
 			Vue.set(item, 'children', []);
 		},
 
-		addItem(item, data) {
+		addItem(data) {
 			//generate id
 
-			item.children.push({id: '', name: 'New item'});
+			data.item.children.push({id: data.id, name: 'New item'});
 			// item.children.push({id: data.newID, name: 'New item'});
 		},
 
