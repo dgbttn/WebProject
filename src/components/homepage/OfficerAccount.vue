@@ -334,8 +334,19 @@ export default {
 					});
 		},
 
+		validateData(data) {
+			for (var i in data)
+				for (var j in data[i])
+					if (!data[i][j]) return false;
+			return true;
+		},
+
 		fileAddAccept() {
-			// push this.newOfficer to server
+			if (!this.newOfficers.length || !this.validateData(this.newOfficers)) {
+				alert('Tệp đính kèm không khả dụng');
+				return;
+			}
+			// push this.newOfficers to server
 			this.newOfficers = [];
 			this.fileAddCancel();
 		},
