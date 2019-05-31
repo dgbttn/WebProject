@@ -6,6 +6,20 @@
 		<button type="button" v-on:click="initRandomList">Tạo mặc định</button>
 		<button type="button" class="add-btn" v-on:click="adding=true; searching=false" @keyup.esc="addCancel">Thêm mới</button>
 		<button type="button" class="search-btn" v-on:click="searching=true; adding=false;" @keyup.esc="searchCancel">Tìm kiếm</button>
+		<button type="button" class="file-btn" v-on:click="fileAdding=!fileAdding">Thêm tệp</button>
+		<input v-if="fileAdding" type="file" class="file-browser"
+				accept=".xlsx"
+				ref="loadedFile"
+				v-on:change="loadFile(getDataFromJSON)"></input>
+		<td v-if="fileAdding" class="file-confirm-domain">
+			<i class="fa fa-check-circle confirm-btn ok-btn" v-on:click="fileAddAccept">
+				<span class="tooltip-text">Xác nhận</span>
+			</i>
+			<i class="fa fa-times-circle confirm-btn no-btn" v-on:click="fileAddCancel">
+				<span class="tooltip-text">Hủy</span>
+			</i>
+		</td>
+		<br>
 
 		<div class="table-bound">
 			<table>
@@ -129,6 +143,7 @@
 
 <script>
 import {OfficerAccount} from '../classes/OfficerAccount.js'
+import XLSX from 'xlsx'
 
 export default {
 	name: 'OfficerAccount',
@@ -142,8 +157,10 @@ export default {
 			adding: false,
 			searching: false,
 			searched: false,
+			fileAdding: false,
 			newOfficer: {id:'', name:'', account:'', mail:'', position:'', degree:'', unit:''},
 			unitList: [],
+			newOfficers: [],
 		}
 	},
 
@@ -163,6 +180,7 @@ export default {
 
 	// Get data from server to this.list
 	created() {
+			this.initRandomList();
 		// this.$http.get('http://localhost/uFaculty/staff/StaffController/adminListStaff')
 		// 		.then(function (data) {
 		// 			this.list = [];
@@ -184,6 +202,7 @@ export default {
 	methods: {
 		// add some random accounts to the list
 		initRandomList() {
+
 			var officers = [];
 			officers.push(new OfficerAccount("1231","Hồ Văn Canh","canhkas","jashdj@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ môn Các Hệ thống Thông tin"));
 			officers.push(new OfficerAccount("3643","Lê Phê Đô","ádasd","ádasdsa@vnu.edu.vn","Giảng viên","Tiến sĩ","Bộ môn Mạng và Truyền thông Máy tính"));
@@ -303,6 +322,28 @@ export default {
 			this.newOfficer = {id:'', name:'', position:'', account:'', mail:'', degree:'', unit:''};
 		},
 
+		getDataFromJSON(json) {
+			this.newOfficers = [];
+			for (var i in json)
+				if (i>0 && json[i] && json[i][0])
+					this.newOfficers.push({
+						account: json[i][1],
+						password: json[i][2],
+						name: json[i][3],
+						VNUemail: json[i][4]
+					});
+		},
+
+		fileAddAccept() {
+			// push this.newOfficer to server
+			this.newOfficers = [];
+			this.fileAddCancel();
+		},
+
+		fileAddCancel() {
+			this.fileAdding = false;
+		},
+
 		searchOfficer() {
 			if (this.searched)
 				this.list = Array.from(Object.create(this.list_clone));
@@ -323,6 +364,24 @@ export default {
 					i--;
 				}
 			}
+		},
+
+		loadFile(callback) {
+			// console.log(this.$refs.loadedFile.files[0]);
+			var f = this.$refs.loadedFile.files[0];
+
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				var data = e.target.result;
+				data = new Uint8Array(data);
+				var workbook = XLSX.read(data, {type: "array"});
+				var firstSheetName = workbook.SheetNames[0];
+				var worksheet = workbook.Sheets[firstSheetName];
+
+				var json = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+				callback(json);
+			}
+			reader.readAsArrayBuffer(f);
 		},
 
 		searchCancel() {
@@ -391,6 +450,8 @@ export default {
 		color: #fff;
 		background-color: #3366ff;
 	}
+
+	.file-browser {width: 50%;}
 
 	table {border-spacing: 0px;}
 

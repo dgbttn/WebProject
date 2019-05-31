@@ -160,6 +160,8 @@ export default {
 		},
 
 		selectToEdit(i) {
+			if (this.searching) return;
+
 			this.editing = i;
 
 			this.editedUnit = {
@@ -289,7 +291,7 @@ export default {
 				// this.$http.post(url, {
 				// 	id: this.list[i].id
 				// }).then(function ($data) {
-				// 	this.list.splice(i,1);
+					this.list.splice(i,1);
 				// })
 			}
 
@@ -439,8 +441,6 @@ export default {
 	}
 
 	.tooltip-text {
-		word-wrap: normal;
-		word-wrap: normal;
 		visibility: hidden;
 		width: auto;
 		background-color: #4257B2;

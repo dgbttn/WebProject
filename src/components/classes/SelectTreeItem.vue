@@ -2,8 +2,8 @@
 	<li>
 		<div class="item-bound" :id="item.id">
 			<div class="item-btn" @click="toggle">
-				<i v-if="!isOpen&&isFolder" class="fa fa-caret-right show-btn"></i>
-				<i v-if="isOpen&&isFolder" class="fa fa-caret-down show-btn"></i>
+				<i v-if="!isOpen&&isFolder" class="fa fa-angle-right show-btn"></i>
+				<i v-if="isOpen&&isFolder" class="fa fa-angle-down show-btn"></i>
 			</div>
 
 			<div class="item-name"  v-on:click="selfSelect">
@@ -46,7 +46,6 @@ export default {
 
 		selfSelect() {
 			this.$emit('select', this.item);
-
 		}
 	}
 }
@@ -63,12 +62,7 @@ export default {
 
 	li {list-style-type: none;}
 
-	.bold {font-weight: bold;}
-
-	.selected {
-		font-weight: bold;
-		color: #ff0066;
-	}
+	.selected {	font-weight: bold;}
 
 	.item-bound {cursor: pointer;}
 	label {
@@ -95,7 +89,6 @@ export default {
 		margin: 0px 15px 0px 5px;
 	}
 
-	.fa-caret-down{color: #cc0000;}
 	i:hover {color: #ffcd1f;}
 
 	i {

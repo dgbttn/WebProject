@@ -61,7 +61,32 @@ export default {
 			// 		return;
 			// 	}
 			// 	else {
-			// 		console.log(this.nickname + ' ' + this.password + ' ' + this.rule);
+			// 		var url = 'http://localhost/uFaculty/Account/AccountController/validate'
+			// 		this.$http.post(url,{
+			// 			username: this.username,
+			// 			password: this.password,
+			// 			role: this.rule
+			// 		}).then(function (data) {
+			// 			var status = data.body.status;
+			// 			if (status == 0) {
+			// 				var reason = data.body.reason;
+			// 				alert(reason);
+			// 			}
+			// 				else {
+			// 				var token = data.body.data;
+			// 				var decoded_token = this.$jwtDec.decode(token);
+			// 				var expired_time = decoded_token.expired;
+			// 				var role = decoded_token.role;
+			// 				this.$cookie.set('user',token, expired_time);
+			// 				if (role == 'admin') {
+			// 					this.$router.push('/home')
+			// 				}
+			// 					else {
+			// 					console.log(role);
+			// 					this.$router.push('/staff-home')
+			// 				}
+			// 			}
+			// 		})
 			// 	}
 			// });
 

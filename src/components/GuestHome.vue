@@ -5,17 +5,7 @@
 				<div v-show="useMode==1" class="backward-btn" v-on:click="back">
 					<a class="nav-link">
 						<i class="fa fa-chevron-left"></i>
-						<span>Back</span>
-					</a>
-				</div>
-
-				<div class="account">
-					<a class="nav-link account-content dropdown-account">
-						<img src="../image/avatar.jpg" alt="user_avatar" class="avatar">
-
-						<span class="account-name">{{ username }}</span>
-
-						<i class="fa fa-chevron-down"></i>
+						<span>Trở lại</span>
 					</a>
 				</div>
 			</nav>
@@ -87,45 +77,84 @@
 		</div>
 
 		<div v-show="useMode==1" class="officer-info">
-			<div class="info-container">
-				<div class="name">
-					<i class="fa fa-user"></i>
-					<label >{{infoList[4]}}. {{infoList[0]}}</label>
+			<div class="container">
+				<div class="info-container">
+					<div class="info">
+
+						<div class="name">
+							<i class="fa fa-user"></i>
+							<label >{{infoList[4]}}. {{infoList[0]}}</label>
+						</div>
+
+						<div class="details">
+							<div class="detail-fields" v-for = "(field, i) in infoTitleList">
+								<div class="detail-label">
+									<i class="info-icon" :class="infoIconList[i]"></i>
+									<label >{{infoTitleList[i]}}:&nbsp</label>
+								</div>
+
+								<div class="detail-value">
+									<label>{{infoList[i+1]}}</label>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<img class="officer-image" v-bind:src="avatar_src">
 				</div>
 
-				<div class="details">
-					<div class="detail-fields" v-for = "(field, i) in infoTitleList">
-						<i class="info-icon" :class="infoIconList[i]"></i>
-						<label >{{infoTitleList[i]}}:&nbsp{{infoList[i+1]}}</label>
+				<br>
+
+				<div class="interested-field">
+					<span class="big-field-title">
+						Lĩnh vực quan tâm
+					</span>
+					<span class="sec-field-title">
+						Tất cả lĩnh vực
+					</span>
+					<br>
+
+					<div class="name-field">
+						<ul class="field-list">
+							<li v-for="field in officerInfo.interestedFields">
+								{{field.name}}
+							</li>
+						</ul>
+					</div>
+
+					<div class="show-field">
+						<div class="content-show">
+							<CheckTreeItem class="check-tree" :item="treeData">
+							</CheckTreeItem>
+						</div>
 					</div>
 				</div>
-			</div>
 
-			<div class="research-topic">
-				<span class="big-field-title">
-					Chủ đề nghiên cứu
-				</span>
-				<div class="show-field">
-					<ul class="topic-list">
-						<li	v-for="topic in officerInfo.researchTopics">
-							{{topic.name}}
-						</li>
-					</ul>
+				<div class="research-topic">
+					<span class="big-field-title">
+						Chủ đề nghiên cứu
+					</span>
+					<span class="sec-field-title">
+						Mô tả
+					</span>
+
+					<br>
+					<div class="name-field">
+						<ul class="topic-list">
+							<li	v-for="(topic,i) in officerInfo.researchTopics" class="topic-name"
+								v-on:click= "selectTopic(i)">
+								<span>{{topic.name}}</span>
+							</li>
+						</ul>
+					</div>
+
+					<div class="show-field">
+						<div class="content-show" v-if="selectedTopic>=0">
+							<span>{{officerInfo.researchTopics[selectedTopic].description}}</span>
+						</div>
+					</div>
 				</div>
-			</div>
 
-			<div class="interested-field">
-				<span class="big-field-title">
-					Lĩnh vực quan tâm
-				</span>
-
-				<div class="show-field">
-					<ul class="field-list">
-						<li v-for="field in officerInfo.interestedFields">
-							{{field}}
-						</li>
-					</ul>
-				</div>
 			</div>
 		</div>
 
@@ -135,17 +164,18 @@
 <script>
 import {OfficerAccount} from './classes/OfficerAccount.js'
 import SelectTreeItem from './classes/SelectTreeItem.vue'
+import CheckTreeItem from './classes/CheckTreeItem.vue'
 
 export default {
 	name: 'GuestHome',
 	components: {
-		SelectTreeItem
+		SelectTreeItem,
+		CheckTreeItem
 	},
 
 	data() {
 		return {
 			titles: ['Tìm kiếm giảng viên', 'Thông tin giảng viên'],
-			username: 'Sinh viên',
 			searchRule: 0, // =0 for unit, =1 for field
 			selectedUnit: -1,
 			selectedField: null,
@@ -155,7 +185,8 @@ export default {
 			treeData: {name: 'sss', children: []},
 			officerList: [],
 			useMode: 0, //0 for search officers, 1 for show selected officer's info
-
+			selectedTopic: -1,
+			avatar_src: require('../image/officer_avatar.jpg'),
 		}
 	},
 
@@ -185,6 +216,106 @@ export default {
 		// 				});
 		// 			}
 		// 		})
+
+		this.unitList.push({id: 3, name:'Bộ môn Khoa học máy tính'});
+		this.unitList.push({id: 4, name:'Bộ Công an'});
+		this.unitList.push({id: 1, name:'Bộ môn các hệ thống thông tin'});
+		this.unitList.push({id: 2, name:'Bộ môn Công nghệ phần mềm'});
+		let officers = [];
+		officers.push(new OfficerAccount("1231","Hồ Văn Canh","canhkas","jashdj@vnu.edu.vn","Giảng viên","Tiến sĩ",4));
+		officers.push(new OfficerAccount("3643","Lê Phê Đô","ádasd","ádasdsa@vnu.edu.vn","Giảng viên","Tiến sĩ",2));
+		officers.push(new OfficerAccount("345sd","Minh Châu","sdfv","ádwqr@vnu.edu.vn","Giảng viên","Tiến sĩ",4));
+		officers.push(new OfficerAccount("ád34","Hồ Văn Cường","ádadasđ","gdfdfgdf@vnu.edu.vn","Giảng viên","Tiến sĩ",4));
+
+		for (var i in officers)
+			this.officerList.push({
+				number : officers[i].number,
+				name : officers[i].name,
+				position : officers[i].position,
+				account : officers[i].account,
+				mail : officers[i].mail,
+				degree : officers[i].degree,
+				unit_id : officers[i].unit,
+				interestedFields: ['4','2']
+			});
+
+		this.officerInfo = {
+			name:'Lê Đình Thanh',
+			number:'12334',
+			position:'Giảng viên',
+			unit:'Phòng Thí nghiệm An toàn Thông tin',
+			degree:'TS',
+			phone:'0987654321',
+			VNUmail:'thanhld@vnu.edu.vn',
+			otherMail:'thanhld.vnuh@gmail.com',
+			website:'https://uet.vnu.edu.vn/~thanhld',
+			address:'Phòng 413 - E3',
+			staff_id: '',
+			researchTopics: [],
+			interestedFields: []
+		};
+
+		this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
+		this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
+		this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
+		this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
+		this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
+		this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
+		this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
+		this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
+		this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
+		this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
+		this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
+		this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
+		this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
+		this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
+		this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
+		this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
+		this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
+		this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
+		this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
+		this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
+		this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
+		this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
+		this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
+		this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
+
+		this.officerInfo.interestedFields.push({id: '3', name: 'Network security'});
+		// this.officerInfo.interestedFields.push({id: '6', name: 'Web application security'});
+		this.officerInfo.interestedFields.push({id: '7', name: 'Web protocol security'});
+		this.officerInfo.interestedFields.push({id: '8', name: 'Web application security'});
+
+		this.treeData = {
+			id: '1',
+			name: 'My Tree',
+			children: [
+				{ id: '2', name: 'hello' },
+				{ id: '3', name: 'wat' },
+				{
+					id: '4', name: 'child folder',
+					children: [
+						{
+							id: '5', name: 'child folder',
+							children: [
+								{ id: '6', name: 'hello' },
+								{ id: '7', name: 'wat' }
+							]
+						},
+						{ id: '8', name: 'hello' },
+						{ id: '9', name: 'wat' },
+						{
+							id: '10', name: 'child folder',
+							children: [
+								{ id: '11', name: 'hello' },
+								{ id: '12', name: 'wat' }
+							]
+						}
+					]
+				}
+			]
+		};
+
+		this.setupFieldTree(this.treeData, false);
 	},
 
 	computed: {
@@ -295,82 +426,14 @@ export default {
 
 	methods: {
 		initRandomList() {
-			this.unitList.push({id: 3, name:'Bộ môn Khoa học máy tính'});
-			this.unitList.push({id: 4, name:'Bộ Công an'});
-			this.unitList.push({id: 1, name:'Bộ môn các hệ thống thông tin'});
-			this.unitList.push({id: 2, name:'Bộ môn Công nghệ phần mềm'});
-			let officers = [];
-			officers.push(new OfficerAccount("1231","Hồ Văn Canh","canhkas","jashdj@vnu.edu.vn","Giảng viên","Tiến sĩ",4));
-			officers.push(new OfficerAccount("3643","Lê Phê Đô","ádasd","ádasdsa@vnu.edu.vn","Giảng viên","Tiến sĩ",2));
-			officers.push(new OfficerAccount("345sd","Minh Châu","sdfv","ádwqr@vnu.edu.vn","Giảng viên","Tiến sĩ",4));
-			officers.push(new OfficerAccount("ád34","Hồ Văn Cường","ádadasđ","gdfdfgdf@vnu.edu.vn","Giảng viên","Tiến sĩ",4));
 
-			for (var i in officers)
-				this.officerList.push({
-					number : officers[i].number,
-					name : officers[i].name,
-					position : officers[i].position,
-					account : officers[i].account,
-					mail : officers[i].mail,
-					degree : officers[i].degree,
-					unit_id : officers[i].unit,
-					interestedFields: ['4','2']
-				});
+		},
 
-			this.officerInfo = {
-				name:'Lê Đình Thanh',
-				number:'12334',
-				position:'Giảng viên',
-				unit:'Phòng Thí nghiệm An toàn Thông tin',
-				degree:'TS',
-				phone:'0987654321',
-				VNUmail:'thanhld@vnu.edu.vn',
-				otherMail:'thanhld.vnuh@gmail.com',
-				website:'https://uet.vnu.edu.vn/~thanhld',
-				address:'Phòng 413 - E3',
-				staff_id: '',
-				researchTopics: [],
-				interestedFields: []
-			};
-
-			this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
-			this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
-			this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
-
-			this.officerInfo.interestedFields.push('Network security');
-			this.officerInfo.interestedFields.push('Web application security');
-			this.officerInfo.interestedFields.push('Web protocol security');
-			this.officerInfo.interestedFields.push('Web application security');
-
-			this.treeData = {
-				id: '1',
-				name: 'My Tree',
-				children: [
-					{ id: '2', name: 'hello' },
-					{ id: '3', name: 'wat' },
-					{
-						id: '4', name: 'child folder',
-						children: [
-							{
-								id: '5', name: 'child folder',
-								children: [
-									{ id: '6', name: 'hello' },
-									{ id: '7', name: 'wat' }
-								]
-							},
-							{ id: '8', name: 'hello' },
-							{ id: '9', name: 'wat' },
-							{
-								id: '10', name: 'child folder',
-								children: [
-									{ id: '11', name: 'hello' },
-									{ id: '12', name: 'wat' }
-								]
-							}
-						]
-					}
-				]
-			}
+		setupFieldTree(item, selected) {
+			selected = selected || this.officerInfo.interestedFields.map(f => f.id).includes(item.id);
+			item.isSelected = selected;
+			for (var i in item.children)
+				this.setupFieldTree(item.children[i], selected);
 		},
 
 		openSearchItem(index) {
@@ -409,8 +472,18 @@ export default {
 
 		selectOfficer(id) {
 			this.selectedOfficer = id;
+			// this.avatar_src = ...
 			// this.officerInfo = ....
 			this.useMode = 1;
+		},
+
+		selectTopic(i) {
+			if (this.selectedTopic>-1)
+				document.getElementsByClassName('topic-name')[this.selectedTopic].className =
+				document.getElementsByClassName('topic-name')[this.selectedTopic].className.replace(" active", "");
+			this.selectedTopic = i;
+			if (i<0) return;
+			document.getElementsByClassName('topic-name')[i].className += " active";
 		},
 
 		back() {
@@ -467,7 +540,7 @@ export default {
 	.backward-btn {
 		margin-top: 1px;
 		float: left;
-		width: 100px;
+		width: 150px;
 	}
 
 	.backward-btn a i, .backward-btn a span {
@@ -501,7 +574,7 @@ export default {
 	}
 
 	.search-field {
-		margin-top: 24px;
+		/* margin-top: 8px; */
 		margin-left: 5%;
 		width: 35%;
 		left: 0;
@@ -520,9 +593,9 @@ export default {
 
 	.content-bound .tabs-navigation span.active {
 		font-weight: bold;
-		background-color: #d9e9f2;
+		background-color: #FFCCCC;
 		color: #3E5252;
-		border-top: 3px solid #3EB3F6;
+		border-top: 3px solid #FF4D4D;
 	}
 
 	.search-container {
@@ -531,7 +604,7 @@ export default {
 		border-color: #d9e9f2 transparent #d9e9f2 #d9e9f2;
 		height: 380px;
 		overflow: auto;
-		padding: 15px 5px 5px 15px;
+		/* padding: 15px 5px 5px 15px; */
 	}
 
 	::-webkit-scrollbar {
@@ -556,14 +629,14 @@ export default {
 	.content-bound .unit-list {
 		list-style-type: none;
 		font-size: 14.5px;
-		padding: 5px 5px 5px 15px;
+		/* padding: 5px 5px 5px 15px; */
 		margin: 0px 0px;
 	}
 
 	.content-bound .unit-list li {
 		margin: 1.5px 0px;
 		cursor: pointer;
-		color: #40bf9f;
+		color: #00cca3;
 	}
 
 	.content-bound .unit-list li:hover {color: #2d8386;}
@@ -572,13 +645,17 @@ export default {
 
 	.content-bound .show-field {
 		margin-left: 43%;
-		margin-top: 10px;
+		margin-top: 20px;
 		text-align: left;
+	}
+
+	.select-tree {
+		margin: 10px 5px 5px 15px;
 	}
 
 	table {
 		border-spacing: 0px;
-		margin-top: 8px;
+		margin-top: 20px;
 	}
 
 	.table-bound {
@@ -635,35 +712,50 @@ export default {
 
 	a {text-decoration: none;}
 
-	.officer-info {
+	.container {
 		margin: 25px 50px 0px 50px;
 	}
 
 	.info-container {
-		margin-left: 40px;
+		margin: 20px 60px 20px 60px;
 		left: 0;
-		width: 35%;
-		position: fixed;
 	}
 
-	.name {
+	.container .info {
+		width: 55%;
+		display: inline-block;
+	}
+
+	.container .officer-image {
+		display: inline-block;
+		max-height: 260px;
+		float: right;
+		border: 1px solid gray;
+		margin-right: 10%;
+		max-width: 30%;
+		top: 0;
+	}
+
+	.container .name {
 		font-size: 25px;
 		font-weight: bold;
 		color: #990000;
 	}
 
-	.name i, .name label {margin: 0px 5px;}
+	.container .name i, .name label {margin: 0px 5px;}
 
-	.details {
-		display: block;
-		padding: 5px 0px 5px 20px;
+	.container .details {
+		display: inline-block;
+		padding: 5px 0px 5px 35px;
 		color: #455358;
 		font-size: 14px;
 	}
 
-	.detail-fields {margin-top: 3px;}
+	.container .detail-fields {margin-top: 3px;}
 
-	.info-icon {
+	.container .detail-fields div {display: inline-block;}
+
+	.container .info-icon {
 		padding: 0px 5px;
 		vertical-align: middle;
 		text-align: center;
@@ -672,40 +764,76 @@ export default {
 		display: inline-block;
 	}
 
-	.research-topic {margin-left: 38%;}
+	.detail-value {word-break: break-all;}
 
-	.interested-field {
-		margin-left: 70%;
-		margin-top: -42px;
+	.research-topic {
+		padding: 20px 40px 20px 40px;
 	}
 
-	.officer-info div span.big-field-title {
-		font-size: 16px;
+	.interested-field {
+		padding: 20px 40px 20px 40px;
+	}
+
+	.big-field-title {
+		font-size: 17px;
 		font-weight: bold;
 		background-color: #ffcccc;
-		color: #3E5252;
 		border-top: 3px solid #ff4d4d;
 		padding: 7px 15px;
 		display: inline-block;
-		cursor: pointer;
+		width: 274px;
+		vertical-align: middle;
+		text-align: center;
 	}
 
-	.officer-info div span.big-field-title:hover {background-color: #ffb3b3;}
+	.sec-field-title {
+		font-size: 17px;
+		font-weight: bold;
+		padding: 7px 15px;
+		display: inline-block;
+		width: 60%;
+		overflow: hidden;
+		vertical-align: middle;
+		text-align: center;
+		border-top: 3px solid #ff8a5c;
+		background-color: #ffc8b3;
+	}
 
-	.officer-info .show-field {
+	.name-field {
 		transition: 0.2s;
 		border: 2px solid;
-		border-color: #ffcccc transparent transparent #ffcccc;
-		padding: 5px;
-		height: 55%;
-		width: 25%;
-		position: fixed;
+		border-color: #ffcccc #ffcccc #ffcccc #ffcccc;
+		width: 300px;
+		height: 300px;
+		background-color: #f8f8f8;
+		overflow-y: auto;
+		display: inline-block;
+	}
+
+	.container .show-field {
+		display: inline-block;
+		height: 300px;
+		width: 60%;
 		overflow: auto;
+		background-color: #f8f8f8;
+		border: 2px solid;
+		border-color: #ffc8b3 #ffc8b3 #ffc8b3 #ffc8b3;
+		padding: 0px 13px;
+	}
+
+	.container .content-show {
+		display: block;
+		padding: 15px 10px 10px 10px;
+		font-size: 14px;
+	}
+
+	.container .content-show span {
+		white-space: pre-wrap;
 	}
 
 	.officer-info ::-webkit-scrollbar {
 		width: 8px;
-		height: 12px;
+		height: 8px;
 	}
 
 	.officer-info ::-webkit-scrollbar-track {
@@ -719,6 +847,31 @@ export default {
 	}
 
 	.officer-info ::-webkit-scrollbar-thumb:hover {background: #3EB3F6;}
+
+	ul {
+		margin: 0px;
+		padding: 0px;
+		list-style-type: none;
+	}
+
+	ul li {
+		padding: 13px 20px;
+		background-color: #E0EDF4;
+		cursor: pointer;
+		font-size: 14px;
+		color: #3E5252;
+	}
+
+	ul li:hover {
+		background-color: #fff9b3;
+	}
+
+	.topic-list li.active {
+		border-left: 3px solid #ffcd1f;
+		background-color: #fff9b3;
+		font-weight: bold;
+		font-size: 15px;
+	}
 
 	*{line-height: 1.5;}
 </style>

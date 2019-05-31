@@ -9,42 +9,50 @@
 				</div>
 
 				<div class="account">
-					<a href="#" class="nav-link account-content dropdown-account">
+					<a href="" class="nav-link account-content dropdown-account">
 						<img src="../image/avatar.jpg" alt="user_avatar" class="avatar">
 
 						<span class="account-name">{{ username }}</span>
 
 						<i class="fa fa-chevron-down"></i>
 					</a>
+					<span class="bonus change-password" v-on:click="changePassword">
+						<i class="fa fa-key"></i>&nbsp;
+						Đổi mật khẩu
+					</span><br>
+					<span class="bonus log-out" v-on:click="Logout">
+						<i class="fa fa-sign-out"></i>&nbsp;
+						Đăng xuất
+					</span>
 				</div>
 			</nav>
 		</div>
 
 		<div class="content-bound">
 			<div class="tool-bar">
-				<div class="tool-control unit-control-btn" v-on:click="openTool('unit-control')">
+				<div class="tool-control unit-control-btn active" v-on:click="openTool('unit-control', 0)">
 					<i class="fa fa-th tool-icon"></i>
 					<span v-if="!minimize" class="tool-name">QUẢN LÍ ĐƠN VỊ</span>
 				</div>
-				<div class="tool-control officer-account-btn" v-on:click="openTool('officer-account')">
+				<div class="tool-control officer-account-btn" v-on:click="openTool('officer-account', 1)">
 					<i class="fa fa-user tool-icon"></i>
 					<span v-if="!minimize" class="tool-name">TÀI KHOẢN GIẢNG VIÊN</span>
 				</div>
-				<div class="tool-control research-field-btn" v-on:click="openTool('research-field')">
+				<div class="tool-control research-field-btn" v-on:click="openTool('research-field', 2)">
 					<i class="fa fa-tasks tool-icon"></i>
 					<span v-if="!minimize" class="tool-name">LĨNH VỰC NGHIÊN CỨU</span>
 				</div>
 			</div>
 
-			<div class="container">
-				<div class="unit-control content" id="unit-control">
-					<UnitControl />
+			<div class="container" id="root">
+				<div v-show="useMode==0" class="unit-control content" id="unit-control" >
+					<UnitControl ref="unit"/>
 				</div>
-				<div class="officer-account content" id="officer-account">
-					<OfficerAccount />
+				<div v-show="useMode==1" class="officer-account content" id="officer-account" >
+					<OfficerAccount ref="account"/>
 				</div>
-				<div class="research-field content" id="research-field">
-					<ResearchField />
+				<div v-show="useMode==2" class="research-field content" id="research-field" >
+					<ResearchField ref="field"/>
 				</div>
 			</div>
 		</div>
@@ -68,24 +76,60 @@ export default {
 		return {
 			username: 'Tung',
 			minimize: false,
+			useMode: 0, 	/* 	0 for unit-control,
+								1 for officer-account,
+								2 for research-field */
+
 		}
+	},
+
+	created() {
+		// var token = this.$cookie.get('user');
+		// if (token == null) {
+		// 	this.$router.push('/login');
+		// }
+		// 	else {
+		// 	var decoded_token = this.$jwtDec.decode(token);
+		// 	var role = decoded_token.role;
+		// 	if (role == null) {
+		// 		this.$router.push('/login');
+		// 	}
+		// 	else {
+		// 		if (role == 'lecture') {
+		// 			this.$router.push('/staff-home');
+		// 		}
+		// 	}
+		// }
 	},
 
 	methods: {
 		// show the selected tool
-		openTool(toolName) {
+		openTool(toolName, index) {
+			this.useMode = index;
 			var i, tabs, contents;
-
-			contents = document.getElementsByClassName('content');
-			for (i=0; i<contents.length; i++)
-			contents[i].style.display = "none";
 
 			tabs = document.getElementsByClassName('tool-control');
 			for (i=0; i<tabs.length; i++)
 			tabs[i].className = tabs[i].className.replace(" active", "");
 
-			document.getElementById(toolName).style.display = "block";
 			document.getElementsByClassName(toolName+'-btn')[0].className += " active";
+
+			switch (this.useMode) {
+				// Unit Control
+				case 0:
+					this.$refs.unit.initRandomList();
+					break;
+
+				// Officer Account
+				case 1:
+					this.$refs.account.initRandomList();
+					break;
+
+				// Research Field
+				case 2:
+					this.$refs.field.initRandomTree();
+					break;
+			}
 
 		},
 
@@ -94,19 +138,25 @@ export default {
 				this.minimize = !this.minimize;
 				document.getElementsByClassName('tool-bar')[0].style.width = "65px";
 				document.getElementsByClassName('container')[0].style.marginLeft = "120px";
-				console.log(document.getElementsByClassName('container')[0].style.marginLeft);
 				return;
 			}
 			this.minimize = !this.minimize;
 			document.getElementsByClassName('container')[0].style.marginLeft = "22%";
 			document.getElementsByClassName('tool-bar')[0].style.width = "20%";
+		},
+
+		changePassword() {
+			console.log('change password');
+		},
+
+		Logout() {
+			console.log('log out');
 		}
 	}
 }
 </script>
 
 <style scoped>
-	@import "https://cdn.jsdelivr.net/npm/animate.css@3.5.1";
 
 	.header {
 		width: 100%;
@@ -116,6 +166,7 @@ export default {
 		left: 0;
 		position: fixed;
 		color: #e2eff1;
+		z-index: 1;
 	}
 
 	.navbar {
@@ -144,21 +195,39 @@ export default {
 	.account {
 		float: right;
 		margin-top: 1px;
-		background-color: inherit;
+		background-color: #555273;
+		position: relative;
+		height: 48px;
 	}
 
-	.navbar div:hover, div:focus {
-		background-color: #ffcd1f;
-		color: #455358;
+	.account:hover {background-color: #4080bf;}
+
+	.account:hover .bonus {visibility: visible;}
+
+	.bonus {
+		visibility: hidden;
+		z-index: 1;
+		width: 100%;
+		text-align: center;
+		background-color: #4080bf;
+		position: absolute;
+		padding: 10px 0px 10px 0px;
+		cursor: pointer;
+		font-size: 14px;
 	}
 
-	.navbar div {
-		transition: 0.2s;
+	.bonus:hover {background-color: #336699;}
+
+	.change-password {top: 100%;}
+
+	.log-out {top: 186%;}
+
+	.bonus span {
+		width: 100%;
+		position: absolute;
 	}
 
-	.content-bound {
-		transition: 0.2s;
-	}
+	.navbar div, .content-bound {transition: 0.2s;}
 
 	.task-icon {
 		font-size: 22px;
@@ -171,6 +240,11 @@ export default {
 		color: inherit;
 		background-color: inherit;
 		cursor: pointer;
+	}
+
+	.task-icon:hover {
+		background-color: #ffcd1f;
+		color: #455358;
 	}
 
 	.tool-bar {
@@ -219,7 +293,7 @@ export default {
 		transition: 0.2s;
 	}
 
-	.content {display: none;}
+	/* .content {display: none;} */
 
 	img {
 		vertical-align: middle;

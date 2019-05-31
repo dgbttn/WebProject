@@ -54,7 +54,6 @@ export default {
 		},
 
 		selfSelect() {
-			this.item.isSelected = !this.item.isSelected;
 			this.$emit('select', this.item);
 		}
 	}

@@ -2,7 +2,6 @@
 	<app-root name="app-root">
 		<div class="header">
 			<nav class="navbar">
-
 				<div class="account">
 					<a class="nav-link account-content dropdown-account">
 						<img src="../image/avatar.jpg" alt="user_avatar" class="avatar">
@@ -11,6 +10,14 @@
 
 						<i class="fa fa-chevron-down"></i>
 					</a>
+					<span class="bonus change-password" v-on:click="changePassword">
+						<i class="fa fa-key"></i>&nbsp;
+						Đổi mật khẩu
+					</span><br>
+					<span class="bonus log-out" v-on:click="logOut">
+						<i class="fa fa-sign-out"></i>&nbsp;
+						Đăng xuất
+					</span>
 				</div>
 			</nav>
 		</div>
@@ -22,7 +29,7 @@
 		</div>
 
 		<div class="container">
-			<div v-if="true" class="info-container">
+			<div class="info-container">
 				<div class="info">
 					<div class="name">
 						<i class="fa fa-user"></i>
@@ -161,13 +168,11 @@
 
 <script>
 import CheckTreeItem from './classes/CheckTreeItem.vue'
-import Comp from './Comp.vue'
 
 export default {
 	name: 'OfficerHome',
 	components: {
-		CheckTreeItem,
-		Comp
+		CheckTreeItem
 	},
 	data() {
 		return {
@@ -181,7 +186,7 @@ export default {
 			topicEditing: false,
 			topicEditedValue: {},
 			topicAdding: false,
-			treeData: Object,
+			treeData: {id:'',name:'', isSelected:false, children:[]},
 			fieldEditing: false,
 		}
 	},
@@ -358,6 +363,7 @@ export default {
 		},
 
 		selectField(item) {
+			item.isSelected = !item.isSelected;
 			if (!this.fieldEditing) this.fieldEditing=true;
 
 			// item.i
@@ -448,6 +454,14 @@ export default {
 		addTopic() {
 			this.officerInfo.researchTopics.push({name: 'New Topic', description: ''});
 			this.selectTopicToEdit(this.officerInfo.researchTopics.length - 1);
+		},
+
+		changePassword() {
+			console.log('change password');
+		},
+
+		logOut() {
+			console.log('log out');
 		}
 	},
 
@@ -477,14 +491,12 @@ export default {
 	.navbar {
 		border: 1px solid #e7e7e7;
 		margin-bottom: 10px;
-		text-align: center;
 	}
 
 	/* buttons on navbar*/
 	.nav-link {
 		display: block;
 		padding: .5rem 1rem;
-		color: inherit;
 		cursor: pointer;
 	}
 
@@ -502,12 +514,37 @@ export default {
 	.account {
 		float: right;
 		margin-top: 1px;
-		background-color: inherit;
+		background-color: #555273;
+		position: relative;
+		height: 48px;
 	}
 
-	.navbar div:hover, div:focus {
-		background-color: #ffcd1f;
-		color: #455358;
+	.account:hover {background-color: #4080bf;}
+
+	.account:hover .bonus {visibility: visible;}
+
+	.bonus {
+		visibility: hidden;
+		z-index: 1;
+		width: 100%;
+		text-align: center;
+		background-color: #4080bf;
+		position: absolute;
+		padding: 10px 0px 10px 0px;
+		cursor: pointer;
+		line-height: 1.5;
+		font-size: 14px;
+	}
+
+	.bonus:hover {background-color: #336699;}
+
+	.change-password {top: 100%;}
+
+	.log-out {top: 186%;}
+
+	.bonus span {
+		width: 100%;
+		position: absolute;
 	}
 
 	.navbar div {transition: 0.2s;}
