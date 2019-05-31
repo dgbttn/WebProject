@@ -73,12 +73,20 @@
 				<span class="sec-field-title">
 					Tất cả lĩnh vực
 				</span>
+				<div v-if="fieldEditing" class="confirm-domain">
+					<i class="fa fa-check confirm-btn ok-btn" v-on:click="editFieldAccept">
+						<span class="tooltip-text">Xác nhận</span>
+					</i>
+					<i class="fa fa-times confirm-btn no-btn" v-on:click="editFieldCancel">
+						<span class="tooltip-text">Hủy</span>
+					</i>
+				</div>
 				<br>
 
 				<div class="name-field">
 					<ul class="field-list">
 						<li v-for="field in officerInfo.interestedFields">
-							{{field}}
+							{{field.name}}
 						</li>
 					</ul>
 				</div>
@@ -153,11 +161,13 @@
 
 <script>
 import CheckTreeItem from './classes/CheckTreeItem.vue'
+import Comp from './Comp.vue'
 
 export default {
 	name: 'OfficerHome',
 	components: {
-		CheckTreeItem
+		CheckTreeItem,
+		Comp
 	},
 	data() {
 		return {
@@ -171,13 +181,69 @@ export default {
 			topicEditing: false,
 			topicEditedValue: {},
 			topicAdding: false,
-			treeData: {},
-			selectedFields: [],
+			treeData: Object,
+			fieldEditing: false,
 		}
 	},
 
 	created() {
+		this.officerInfo = {
+			name:'Lê Đình Thanh',
+			number:'12334',
+			position:'Giảng viên',
+			unit:'Phòng Thí nghiệm An toàn Thông tin',
+			degree:'TS',
+			phone:'0987654321',
+			VNUmail:'thanhld@vnu.edu.vn',
+			otherMail:'thanhld.vnuh@gmail.com',
+			website:'https://uet.vnu.edu.vn/~thanhld',
+			address:'Phòng 413 - E3',
+			staff_id: '',
+			researchTopics: [],
+			interestedFields: []
+		};
 
+		this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
+		this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
+		this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
+
+		this.officerInfo.interestedFields.push({id: '3', name: 'Network security'});
+		// this.officerInfo.interestedFields.push({id: '6', name: 'Web application security'});
+		this.officerInfo.interestedFields.push({id: '7', name: 'Web protocol security'});
+		this.officerInfo.interestedFields.push({id: '8', name: 'Web application security'});
+
+		this.treeData = {
+			id: '1',
+			name: 'My Tree',
+			isSelected: false,
+			children: [
+				{ id: '2', isSelected: false, name: 'An toàn thông tin' },
+				{ id: '3', isSelected: false, name: 'Network security' },
+				{
+					id: '4', isSelected: false, name: 'An toàn thông tin',
+					children: [
+						{
+							id: '5', isSelected: false, name: 'Web application security',
+							children: [
+								{ id: '6', isSelected: false, name: 'Mạng cảm biến không dây' },
+								{ id: '7', isSelected: false, name: 'Web protocol security' }
+							]
+						},
+						{ id: '8', isSelected: false, name: 'Mạng cảm biến không dây Network security' },
+						{ id: '9', isSelected: false, name: 'Network security' },
+						{
+							id: '10', isSelected: false, name: 'Web application security',
+							children: [
+								{ id: '11', isSelected: false, name: 'Web protocol security' },
+								{ id: '12', isSelected: false, name: 'Network security Web protocol security' }
+							]
+						}
+					]
+				}
+			]
+		};
+
+		this.setupFieldTree(this.treeData, false);
 	},
 
 	computed:{
@@ -249,73 +315,31 @@ export default {
 
 	methods: {
 		initRandomList() {
-			// this.officerInfo = [
-			// 	'Lê Đình Thanh', 						//name:
-			// 	'12334', 								//id:
-			// 	'Giảng viên', 							//position:
-			// 	'Phòng Thí nghiệm An toàn Thông tin', 	//unit:
-			// 	'TS', 									//degree:
-			// 	'0987654321', 							//phone:
-			// 	'thanhld@vnu.edu.vn', 					//VNUmail:
-			// 	'thanhld.vnuh@gmail.com', 				//otherMail:
-			// 	'https://uet.vnu.edu.vn/~thanhld', 		//website:
-			// 	'Phòng 413 - E3' 						//address:
-			// ];
 
-			this.officerInfo = {
-				name:'Lê Đình Thanh',
-				number:'12334',
-				position:'Giảng viên',
-				unit:'Phòng Thí nghiệm An toàn Thông tin',
-				degree:'TS',
-				phone:'0987654321',
-				VNUmail:'thanhld@vnu.edu.vn',
-				otherMail:'thanhld.vnuh@gmail.com',
-				website:'https://uet.vnu.edu.vn/~thanhld',
-				address:'Phòng 413 - E3',
-				staff_id: '',
-				researchTopics: [],
-				interestedFields: []
-			};
+		},
 
-			this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
-			this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
-			this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
+		setupFieldTree(item, selected) {
+			selected = selected || this.officerInfo.interestedFields.map(f => f.id).includes(item.id);
+			item.isSelected = selected;
+			for (var i in item.children)
+				this.setupFieldTree(item.children[i], selected);
+		},
 
-			this.officerInfo.interestedFields.push('Network security');
-			this.officerInfo.interestedFields.push('Web application security');
-			this.officerInfo.interestedFields.push('Web protocol security');
-			this.officerInfo.interestedFields.push('Web application security');
+		updateFieldTree(item, selected) {
+			item.isSelected = selected;
+			for (var i in item.children)
+				this.updateFieldTree(item.children[i], selected);
+		},
 
-			this.treeData = {
-				id: '1',
-				name: 'My Tree',
-				children: [
-					{ id: '2', name: 'An toàn thông tin' },
-					{ id: '3', name: 'Network security' },
-					{
-						id: '4', name: 'An toàn thông tin',
-						children: [
-							{
-								id: '5', name: 'Web application security',
-								children: [
-									{ id: '6', name: 'Mạng cảm biến không dây' },
-									{ id: '7', name: 'Web protocol security' }
-								]
-							},
-							{ id: '8', name: 'Mạng cảm biến không dây Network security' },
-							{ id: '9', name: 'Network security' },
-							{
-								id: '10', name: 'Web application security',
-								children: [
-									{ id: '11', name: 'Web protocol security' },
-									{ id: '12', name: 'Network security Web protocol security' }
-								]
-							}
-						]
-					}
-				]
+		findParents(node, id) {
+			if (!(node.children && node.children.length)) return null;
+			let res = null;
+			for (var i in node.children) {
+				if (node.children[i].id == id) return [node, i];
+				res = this.findParents(node.children[i], id);
+				if (res!=null) return res;
 			}
+			return res;
 		},
 
 		editValue() {
@@ -328,16 +352,53 @@ export default {
 		},
 
 		unselectField(item) {
-
+			this.updateFieldTree(item, false);
+			let parents = this.findParents(this.treeData, item.id);
+			if (parents) parents[0].isSelected = false;
 		},
 
 		selectField(item) {
-			if (this.selectedFields.includes(item.id)) {
-				unselectField(item);
+			if (!this.fieldEditing) this.fieldEditing=true;
+
+			// item.i
+			if (!item.isSelected) {
+				this.unselectField(item);
 				return;
 			}
 
-			
+			item.isSelected = true;
+			this.updateFieldTree(item, true);
+
+			let parentsSelected = true;
+			let parents = this.findParents(this.treeData, item.id);
+			if (!parents) return;
+
+			for (let i in parents[0].children)
+				if (!parents[0].children[i].isSelected) {
+					parentsSelected = false;
+					break;
+				}
+			parents[0].isSelected = parentsSelected;
+		},
+
+		updateInterestedFields(item) {
+			if (item.isSelected){
+				this.officerInfo.interestedFields.push({id: item.id, name: item.name});
+				return;
+			}
+			for (let i in item.children)
+				this.updateInterestedFields(item.children[i]);
+		},
+
+		editFieldAccept(item) {
+			this.officerInfo.interestedFields = [];
+			this.updateInterestedFields(this.treeData);
+			this.fieldEditing = false;
+		},
+
+		editFieldCancel() {
+			this.fieldEditing = false;
+			this.setupFieldTree(this.treeData, false);
 		},
 
 		selectTopicToEdit(i) {
@@ -410,6 +471,7 @@ export default {
 		left: 0;
 		position: fixed;
 		color: #e2eff1;
+		z-index: 1;
 	}
 
 	.navbar {
@@ -665,7 +727,7 @@ export default {
 		display: inline-block;
 		height: 300px;
 		width: 60%;
-		overflow-y: auto;
+		overflow: auto;
 		background-color: #f8f8f8;
 		border: 2px solid;
 		border-color: #ffc8b3 #ffc8b3 #ffc8b3 #ffc8b3;
@@ -684,7 +746,7 @@ export default {
 
 	::-webkit-scrollbar {
 		width: 8px;
-		height: 12px;
+		height: 8px;
 	}
 
 	::-webkit-scrollbar-track {

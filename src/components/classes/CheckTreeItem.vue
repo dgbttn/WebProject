@@ -2,18 +2,20 @@
 	<li>
 		<div class="item-bound" :id="item.id">
 			<div class="item-btn" @click="toggle">
-				<i v-if="!isOpen&&isFolder" class="fa fa-caret-right show-btn"></i>
-				<i v-if="isOpen&&isFolder" class="fa fa-caret-down show-btn"></i>
+				<i v-if="!isOpen&&isFolder" class="fa fa-chevron-right show-btn"></i>
+				<i v-if="isOpen&&isFolder" class="fa fa-chevron-down show-btn"></i>
+			</div>
+
+			<div class="selection" v-on:click="selfSelect">
+				<i v-if="!item.isSelected" class="fa fa-square-o"></i>
+				<i v-else class="fa fa-check-square"></i>
 			</div>
 
 			<div class="item-name">
 				<label >{{ item.name }}</label>
 			</div>
 
-			<div class="selection" v-on:click="selfSelect">
-				<i v-if="!isSelected" class="fa fa-square-o"></i>
-				<i v-else class="fa fa-check-square"></i>
-			</div>
+
 		</div>
 
 		<ul class="children-list" v-show="isOpen" v-if="isFolder">
@@ -35,8 +37,7 @@ export default {
 
 	data() {
 		return {
-			isOpen: false,
-			isSelected: false,
+			isOpen: true,
 		}
 	},
 
@@ -53,13 +54,16 @@ export default {
 		},
 
 		selfSelect() {
-			this.isSelected = !this.isSelected;
+			this.item.isSelected = !this.item.isSelected;
+			this.$emit('select', this.item);
 		}
 	}
 }
 </script>
 
 <style scoped>
+	@import "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css";
+
 	ul {
 		list-style-type: none;
 		margin-block-start: 0px;
@@ -85,20 +89,24 @@ export default {
 	.show-btn {
 		width: 100%;
 		height: 100%;
-		margin-bottom: 2px;
+		/* margin-bottom: 2px; */
+		font-size: 14px;
+		margin-top: 3px;
+		-webkit-text-stroke: 1px #f8f8f8;
 	}
 
 	.item-name {
 		display: inline-block;
 		margin: 0px 10px 0px 5px;
-		width: 70%;
+		/* width: 70%; */
 		vertical-align: middle;
+		white-space: nowrap;
 	}
 
 	.selection {
 		display: inline-block;
 		margin: 0px 5px 0px 5px;
-		float: right;
+		/* float: right; */
 		vertical-align: middle;
 	}
 
@@ -113,4 +121,7 @@ export default {
 		position: relative;
 		text-align: center;
 	}
+
+	.fa-square-o {color: #006633;}
+	.fa-check-square {color: #00b300;}
 </style>
