@@ -147,6 +147,7 @@
 
 			},
 
+			// minimize the left nav bar
 			toggle() {
 				if (!this.minimize) {
 					this.minimize = !this.minimize;

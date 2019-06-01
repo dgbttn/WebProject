@@ -74,6 +74,8 @@
             }
         },
         methods: {
+
+            // change the password
             changePass(){
                 var msg_success = document.getElementById("success-block");
                 var msg_error = document.getElementById("error-block");
@@ -84,7 +86,7 @@
                     setTimeout(function(){ msg_warning.style.display = "none" }, 3000);
                 } else {
                     if(this.re_new_password == this.new_password){
-                        console.log(this.username);
+                        // console.log(this.username);
                         var url = 'http://localhost/uFaculty/account/AccountController/changePassword';
                         this.$http.post(url,{
                             username: this.username,

@@ -39,17 +39,20 @@
             }
         },
         computed: {
+            // the current node is a folder or not
             isFolder() {
                 return this.item.children && this.item.children.length;
             }
         },
         methods: {
+            // open/close the current node
             toggle() {
                 if (this.isFolder)
                     this.isOpen = !this.isOpen;
             },
+
+            // select the current node
             selfSelect() {
-                this.item.isSelected = !this.item.isSelected;
                 this.$emit('select', this.item);
             }
         }
@@ -57,7 +60,6 @@
 </script>
 
 <style scoped>
-    @import "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css";
     ul {
         list-style-type: none;
         margin-block-start: 0px;
@@ -97,7 +99,9 @@
         /* float: right; */
         vertical-align: middle;
     }
+
     .fa-caret-down{color: #cc0000;}
+
     i:hover {color: #ffcd1f;}
     i {
         font-size: 19px;
@@ -107,6 +111,6 @@
         position: relative;
         text-align: center;
     }
-    .fa-square-o {color: #ea4d2f;}
-    .fa-check-square {color: #ff502f;}
+    .fa-square-o {color: #ea6311;}
+    .fa-check-square {color: #ffa323;}
 </style>

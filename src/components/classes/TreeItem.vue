@@ -63,17 +63,20 @@ export default {
 	},
 
 	computed: {
+		// the current node is a folder or not
 		isFolder() {
 			return this.item.children && this.item.children.length;
 		}
 	},
 
 	methods: {
+		// open/close the current node
 		toggle() {
 			if (this.isFolder)
 				this.isOpen = !this.isOpen;
 		},
 
+		// make the current node become a folder
 		makeFolder() {
 			if (!this.isFolder) {
 				this.$emit('make-folder', this.item);
@@ -106,6 +109,7 @@ export default {
 			this.editing = false;
 		},
 
+		// remove the current node
 		selfRemove() {
 			if(confirm("Bạn chắc chắn muốn xóa Mục này và các mục con của nó chứ?")){
 				this.$emit('remove-item', this.item.id);

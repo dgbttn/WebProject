@@ -248,6 +248,8 @@
 							}
 						})
 			},
+
+			// select officer to edit informations
 			selectToEdit(i) {
 				this.editing = i;
 				this.editedOfficer = {
@@ -299,6 +301,8 @@
 			editCancel() {
 				this.editing = -1;
 			},
+
+			// accept adding/searching form
 			formAccept() {
 				if (this.adding) {
 					this.addOfficer();
@@ -306,6 +310,8 @@
 				}
 				else this.searchOfficer();
 			},
+
+			// ignore adding/searching form
 			formCancel() {
 				if (this.adding) this.addCancel()
 				else this.searchCancel();
@@ -378,6 +384,8 @@
 						if (!data[i][j]) return false;
 				return true;
 			},
+
+			// confirm add information from loaded file
 			fileAddAccept() {
 				// kiểm tra định dạng của file excel nhập vào
 				if (!this.newOfficers.length || !this.validateData(this.newOfficers)) {
@@ -418,6 +426,8 @@
 				})
 				// push this.newOfficers to server
 			},
+
+			// adding file cancel
 			fileAddCancel() {
 				this.fileAdding = false;
 			},
@@ -444,6 +454,8 @@
 					}
 				}
 			},
+
+			// searching cancel
 			searchCancel() {
 				if (this.searched) this.list = Array.from(Object.create(this.list_clone));
 				this.searching = false;
@@ -488,8 +500,6 @@
 </script>
 
 <style scoped>
-	@import "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css";
-	@import "https://cdn.jsdelivr.net/npm/animate.css@3.5.1";
 	.note {
 		font-size: 11px;
 		font-style: italic;

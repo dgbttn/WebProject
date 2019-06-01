@@ -2,7 +2,7 @@
 	<div class="content-bound">
 		<span class="note">*Quyền quản trị viên</span>
 		<br>
-		<span class="note">Double click de make folder cho node</span>
+		<span class="note">Click đúp để sửa tên lĩnh vực</span>
 		<br>
 
 		<!-- the demo root element -->
@@ -73,6 +73,7 @@ export default {
 					})
 		},
 
+		// make a tree node become a folder that contains many nodes
 		makeFolder(item) {
 			Vue.set(item, 'children', []);
 		},
@@ -82,6 +83,7 @@ export default {
 			data.item.children.push({id: data.id, name: 'New item'});
 		},
 
+		// find parents node of the id node
 		findParents(node, id) {
 			if (!(node.children && node.children.length)) return null;
 			let res = null;
@@ -109,6 +111,7 @@ export default {
 			node.children = [];
 		},
 
+		// remove a node
 		removeItem(id) {
 			let parents = this.findParents(this.treeData, id);
 			let upperNode = parents[0];

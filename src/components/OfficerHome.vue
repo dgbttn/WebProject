@@ -1,5 +1,9 @@
 <template>
     <app-root name="app-root">
+
+<!--        header nav bar: -->
+<!--            -   change password button-->
+<!--            -   log out button-->
         <div class="header">
             <nav class="navbar">
                 <div class="account">
@@ -23,9 +27,12 @@
             <img src="../image/Untitled-5.png" class="logo">
         </div>
 
+
+<!--        page title-->
         <div class="title">
             <h1>{{title}}</h1>
         </div>
+
 
         <div class="container">
             <div v-if="true" class="info-container">
@@ -48,7 +55,6 @@
                                        v-focus v-model="editedValue"
                                        @keyup.esc="editCancel"
                                        @keyup.enter="editValue">
-                                </input>
                             </div>
 
                             <div class="confirm-domain">
@@ -283,6 +289,7 @@
                 })
         },
         computed:{
+            // get officer's info as a array
             infoList() {
                 return [
                     this.officerInfo.name,
@@ -297,6 +304,8 @@
                     this.officerInfo.address
                 ]
             },
+
+            // fields names of officer info
             infoFields() {
                 return [
                     'name:',
@@ -311,6 +320,8 @@
                     'address'
                 ]
             },
+
+            // titles of officer info table
             infoTitleList() {
                 return [
                     'Mã cán bộ',
@@ -324,6 +335,8 @@
                     'Địa chỉ'
                 ]
             },
+
+            // array of icon
             infoIconList() {
                 return [
                     "fa fa-id-card-o",
@@ -337,9 +350,11 @@
                     "fa fa-map-marker"
                 ]
             },
+
+            // officer info fields' editability
             editable() {
                 return [false, false, false, false, true, false, true, true, true];
-            },
+            }
         },
         methods: {
             // hàm lặp tạo dữ liệu cây của lĩnh vực nghiên cứu
@@ -352,19 +367,24 @@
                 }
                 return node;
             },
-            initRandomList() {
-            },
+
+            // build check tree base on interested fields array
             setupFieldTree(item, selected) {
                 selected = selected || this.officerInfo.interestedFields.map(f => f.id).includes(item.id);
                 item.isSelected = selected;
                 for (var i in item.children)
                     this.setupFieldTree(item.children[i], selected);
             },
+
+            // update check tree whenever change selection
             updateFieldTree(item, selected) {
                 item.isSelected = selected;
                 for (var i in item.children)
                     this.updateFieldTree(item.children[i], selected);
             },
+
+            // get parents node of id
+            // return [id of parents, i-th of the child]
             findParents(node, id) {
                 if (!(node.children && node.children.length)) return null;
                 let res = null;
@@ -375,6 +395,7 @@
                 }
                 return res;
             },
+
             // sửa các giá trị thông tin của staff
             editValue() {
                 var chosenField = this.infoFields[this.editing+1];
@@ -407,16 +428,22 @@
                         this.editCancel();
                     })
             },
+
+            // cancel editing
             editCancel() {
                 this.editing = '';
             },
 
+            // unselect a field and update tree's status
             unselectField(item) {
                 this.updateFieldTree(item, false);
                 let parents = this.findParents(this.treeData, item.id);
                 if (parents) parents[0].isSelected = false;
             },
+
+            // select a field and update tree's status
             selectField(item) {
+                item.isSelected = !item.isSelected;
                 if (!this.fieldEditing) this.fieldEditing=true;
                 // item.i
                 if (!item.isSelected) {
@@ -435,6 +462,7 @@
                     }
                 parents[0].isSelected = parentsSelected;
             },
+
             // update các lĩnh vực quan tâm của staff
             updateInterestedFields(item) {
                 if (item.isSelected){
@@ -443,7 +471,7 @@
                         research_id: item.id
                     }).then(function (data) {
                         if (data.body.status == 1) {
-                            console.log("add successfully item with id = "+ item.id);
+                            // console.log("add successfully item with id = "+ item.id);
                         }
                     })
                     this.officerInfo.interestedFields.push({id: item.id, name: item.name});
@@ -452,23 +480,26 @@
                 for (let i in item.children)
                     this.updateInterestedFields(item.children[i]);
             },
+
+            // accept changes in check tree
             editFieldAccept() {
                 // xóa tất cả các ánh xạ đến lĩnh vực quan tâm của staff và insert các ánh xạ mới
                 this.$http.post('http://localhost/uFaculty/staff/StaffController/deleteInterestField',{
                     staff_id: this.auth_id
                 }).then(function (data) {
-                    if (data.body.status == 1 || data.body.status == 0) {
-                        this.officerInfo.interestedFields = [];
-                        this.updateInterestedFields(this.treeData);
-                        this.fieldEditing = false;
-                    }
+                    this.officerInfo.interestedFields = [];
+                    this.updateInterestedFields(this.treeData);
+                    this.fieldEditing = false;
                 })
             },
+
+            // ignore changes in check tree
             editFieldCancel() {
                 this.fieldEditing = false;
                 this.setupFieldTree(this.treeData, false);
             },
 
+            // select a topic to edit it
             selectTopicToEdit(i) {
                 if (this.topicEditing) return;
                 this.selectTopic(i);
@@ -479,6 +510,7 @@
                 };
             },
 
+            // select a topic to show it
             selectTopic(i) {
                 if (this.topicEditing) return;
                 if (this.selectedTopic>-1)
@@ -489,6 +521,7 @@
                 document.getElementsByClassName('topic-name')[i].className += " active";
             },
 
+            // edit a topic
             editTopic() {
                 if (!this.topicEditedValue.name) {
                     alert('Chủ đề này chưa có tên.');
@@ -510,9 +543,12 @@
                         this.topicEditCancel();
                     })
             },
+
+            // ignore changes of the selected topic
             topicEditCancel() {
                 this.topicEditing = false;
             },
+
             // xóa các chủ đề nghiên cứu
             removeTopic(index) {
                 if (confirm("Bạn chắc chắn muốn xóa Chủ đề này chứ?")) {
@@ -526,6 +562,7 @@
                         })
                 }
             },
+
             // thêm chủ đề nghiên cứu mới
             addTopic() {
                 var new_name = 'New Topic';
@@ -541,15 +578,18 @@
                         this.selectTopic(this.officerInfo.researchTopics.length - 1);
                     })
             },
+
             // thay đổi mật khẩu
             changePassword() {
                 this.$router.push('/change-password');
             },
+
             // đăng xuất
             Logout() {
                 this.$router.push('/Login');
                 this.$cookie.delete('user');
             },
+
             // chọn và update avatar
             selectedAvatar(element) {
                 var big_this = this;
@@ -689,7 +729,7 @@
         text-transform: uppercase;
     }
 
-    .container {margin: 25px 40px 0px 90px;}
+    .container {margin: 25px 40px 0px 100px;}
 
     .info-container {
         margin: 20px 60px 20px 60px;
@@ -835,6 +875,7 @@
     .bold {font-weight: bold; color: #ffffff;}
 
     .research-topic {
+
         padding: 20px 40px 20px 40px;
     }
 

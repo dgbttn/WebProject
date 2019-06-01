@@ -2,8 +2,8 @@
     <li>
         <div class="item-bound" :id="item.id">
             <div class="item-btn" @click="toggle">
-                <i v-if="!isOpen&&isFolder" class="fa fa-caret-right show-btn"></i>
-                <i v-if="isOpen&&isFolder" class="fa fa-caret-down show-btn"></i>
+                <i v-if="!isOpen&&isFolder" class="fa fa-angle-right show-btn"></i>
+                <i v-if="isOpen&&isFolder" class="fa fa-angle-down show-btn"></i>
             </div>
 
             <div class="item-name"  v-on:click="selfSelect">
@@ -31,15 +31,18 @@
             }
         },
         computed: {
+            // the current node is a folder or not
             isFolder() {
                 return this.item.children && this.item.children.length;
             }
         },
         methods: {
+            // open/close the current node
             toggle() {
                 if (this.isFolder)
                     this.isOpen = !this.isOpen;
             },
+            // select the current node
             selfSelect() {
                 this.$emit('select', this.item);
             }
@@ -55,13 +58,13 @@
         line-height: 1.7;
         padding-left: 1;
     }
+
     li {list-style-type: none;}
-    .bold {font-weight: bold;}
-    .selected {
-        font-weight: bold;
-        color: #ff0066;
-    }
+
+    .selected {	font-weight: bold;}
+
     .item-bound {cursor: pointer;}
+
     label {
         cursor: pointer;
         color: #4d0066;
@@ -82,7 +85,6 @@
         display: inline-block;
         margin: 0px 15px 0px 5px;
     }
-    .fa-caret-down{color: #cc0000;}
     i:hover {color: #ffcd1f;}
     i {
         font-size: 19px;

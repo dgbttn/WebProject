@@ -155,6 +155,7 @@ export default {
 					})
 		},
 
+		// select a unit to edit it
 		selectToEdit(i) {
 			this.editing = i;
 			this.editedUnit = {
@@ -196,6 +197,7 @@ export default {
 			this.editing = -1;
 		},
 
+		// accept the adding/searching form
 		formAccept() {
 			if (this.adding) {
 				this.addUnit();
@@ -204,6 +206,7 @@ export default {
 			else this.searchUnit();
 		},
 
+		// ignore the adding/searching form
 		formCancel() {
 			if (this.adding) this.addCancel()
 			else this.searchCancel();
@@ -243,6 +246,7 @@ export default {
 			this.newUnit = {id:'',name: '',type: '',address: '',phone: '',website: ''};
 		},
 
+		// show array of officers in searching unit
 		searchUnit() {
 			if (this.searched)
 				this.list = Array.from(Object.create(this.list_clone));
@@ -265,6 +269,7 @@ export default {
 			}
 		},
 
+		// cancel the searching form
 		searchCancel() {
 			if (this.searched) this.list = Array.from(Object.create(this.list_clone));
 			this.searching = false;
@@ -298,7 +303,6 @@ export default {
 
 <style scoped>
 	@import "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css";
-	@import "https://cdn.jsdelivr.net/npm/animate.css@3.5.1";
 	.note {
 		font-size: 11px;
 		font-style: italic;

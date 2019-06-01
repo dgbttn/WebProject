@@ -4,7 +4,6 @@ import VeeValidate from 'vee-validate'
 import { Validator } from 'vee-validate'
 import router from './router'
 import VueResource from 'vue-resource'
-
 import VueCookie from 'vue-cookie'
 import VueJwtDecode from 'vue-jwt-decode'
 
