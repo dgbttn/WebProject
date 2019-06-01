@@ -1,7 +1,6 @@
 <template>
 	<div id="app">
 		<router-view/>
-		<!-- <ChangePassword /> -->
 	</div>
 </template>
 

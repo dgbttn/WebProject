@@ -5,9 +5,6 @@
 		<span class="note">Double click de make folder cho node</span>
 		<br>
 
-		<button type="button" v-on:click="initRandomTree">Tạo mặc định</button>
-		<button type="button" >Thêm lĩnh vực</button>
-
 		<!-- the demo root element -->
 		<div class="tree-bound">
 			<TreeItem class="item" :item="treeData"
@@ -36,20 +33,22 @@ export default {
 	},
 
 	created() {
-		// this.$http.get('http://localhost/uFaculty/Research/ResearchControl/getAll')
-		// 		.then(function (data) {
-		// 			var rawData = data.body.data;
-		// 			var root = {id: 0, name: 'Root', children: []}
-		// 			for (var idx in rawData) {
-		// 				if (rawData[idx].parent_id == 0) {
-		// 					root.children.push(this.recursive(rawData[idx],rawData));
-		// 				}
-		// 			}
-		// 			this.treeData = root;
-		// 		})
+		// lấy tất cả các lĩnh vực nghiên cứu vào chuyển thành kiểu dữ liệu cây
+		this.$http.get('http://localhost/uFaculty/Research/ResearchControl/getAll')
+				.then(function (data) {
+					var rawData = data.body.data;
+					var root = {id: 0, name: 'Lĩnh vực nghiên cứu', children: []}
+					for (var idx in rawData) {
+						if (rawData[idx].parent_id == 0) {
+							root.children.push(this.recursive(rawData[idx],rawData));
+						}
+					}
+					this.treeData = root;
+				})
 	},
 
 	methods: {
+		// hàm đệ quy tạo dữ liệu cây
 		recursive(rawNode, rawData) {
 			var node = {id: rawNode.research_id, name: decodeURIComponent(escape(rawNode.name)), children: []}
 			for (var idx in rawData) {
@@ -59,48 +58,28 @@ export default {
 			}
 			return node;
 		},
-
-		initRandomTree() {
-			this.treeData = {
-				id: '1',
-				name: 'My Tree',
-				children: [
-					{ id: '2', name: 'hello' },
-					{ id: '3', name: 'wat' },
-					{
-						id: '4', name: 'child folder',
-						children: [
-							{
-								id: '5', name: 'child folder',
-								children: [
-									{ id: '6', name: 'hello' },
-									{ id: '7', name: 'wat' }
-								]
-							},
-							{ id: '8', name: 'hello' },
-							{ id: '9', name: 'wat' },
-							{
-								id: '10', name: 'child folder',
-								children: [
-									{ id: '11', name: 'hello' },
-									{ id: '12', name: 'wat' }
-								]
+		// hàm khởi tạo lại cây
+		init() {
+			this.$http.get('http://localhost/uFaculty/Research/ResearchControl/getAll')
+					.then(function (data) {
+						var rawData = data.body.data;
+						var root = {id: 0, name: 'Lĩnh vực nghiên cứu', children: []}
+						for (var idx in rawData) {
+							if (rawData[idx].parent_id == 0) {
+								root.children.push(this.recursive(rawData[idx],rawData));
 							}
-						]
-					}
-				]
-			}
+						}
+						this.treeData = root;
+					})
 		},
 
 		makeFolder(item) {
 			Vue.set(item, 'children', []);
 		},
-
+		// thêm lĩnh vực mới vào cây
 		addItem(data) {
 			//generate id
-
 			data.item.children.push({id: data.id, name: 'New item'});
-			// item.children.push({id: data.newID, name: 'New item'});
 		},
 
 		findParents(node, id) {
@@ -114,14 +93,18 @@ export default {
 			return res;
 		},
 
+		// xóa lĩnh vực trong cây và các lĩnh vực con của nó
 		removeSubTree(node) {
 			for (var i in node.children)
 				this.removeSubTree(node.children[i]);
-
 			var url = 'http://localhost/uFaculty/Research/ResearchControl/delete';
 			this.$http.post(url, {
 				id: node.id
+			}).then(function ($data) {
+
 			})
+
+			// call remove node to server
 
 			node.children = [];
 		},

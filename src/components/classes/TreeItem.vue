@@ -12,6 +12,7 @@
 						v-focus v-model="editedValue"
 						@keyup.esc="editCancel"
 						@keyup.enter="editValue">
+				</input>
 			</div>
 
 			<div v-if="!editing" class="tool-btn">
@@ -80,23 +81,25 @@ export default {
 			}
 		},
 
+		// thêm lĩnh vực nghiên cứu
 		addItem() {
-			// var url = 'http://localhost/uFaculty/Research/ResearchControl/create';
-			// this.$http.post(url,{parent_id: this.item.id, name: 'New item'})
-			// 		.then(function (data) {
-						if (!this.isFolder) this.makeFolder();
-						this.isOpen = true;
-						this.$emit('add-item', {item: this.item, id: '10'});
-			// 		})
+			if (!this.isFolder) this.makeFolder();
+			this.isOpen = true;
+			var url = 'http://localhost/uFaculty/Research/ResearchControl/create';
+			this.$http.post(url,{parent_id: this.item.id, name: 'New item'})
+					.then(function (data) {
+						this.$emit('add-item', {item: this.item, id: data.body.data[0].research_id});
+					})
 		},
-
+		// chính sửa lĩnh vực nghiên cứu
 		editValue() {
-			// var url = 'http://localhost/uFaculty/Research/ResearchControl/update';
-			// this.$http.post(url,{id: this.item.id,name: this.editedValue})
-			// 		.then(function (data) {
+
+			var url = 'http://localhost/uFaculty/Research/ResearchControl/update';
+			this.$http.post(url,{id: this.item.id,name: this.editedValue})
+					.then(function (data) {
 						this.item.name = this.editedValue;
 						this.editCancel();
-			// 		})
+					})
 		},
 
 		editCancel() {
@@ -121,9 +124,7 @@ export default {
 </script>
 
 <style scoped>
-
 	* {transition: 0.2;}
-
 	ul {
 		list-style-type: none;
 		margin-block-start: 0px;
@@ -131,9 +132,7 @@ export default {
 		line-height: 1.7;
 		padding-left: 1;
 	}
-
 	li {list-style-type: none;}
-
 	input {
 		width: 100%;
 		height: 100%;
@@ -148,15 +147,12 @@ export default {
 		margin: 1px 0px;
 		font: 400 13.3333px Arial;
 	}
-
 	input:focus {
 		border-color: #66afe9;
 		outline: 0;
 		box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
 	}
-
 	.bold {font-weight: bold;}
-
 	.item-btn {
 		display: inline-block;
 		cursor: pointer;
@@ -164,33 +160,27 @@ export default {
 		height: 20px;
 		margin-right: 5px;
 	}
-
 	.show-btn {
 		width: 100%;
 		height: 100%;
 		margin-bottom: 2px;
 	}
-
 	.item-name {
 		display: inline-block;
 		margin: 0px 15px 0px 5px;
 	}
-
 	.tool-btn {
 		visibility: hidden;
 		display: inline-block;
 		padding-left: 8px;
 	}
-
 	.item-bound:hover .tool-btn {visibility: visible;}
-
 	.confirm-domain {
 		display: inline-block;
 		height: 100%;
 		width: 100px;
 		padding: 8px;
 	}
-
 	.tooltip-text {
 		word-wrap: normal;
 		visibility: hidden;
@@ -205,13 +195,11 @@ export default {
 		width: 40px;
 		top: 170%;
 		left: 35%;
-
 		font-family: hurme_no2-webfont,-apple-system,BlinkMacSystemFont,sans-serif;
 		font-size: 12px;
 		font-weight: 600;
 		transition: 0.2s;
 	}
-
 	.tooltip-text::after {
 		content: "";
 		position: absolute;
@@ -222,9 +210,7 @@ export default {
 		border-style: solid;
 		border-color: transparent transparent #4257B2 transparent;
 	}
-
 	i:hover .tooltip-text {visibility: visible;}
-
 	.ok-btn 	  {color: #00e600;}
 	.no-btn		  {color: #e60000;}
 	.del-btn      {color: #455358;}
@@ -232,7 +218,6 @@ export default {
 	.add-btn      {color: #00cc00;}
 	.fa-caret-down{color: #cc0000;}
 	i:hover {color: #ffcd1f;}
-
 	i {
 		font-size: 19px;
 		padding: 0px 5px;
@@ -241,5 +226,4 @@ export default {
 		position: relative;
 		text-align: center;
 	}
-
 </style>

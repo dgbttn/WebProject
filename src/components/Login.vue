@@ -8,7 +8,7 @@
 				<div class="form-group">
 					<label class="control-label" for="username">Tên đăng nhập:</label>
 					<div v-bind:class="{ 'has-error' : errors.has('username') }">
-						<input name="username" v-model="username"  data-vv-delay="100" v-validate="'required|min:6'" class="form-control" type="text">
+						<input name="username" v-model="username"  data-vv-delay="100" v-validate="'required|min:4'" class="form-control" type="text">
 						<span v-show="errors.has('username')" class="text-danger">{{ errors.first('username') }}</span>
 					</div>
 				</div>
@@ -35,8 +35,8 @@
 			<center><a class="button login-btn" v-on:click="log">Đăng nhập</a></center>
 
 			<center><a class="student-login-btn" v-on:click="guest_log">Tham gia với tư cách sinh viên</a></center>
-
 		</div>
+		<label class="error-mess">{{mess}}</label>
 
 	</div>
 </template>
@@ -48,6 +48,7 @@ export default {
 		return {
 			username: '',
 			password: '',
+			mess: '',
 			rule: 'teacher'
 		}
 	},
@@ -55,45 +56,63 @@ export default {
 	methods: {
 		// login
 		log() {
-			// this.$validator.validateAll().then((result) => {
-			// 	if (!result) {
-			// 		alert('Đăng nhập thất bại.');
-			// 		return;
-			// 	}
-			// 	else {
-			// 		var url = 'http://localhost/uFaculty/Account/AccountController/validate'
-			// 		this.$http.post(url,{
-			// 			username: this.username,
-			// 			password: this.password,
-			// 			role: this.rule
-			// 		}).then(function (data) {
-			// 			var status = data.body.status;
-			// 			if (status == 0) {
-			// 				var reason = data.body.reason;
-			// 				alert(reason);
-			// 			}
-			// 				else {
-			// 				var token = data.body.data;
-			// 				var decoded_token = this.$jwtDec.decode(token);
-			// 				var expired_time = decoded_token.expired;
-			// 				var role = decoded_token.role;
-			// 				this.$cookie.set('user',token, expired_time);
-			// 				if (role == 'admin') {
-			// 					this.$router.push('/home')
-			// 				}
-			// 					else {
-			// 					console.log(role);
-			// 					this.$router.push('/staff-home')
-			// 				}
-			// 			}
-			// 		})
-			// 	}
-			// });
+			// kiểm tra độ dài username và password nhập vào
+		    this.$validator.validateAll().then((result) => {
+				if (!result) {
+					this.mess = 'Đăng nhập thất bại';
+					return;
+				}
+				else {
+					// xác thực username và password
+					var url = 'http://localhost/uFaculty/Account/AccountController/validate'
+					this.$http.post(url,{
+						username: this.username,
+						password: this.password,
+						role: this.rule
+					}).then(function (data) {
+						var status = data.body.status;
+						if (status == 0) {
+							var reason = data.body.reason;
+							alert(reason);
+						}
+							else {
+							// lấy json web token từ server và lưu vào cookies
+							var token = data.body.data;
+							var decoded_token = this.$jwtDec.decode(token);
+							var expired_time = decoded_token.expired;
+							var role = decoded_token.role;
+							// điều hướng tùy theo quyền và mục đích của user
+							if (role == 'admin') {
+								if (this.rule == 'admin') {
+									this.$cookie.set('user',token, expired_time);
+									this.$router.push('/home')
+								}
+									else {
+									this.$cookie.set('user',token, expired_time);
+									this.$router.push('/staff-home')
+								}
+							}
+								else {
+								if (this.rule == 'admin') {
+									alert('Không đúng quyền')
+								}
+								else {
+									this.$cookie.set('user',token, expired_time);
+									this.$router.push('/staff-home')
+								}
+							}
+						}
+					})
 
-			this.$router.push('/home');
+				}
+			});
+			//this.$router.push('/home');
+
+
 		},
 
 		guest_log() {
+			// đăng nhập khách
 			this.$router.push('/guest-home');
 		}
 	}
@@ -209,8 +228,8 @@ export default {
 	option {
 		padding: 3px 0px;
 		-webkit-appearance: none;
-	    -moz-appearance: none;
-	    appearance: none;
+		-moz-appearance: none;
+		appearance: none;
 	}
 
 	.container {

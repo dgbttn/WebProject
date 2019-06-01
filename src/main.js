@@ -4,16 +4,14 @@ import VeeValidate from 'vee-validate'
 import { Validator } from 'vee-validate'
 import router from './router'
 import VueResource from 'vue-resource'
+
 import VueCookie from 'vue-cookie'
 import VueJwtDecode from 'vue-jwt-decode'
-import XLSX from 'xlsx'
 
 Vue.use(VeeValidate);
 Vue.use(VueResource);
 Vue.use(VueCookie);
 Vue.use(VueJwtDecode);
-Vue.use(XLSX);
-// Vue.config.productionTip = false
 
 const dict = {
 	en: {
