@@ -4,7 +4,6 @@
 		<span class="note">*Quyền {{rule}}</span>
 		<br>
 
-		<button type="button" v-on:click="initRandomList">Tạo mặc định</button>
 		<button type="button" class="add-btn" v-on:click="adding=true; searching=false" @keyup.esc="addCancel">Thêm mới</button>
 		<button type="button" class="search-btn" v-on:click="searching=true; adding=false;" @keyup.esc="searchCancel">Tìm kiếm</button>
 
@@ -24,7 +23,6 @@
 						<i class="fa fa-plus-square tool-icon" v-if="adding"></i>
 						<i class="fa fa-search tool-icon" v-if="searching"></i>
 					</td>
-
 					<!-- <td v-for="(content, key, j) in newUnit" v-if="j>0">
 						<input type="text" v-model="newUnit[key]">
 					</td> -->
@@ -35,6 +33,7 @@
 
 					<td>
 						<select v-model="newUnit.type">
+							<option value=""></option>
 							<option value="Bộ môn">Bộ môn</option>
 							<option value="Phòng thí nghiệm">Phòng thí nghiệm</option>
 						</select>
@@ -70,8 +69,8 @@
 						<label v-if="editing!=i">{{ content }}</label>
 
 						<input v-else-if="j!=2" class="edit-input" type="text" v-model="editedUnit[key]"
-								@keyup.esc="editCancel"
-								@keyup.enter="valueEditing(i)">
+							   @keyup.esc="editCancel"
+							   @keyup.enter="valueEditing(i)">
 
 						<select v-else class="edit-input" type="text" v-model="editedUnit.type"
 								@keyup.esc="editCancel"
@@ -117,53 +116,48 @@ export default {
 			adding: false,
 			searching: false,
 			searched: false,
-			newUnit: {id:'',name: '',type: 'Bộ môn',address: '',phone: '',website: ''},
+			newUnit: {id:'',name: '',type: '',address: '',phone: '',website: ''},
 		}
 	},
 
 	// Get data from server to this.list
 	created() {
-		// this.$http.get('http://localhost/uFaculty/Faculty/FacultyControl/getAllUetOwner')
-		// 		.then(function (data) {
-		// 			this.list = [];
-		// 			for(var idx in data.body.data) {
-		// 				var name= decodeURIComponent(escape(data.body.data[idx].name));
-		// 				var address= decodeURIComponent(escape(data.body.data[idx].address));
-		// 				var type= decodeURIComponent(escape(data.body.data[idx].type));
-		// 				var id= data.body.data[idx].faculty_id;
-		// 				var phone= data.body.data[idx].phone_number;
-		// 				var website = data.body.data[idx].website;
-		// 				this.list.push(new Unit(id,name,type,address,phone,website));
-		// 			}
-		// 		})
+		this.$http.get('http://localhost/uFaculty/Faculty/FacultyControl/getAllUetOwner')
+				.then(function (data) {
+					this.list = [];
+					for(var idx in data.body.data) {
+						var name= decodeURIComponent(escape(data.body.data[idx].name));
+						var address= decodeURIComponent(escape(data.body.data[idx].address));
+						var type= decodeURIComponent(escape(data.body.data[idx].type));
+						var id= data.body.data[idx].faculty_id;
+						var phone= data.body.data[idx].phone_number;
+						var website = data.body.data[idx].website;
+						this.list.push(new Unit(id,name,type,address,phone,website));
+					}
+				})
 	},
 
 	methods: {
 		// add some random units to the list
-		initRandomList() {
-			var units = [];
-			units.push(new Unit("1","Bộ môn Các Hệ thống Thông tin", "Bộ môn", "", "", ""));
-			units.push(new Unit("2","Bộ môn Công nghệ Phần mềm", "Bộ môn", "", "", ""));
-			units.push(new Unit("3","Bộ môn Khoa học Máy tính", "Bộ môn", "", "", ""));
-			units.push(new Unit("4","Bộ môn Khoa học và Ký thuật Tính toán", "Bộ môn", "", "", ""));
-			units.push(new Unit("5","Bộ môn Mạng và Truyền thông Máy tính", "Bộ môn", "406-E3", "", ""));
-
-			for (var i in units)
-			this.list.push({
-				id: units[i].id,
-				name: units[i].name,
-				type: units[i].type,
-				address: units[i].address,
-				phone: units[i].phone,
-				website: units[i].website
-			});
+		init() {
+			this.$http.get('http://localhost/uFaculty/Faculty/FacultyControl/getAllUetOwner')
+					.then(function (data) {
+						this.list = [];
+						for(var idx in data.body.data) {
+							var name= decodeURIComponent(escape(data.body.data[idx].name));
+							var address= decodeURIComponent(escape(data.body.data[idx].address));
+							var type= decodeURIComponent(escape(data.body.data[idx].type));
+							var id= data.body.data[idx].faculty_id;
+							var phone= data.body.data[idx].phone_number;
+							var website = data.body.data[idx].website;
+							this.list.push(new Unit(id,name,type,address,phone,website));
+						}
+					})
 		},
 
+		// select a unit to edit it
 		selectToEdit(i) {
-			if (this.searching) return;
-
 			this.editing = i;
-
 			this.editedUnit = {
 				id: this.list[i].id,
 				name: this.list[i].name,
@@ -176,7 +170,6 @@ export default {
 
 		// edit the selected value after acceptance
 		valueEditing(i) {
-			// client
 			this.list[i] = {
 				id: this.editedUnit.id,
 				name: this.editedUnit.name,
@@ -187,17 +180,16 @@ export default {
 			}
 			this.editedUnit = null;
 			this.editCancel();
-
 			// server
-			// var url = 'http://localhost/uFaculty/Faculty/FacultyControl/update';
-			// this.$http.post(url,{
-			// 	id: this.list[i].id,
-			// 	name: this.list[i].name,
-			// 	type: this.list[i].type,
-			// 	address: this.list[i].address,
-			// 	phone: this.list[i].phone,
-			// 	website: this.list[i].website
-			// })
+			var url = 'http://localhost/uFaculty/Faculty/FacultyControl/update';
+			this.$http.post(url,{
+				id: this.list[i].id,
+				name: this.list[i].name,
+				type: this.list[i].type,
+				address: this.list[i].address,
+				phone: this.list[i].phone,
+				website: this.list[i].website
+			})
 		},
 
 		// cancel editing value
@@ -205,6 +197,7 @@ export default {
 			this.editing = -1;
 		},
 
+		// accept the adding/searching form
 		formAccept() {
 			if (this.adding) {
 				this.addUnit();
@@ -213,6 +206,7 @@ export default {
 			else this.searchUnit();
 		},
 
+		// ignore the adding/searching form
 		formCancel() {
 			if (this.adding) this.addCancel()
 			else this.searchCancel();
@@ -227,34 +221,32 @@ export default {
 				alert('Đơn vị mới chưa có thông tin nào.');
 				return;
 			}
-
 			if (!this.newUnit.name) {
 				alert('Đơn vị mới chưa có tên.');
 				return;
 			}
 
-			// var url = 'http://localhost/uFaculty/Faculty/FacultyControl/create';
-			// this.$http.post(url,{
-			// 	name: this.newUnit.name,
-			// 	type: this.newUnit.type,
-			// 	address: this.newUnit.address,
-			// 	phone: this.newUnit.phone,
-			// 	website: this.newUnit.website
-			// }).then(function (data) {
-			// 	this.newUnit.id = data.body.data[0].faculty_id;
+			var url = 'http://localhost/uFaculty/Faculty/FacultyControl/create';
+			this.$http.post(url,{
+				name: this.newUnit.name,
+				type: this.newUnit.type,
+				address: this.newUnit.address,
+				phone: this.newUnit.phone,
+				website: this.newUnit.website
+			}).then(function (data) {
+				this.newUnit.id = data.body.data[0].faculty_id;
 				this.list.push(this.newUnit);
 				this.addCancel();
-			// })
-
-
+			})
 		},
 
 		// cancel adding new unit
 		addCancel() {
 			this.adding = false;
-			this.newUnit = {id:'',name: '',type: 'Bộ môn',address: '',phone: '',website: ''};
+			this.newUnit = {id:'',name: '',type: '',address: '',phone: '',website: ''};
 		},
 
+		// show array of officers in searching unit
 		searchUnit() {
 			if (this.searched)
 				this.list = Array.from(Object.create(this.list_clone));
@@ -277,22 +269,23 @@ export default {
 			}
 		},
 
+		// cancel the searching form
 		searchCancel() {
 			if (this.searched) this.list = Array.from(Object.create(this.list_clone));
 			this.searching = false;
 			this.searched = false;
-			this.newUnit = {id:'', name: '',type: 'Bộ môn',address: '',phone: '',website: ''};
+			this.newUnit = {id:'', name: '',type: '',address: '',phone: '',website: ''};
 		},
 
 		// delete an unit
 		removeUnit(i) {
 			if(confirm("Bạn chắc chắn muốn xóa Đơn vị này chứ?")){
-				// var url = 'http://localhost/uFaculty/Faculty/FacultyControl/delete';
-				// this.$http.post(url, {
-				// 	id: this.list[i].id
-				// }).then(function ($data) {
+				var url = 'http://localhost/uFaculty/Faculty/FacultyControl/delete';
+				this.$http.post(url, {
+					id: this.list[i].id
+				}).then(function ($data) {
 					this.list.splice(i,1);
-				// })
+				})
 			}
 
 		}
@@ -310,19 +303,15 @@ export default {
 
 <style scoped>
 	@import "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css";
-	@import "https://cdn.jsdelivr.net/npm/animate.css@3.5.1";
-
 	.note {
 		font-size: 11px;
 		font-style: italic;
 		color: red;
 	}
-
 	button {
 		color: #fff;
 		background-color: #3366ff;
 		border-color: #1a53ff;
-
 		display: inline-block;
 		padding: 6px 12px;
 		margin: 10px 10px;
@@ -337,20 +326,16 @@ export default {
 		border: 2px solid transparent;
 		border-radius: 4px;
 	}
-
 	button:hover {
 		background-color: #ffcd1f;
 		color: #455358;
 	}
-
 	button:focus {
 		outline: none;
 		color: #fff;
 		background-color: #3366ff;
 	}
-
 	table {border-spacing: 0px;}
-
 	input, select {
 		width: 100%;
 		height: 30px;
@@ -365,73 +350,58 @@ export default {
 		margin: 0em;
 		font: 400 13.3333px Arial;
 	}
-
 	input:focus {
 		border-color: #66afe9;
 		outline: 0;
 		box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
 	}
-
 	.table-bound {
 		font-family: "Helvetica", sans-serif;
 		border-collapse: collapse;
 		width: 100%;
 	}
-
 	.table-bound td, .table-bound th {
 		border: 1px solid #ddd;
 		padding: 6px 10px;
 	}
-
 	.table-bound tr td:nth-child(4) {text-align: center;}
-
 	.table-bound tr:nth-child(even){background-color: #f2f2f2;}
-
 	.table-bound tr:hover {background-color: #ddd;}
-
 	.table-bound tr td:nth-child(7){
 		background-color: #fff;
 		border: none;
 	}
-
 	.table-bound tr:nth-child(1) td[class="icon-domain"] {
 		background-color: #fff;
 		border: none;
 	}
-
 	.table-bound th {
 		padding: 9px 0px;
 		text-align: center;
-		background-color: #4CAF50;
+		background-color: #17b978;
 		color: white;
 		font-size: 14px;
 	}
-
 	.table-bound td {font-size: 13px;}
-
 	.stt {text-align: center;}
-
 	.confirm-domain {
 		background-color: #fff;
 		height: 100%;
 		width: 70px;
 		padding: 8px;
 	}
-
 	.icon-domain {
 		background-color: #fff;
 		height: 100%;
 		padding: 8px;
 		text-align: center;
 	}
-
 	.tool-icon {
 		padding: 0px 2px;
 		vertical-align: middle;
 		font-size: 18px;
 		color: #455358;
 	}
-
 	.confirm-btn {
 		padding: 0px 5px;
 		vertical-align: middle;
@@ -439,8 +409,9 @@ export default {
 		font-size: 22px;
 		position: relative;
 	}
-
 	.tooltip-text {
+		word-wrap: normal;
+		word-wrap: normal;
 		visibility: hidden;
 		width: auto;
 		background-color: #4257B2;
@@ -453,12 +424,10 @@ export default {
 		width: 100%;
 		top: 170%;
 		left: 35%;
-
 		font-family: hurme_no2-webfont,-apple-system,BlinkMacSystemFont,sans-serif;
 		font-size: 12px;
 		font-weight: 600;
 	}
-
 	.tooltip-text::after {
 		content: "";
 		position: absolute;
@@ -469,16 +438,13 @@ export default {
 		border-style: solid;
 		border-color: transparent transparent #4257B2 transparent;
 	}
-
 	.confirm-btn:hover .tooltip-text {visibility: visible;}
-
 	.ok-btn 	  {color: #00e600;}
 	.no-btn		  {color: #e60000;}
 	.del-btn      {color: #455358; visibility: hidden;}
 	.edit-btn 	  {color: #3333cc; visibility: hidden;}
 	.del-btn:hover, .no-btn:hover, .ok-btn:hover, .edit-btn:hover  {color: #ffcd1f;}
 	tr:hover td .del-btn , tr:hover td .edit-btn {visibility: visible;}
-
 	* {
 		transition: 0.2s;
 	}

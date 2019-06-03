@@ -10,8 +10,8 @@
 
 				<div class="account">
 					<a href="" class="nav-link account-content dropdown-account">
-						<img src="../image/avatar.jpg" alt="user_avatar" class="avatar">
-
+						<!-- <img src="../image/avatar.jpg" alt="user_avatar" class="avatar"> -->
+						<img class="avatar" v-bind:src="avatar_src">
 						<span class="account-name">{{ username }}</span>
 
 						<i class="fa fa-chevron-down"></i>
@@ -26,6 +26,7 @@
 					</span>
 				</div>
 			</nav>
+			<img src="../image/Untitled-5.png" class="title">
 		</div>
 
 		<div class="content-bound">
@@ -61,99 +62,114 @@
 </template>
 
 <script>
-import UnitControl from './homepage/UnitControl.vue'
-import OfficerAccount from './homepage/OfficerAccount.vue'
-import ResearchField from './homepage/ResearchField.vue'
+	import UnitControl from './homepage/UnitControl.vue'
+	import OfficerAccount from './homepage/OfficerAccount.vue'
+	import ResearchField from './homepage/ResearchField.vue'
 
-export default {
-	name: 'HomePage',
-	components: {
-		UnitControl,
-		OfficerAccount,
-		ResearchField
-	},
-	data() {
-		return {
-			username: 'Tung',
-			minimize: false,
-			useMode: 0, 	/* 	0 for unit-control,
+	export default {
+		name: 'HomePage',
+		components: {
+			UnitControl,
+			OfficerAccount,
+			ResearchField
+		},
+		data() {
+			return {
+				username: 'Tung',
+				avatar_src: require('../image/officer_avatar.jpg'),
+				minimize: false,
+				useMode: 0, 	/* 	0 for unit-control,
 								1 for officer-account,
 								2 for research-field */
 
-		}
-	},
-
-	created() {
-		// var token = this.$cookie.get('user');
-		// if (token == null) {
-		// 	this.$router.push('/login');
-		// }
-		// 	else {
-		// 	var decoded_token = this.$jwtDec.decode(token);
-		// 	var role = decoded_token.role;
-		// 	if (role == null) {
-		// 		this.$router.push('/login');
-		// 	}
-		// 	else {
-		// 		if (role == 'lecture') {
-		// 			this.$router.push('/staff-home');
-		// 		}
-		// 	}
-		// }
-	},
-
-	methods: {
-		// show the selected tool
-		openTool(toolName, index) {
-			this.useMode = index;
-			var i, tabs, contents;
-
-			tabs = document.getElementsByClassName('tool-control');
-			for (i=0; i<tabs.length; i++)
-			tabs[i].className = tabs[i].className.replace(" active", "");
-
-			document.getElementsByClassName(toolName+'-btn')[0].className += " active";
-
-			switch (this.useMode) {
-				// Unit Control
-				case 0:
-					this.$refs.unit.initRandomList();
-					break;
-
-				// Officer Account
-				case 1:
-					this.$refs.account.initRandomList();
-					break;
-
-				// Research Field
-				case 2:
-					this.$refs.field.initRandomTree();
-					break;
 			}
+		},
+
+		created() {
+			// kiểm tra token
+			var token = this.$cookie.get('user');
+			if (token == null) {
+				this.$router.push('/login');
+			}
+			else {
+				var decoded_token = this.$jwtDec.decode(token);
+				var role = decoded_token.role;
+				if (role == null) {
+					this.$router.push('/login');
+				}
+				else {
+					if (role == 'lecture') {
+						this.$router.push('/staff-home');
+					}
+						else {
+						this.username = decoded_token.username;
+					}
+				}
+			}
+
+			// lấy avatar cho người dùng
+			this.$http.post('http://localhost/uFaculty/staff/StaffController/getAvatar',{
+				staff_id: decoded_token.staff_id
+			}).then(function (data) {
+				this.avatar_src = 'data:image/png;base64,'+data.body.data;
+			})
 
 		},
 
-		toggle() {
-			if (!this.minimize) {
+		methods: {
+			// show the selected tool
+			openTool(toolName, index) {
+				this.useMode = index;
+				var i, tabs, contents;
+
+				tabs = document.getElementsByClassName('tool-control');
+				for (i=0; i<tabs.length; i++)
+					tabs[i].className = tabs[i].className.replace(" active", "");
+
+				document.getElementsByClassName(toolName+'-btn')[0].className += " active";
+
+				switch (this.useMode) {
+						// Unit Control
+					case 0:
+						this.$refs.unit.init();
+						break;
+
+						// Officer Account
+					case 1:
+						this.$refs.account.init();
+						break;
+
+						// Research Field
+					case 2:
+						this.$refs.field.init();
+						break;
+				}
+
+			},
+
+			// minimize the left nav bar
+			toggle() {
+				if (!this.minimize) {
+					this.minimize = !this.minimize;
+					document.getElementsByClassName('tool-bar')[0].style.width = "65px";
+					document.getElementsByClassName('container')[0].style.marginLeft = "120px";
+					return;
+				}
 				this.minimize = !this.minimize;
-				document.getElementsByClassName('tool-bar')[0].style.width = "65px";
-				document.getElementsByClassName('container')[0].style.marginLeft = "120px";
-				return;
+				document.getElementsByClassName('container')[0].style.marginLeft = "22%";
+				document.getElementsByClassName('tool-bar')[0].style.width = "20%";
+			},
+			// thay đổi mật khẩu
+			changePassword() {
+				this.$router.push('/change-password');
+			},
+			// đăng xuất
+			Logout() {
+				this.$router.push('/Login');
+				this.$cookie.delete('user');
 			}
-			this.minimize = !this.minimize;
-			document.getElementsByClassName('container')[0].style.marginLeft = "22%";
-			document.getElementsByClassName('tool-bar')[0].style.width = "20%";
-		},
-
-		changePassword() {
-			console.log('change password');
-		},
-
-		Logout() {
-			console.log('log out');
 		}
 	}
-}
 </script>
 
 <style scoped>
@@ -161,14 +177,19 @@ export default {
 	.header {
 		width: 100%;
 		height: 50px;
-		background-color: #555273;
+		background-color: #0F2557;
 		top: 0;
 		left: 0;
 		position: fixed;
-		color: #e2eff1;
+		color: #ffffff;
 		z-index: 1;
 	}
 
+	.title{
+		height: 30px;
+		left: 20px;
+		top: 0%;
+	}
 	.navbar {
 		border: 1px solid #e7e7e7;
 		margin-bottom: 10px;
@@ -195,7 +216,7 @@ export default {
 	.account {
 		float: right;
 		margin-top: 1px;
-		background-color: #555273;
+		background-color: #0F2557;
 		position: relative;
 		height: 48px;
 	}
@@ -248,7 +269,7 @@ export default {
 	}
 
 	.tool-bar {
-		background-color: #36AE88;
+		background-color: #28559a;
 		margin-top: 50px;
 		width: 20%;
 		height: 100%;
@@ -270,7 +291,7 @@ export default {
 		font-family: hurme_no2-webfont,-apple-system,BlinkMacSystemFont,sans-serif;
 	}
 
-	.tool-control:hover {background-color: #1c9770;}
+	.tool-control:hover {background-color: #6bb7cc;}
 
 	.tool-icon {
 		font-size: 22px;
@@ -282,9 +303,9 @@ export default {
 	}
 
 	.tool-bar div.active {
-		background-color: #b5525c ;
-		color: #ffcd1f;
-		border-left: 3px solid #ffcd1f;
+		background-color: #4b9fe1;
+		color: #ffd36a;
+		border-left: 3px solid #ffcb36;
 	}
 
 	.container {

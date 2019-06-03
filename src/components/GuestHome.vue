@@ -1,6 +1,7 @@
 <template>
 	<app-root name="app-root">
 		<div class="header">
+
 			<nav class="navbar">
 				<div v-show="useMode==1" class="backward-btn" v-on:click="back">
 					<a class="nav-link">
@@ -9,13 +10,12 @@
 					</a>
 				</div>
 			</nav>
+			<img src="../image/Untitled-5.png" class="title-page">
 		</div>
 
 		<div class="title">
 			<h1>{{title}}</h1>
 			<span class="note">*Chọn đơn vị hoặc lĩnh vực, tiếp đó chọn giảng viên để xem chi tiết.</span>
-
-			<button type="button" v-on:click="initRandomList">Tạo mặc định</button>
 		</div>
 
 		<div v-show="useMode==0" class="content-bound">
@@ -41,7 +41,7 @@
 					</div>
 					<div v-show="searchRule==1" class="search-content field-search">
 						<SelectTreeItem class="select-tree" :item="treeData"
-							@select = "selectField">
+										@select = "selectField">
 						</SelectTreeItem>
 					</div>
 				</div>
@@ -142,7 +142,7 @@
 					<div class="name-field">
 						<ul class="topic-list">
 							<li	v-for="(topic,i) in officerInfo.researchTopics" class="topic-name"
-								v-on:click= "selectTopic(i)">
+								   v-on:click= "selectTopic(i)">
 								<span>{{topic.name}}</span>
 							</li>
 						</ul>
@@ -162,350 +162,339 @@
 </template>
 
 <script>
-import {OfficerAccount} from './classes/OfficerAccount.js'
-import SelectTreeItem from './classes/SelectTreeItem.vue'
-import CheckTreeItem from './classes/CheckTreeItem.vue'
+	import SelectTreeItem from './classes/SelectTreeItem.vue'
+	import CheckTreeItem from './classes/CheckTreeItem.vue'
 
-export default {
-	name: 'GuestHome',
-	components: {
-		SelectTreeItem,
-		CheckTreeItem
-	},
+	export default {
+		name: 'GuestHome',
+		components: {
+			SelectTreeItem,
+			CheckTreeItem
+		},
+		data() {
+			return {
+				titles: ['Tìm kiếm giảng viên', 'Thông tin giảng viên'],
+				username: 'Sinh viên',
+				searchRule: 0, // =0 for unit, =1 for field
+				selectedUnit: -1,
+				selectedField: null,
+				selectedOfficer: -1,
+				officerInfo: {},
+				unitList: [],
+				treeData: {name: 'sss', children: []},
+				officerList: [],
+				comparedList: [],
+				useMode: 0, //0 for search officers, 1 for show selected officer's info
+				avatar_src: require('../image/officer_avatar.jpg'),
+				selectedTopic: -1
+			}
+		},
 
-	data() {
-		return {
-			titles: ['Tìm kiếm giảng viên', 'Thông tin giảng viên'],
-			searchRule: 0, // =0 for unit, =1 for field
-			selectedUnit: -1,
-			selectedField: null,
-			selectedOfficer: -1,
-			officerInfo: {},
-			unitList: [],
-			treeData: {name: 'sss', children: []},
-			officerList: [],
-			useMode: 0, //0 for search officers, 1 for show selected officer's info
-			selectedTopic: -1,
-			avatar_src: require('../image/officer_avatar.jpg'),
-		}
-	},
-
-	created() {
-		// this.$http.get('http://localhost/uFaculty/Faculty/FacultyControl/getAll')
-		// 		.then(function (data) {
-		// 			this.unitList = [];
-		// 			for(var i in data.body.data) {
-		// 				this.unitList.push({
-		// 					id: data.body.data[i].faculty_id,
-		// 					name: decodeURIComponent(escape(data.body.data[i].name))
-		// 				});
-		// 			}
-		// 		})
-		// this.$http.get('http://localhost/uFaculty/Staff/StaffController/getAll')
-		// 		.then(function (data) {
-		// 			this.officerList = [];
-		// 			for(var i in data.body.data) {
-		// 				this.officerList.push({
-		// 					id : data.body.data[i].staff_id,
-		// 					name : decodeURIComponent(escape(data.body.data[i].full_name)),
-		// 					position : decodeURIComponent(escape(data.body.data[i].staff_type)),
-		// 					mail : decodeURIComponent(escape(data.body.data[i].vnu_email)),
-		// 					degree : decodeURIComponent(escape(data.body.data[i].academic_title)),
-		// 					unit_id : data.body.data[i].faculty_id,
-		// 					account_id : data.body.data[i].account_id
-		// 				});
-		// 			}
-		// 		})
-
-		this.unitList.push({id: 3, name:'Bộ môn Khoa học máy tính'});
-		this.unitList.push({id: 4, name:'Bộ Công an'});
-		this.unitList.push({id: 1, name:'Bộ môn các hệ thống thông tin'});
-		this.unitList.push({id: 2, name:'Bộ môn Công nghệ phần mềm'});
-		let officers = [];
-		officers.push(new OfficerAccount("1231","Hồ Văn Canh","canhkas","jashdj@vnu.edu.vn","Giảng viên","Tiến sĩ",4));
-		officers.push(new OfficerAccount("3643","Lê Phê Đô","ádasd","ádasdsa@vnu.edu.vn","Giảng viên","Tiến sĩ",2));
-		officers.push(new OfficerAccount("345sd","Minh Châu","sdfv","ádwqr@vnu.edu.vn","Giảng viên","Tiến sĩ",4));
-		officers.push(new OfficerAccount("ád34","Hồ Văn Cường","ádadasđ","gdfdfgdf@vnu.edu.vn","Giảng viên","Tiến sĩ",4));
-
-		for (var i in officers)
-			this.officerList.push({
-				number : officers[i].number,
-				name : officers[i].name,
-				position : officers[i].position,
-				account : officers[i].account,
-				mail : officers[i].mail,
-				degree : officers[i].degree,
-				unit_id : officers[i].unit,
-				interestedFields: ['4','2']
-			});
-
-		this.officerInfo = {
-			name:'Lê Đình Thanh',
-			number:'12334',
-			position:'Giảng viên',
-			unit:'Phòng Thí nghiệm An toàn Thông tin',
-			degree:'TS',
-			phone:'0987654321',
-			VNUmail:'thanhld@vnu.edu.vn',
-			otherMail:'thanhld.vnuh@gmail.com',
-			website:'https://uet.vnu.edu.vn/~thanhld',
-			address:'Phòng 413 - E3',
-			staff_id: '',
-			researchTopics: [],
-			interestedFields: []
-		};
-
-		this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
-		this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
-		this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
-		this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
-		this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
-		this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
-		this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
-		this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
-		this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
-		this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
-		this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
-		this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
-		this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
-		this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
-		this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
-		this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
-		this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
-		this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
-		this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
-		this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
-		this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
-		this.officerInfo.researchTopics.push({name: 'An toàn thông tin', description: 'Môn An toàn thông tin'});
-		this.officerInfo.researchTopics.push({name: 'Phát triển ứng dụng web', description: 'Môn Phát triển ứng dụng web'});
-		this.officerInfo.researchTopics.push({name: 'Mạng cảm biến không dây', description: 'Môn Mạng cảm biến không dây'});
-
-		this.officerInfo.interestedFields.push({id: '3', name: 'Network security'});
-		// this.officerInfo.interestedFields.push({id: '6', name: 'Web application security'});
-		this.officerInfo.interestedFields.push({id: '7', name: 'Web protocol security'});
-		this.officerInfo.interestedFields.push({id: '8', name: 'Web application security'});
-
-		this.treeData = {
-			id: '1',
-			name: 'My Tree',
-			children: [
-				{ id: '2', name: 'hello' },
-				{ id: '3', name: 'wat' },
-				{
-					id: '4', name: 'child folder',
-					children: [
-						{
-							id: '5', name: 'child folder',
-							children: [
-								{ id: '6', name: 'hello' },
-								{ id: '7', name: 'wat' }
-							]
-						},
-						{ id: '8', name: 'hello' },
-						{ id: '9', name: 'wat' },
-						{
-							id: '10', name: 'child folder',
-							children: [
-								{ id: '11', name: 'hello' },
-								{ id: '12', name: 'wat' }
-							]
+		created() {
+			this.$http.get('http://localhost/uFaculty/Faculty/FacultyControl/getAll')
+					.then(function (data) {
+						this.unitList = [];
+						for(var i in data.body.data) {
+							this.unitList.push({
+								id: data.body.data[i].faculty_id,
+								name: decodeURIComponent(escape(data.body.data[i].name))
+							});
 						}
-					]
+					});
+
+
+			this.$http.get('http://localhost/uFaculty/Staff/StaffController/getAll')
+					.then(function (data) {
+						this.officerList = [];
+						for(var i in data.body.data) {
+							this.officerList.push({
+								id : data.body.data[i].staff_id,
+								number: data.body.data[i].staff_number,
+								name : decodeURIComponent(escape(data.body.data[i].full_name)),
+								position : decodeURIComponent(escape(data.body.data[i].staff_type)),
+								VNUmail : decodeURIComponent(escape(data.body.data[i].vnu_email)),
+								phone : data.body.data[i].phone_number,
+								otherMail : data.body.data[i].other_email,
+								address : data.body.data[i].address,
+								website : data.body.data[i].website,
+								degree : decodeURIComponent(escape(data.body.data[i].academic_title)),
+								unit_id : data.body.data[i].faculty_id,
+								account_id : data.body.data[i].account_id,
+							});
+						}
+					});
+			this.$http.get('http://localhost/uFaculty/Staff/StaffController/getAllResearchStaff')
+					.then(function (data) {
+						for(var i in data.body.data) {
+							this.comparedList.push({
+								research_id: data.body.data[i].research_id,
+								staff_id: data.body.data[i].staff_id
+							});
+						}
+					});
+
+			this.$http.get('http://localhost/uFaculty/Research/ResearchControl/getAll')
+					.then(function (data) {
+						var rawData = data.body.data;
+						var root = {id: 0, isSelected: false, name: 'Lĩnh vực nghiên cứu', children: []}
+						for (var idx in rawData) {
+							if (rawData[idx].parent_id == 0) {
+								root.children.push(this.recursive(rawData[idx],rawData));
+							}
+						}
+						this.treeData = root;
+					});
+		},
+
+		computed: {
+
+			// title of the current page
+			title() {
+				return this.titles[this.useMode];
+			},
+
+			// label of the search's result table
+			showLabel() {
+				// unit
+				if (this.searchRule==0) {
+					if (this.selectedUnit<0) return '';
+					return 'Danh sách Giảng viên thuộc ' + this.unitList[this.selectedUnit].name;
 				}
-			]
-		};
+				// field
+				else {
+					if (!this.selectedField) return '';
+					return 'Danh sách Giảng viên quan tâm Lĩnh vực ' + this.selectedField.name;
+				}
+			},
 
-		this.setupFieldTree(this.treeData, false);
-	},
-
-	computed: {
-		title() {
-			return this.titles[this.useMode];
-		},
-
-		showLabel() {
-			// unit
-			if (this.searchRule==0) {
-				if (this.selectedUnit<0) return '';
-				return 'Danh sách Giảng viên thuộc ' + this.unitList[this.selectedUnit].name;
-			}
-			// field
-			else {
-				if (!this.selectedField) return '';
-				return 'Danh sách Giảng viên quan tâm Lĩnh vực ' + this.selectedField.name;
-			}
-		},
-
-		showOfficerList() {
-			var uList = [];
-
-			//unit
-			if (this.searchRule==0) {
-				if (this.selectedUnit<0) return uList;
-				for (var i in this.officerList)
-					if (this.officerList[i].unit_id == this.unitList[this.selectedUnit].id) {
-						var chosenOne = this.officerList[i];
-						chosenOne.unit = this.unitList[this.selectedUnit].name;
-						uList.push(chosenOne);
+			// array of officers to import to table
+			showOfficerList() {
+				var uList = [];
+				//unit
+				if (this.searchRule==0) {
+					if (this.selectedUnit<0) return uList;
+					for (let i in this.officerList)
+						if (this.officerList[i].unit_id == this.unitList[this.selectedUnit].id) {
+							var chosenOne = this.officerList[i];
+							chosenOne.unit = this.unitList[this.selectedUnit].name;
+							uList.push(chosenOne);
+						}
+					return uList;
+				} else {
+					// field
+					if (!this.selectedField) return uList;
+					for (let i in this.officerList) {
+						let check = false;
+						for (let j in this.comparedList) {
+							if (this.comparedList[j].staff_id == this.officerList[i].id && this.comparedList[j].research_id == this.selectedField.id) {
+								check = true;
+								break;
+							}
+						}
+						if (check) {
+							var chosenOneField = this.officerList[i];
+							chosenOneField.unit = this.unitList.find(u => u.id == chosenOneField.unit_id).name;
+							uList.push(chosenOneField);
+						}
 					}
-				return uList;
-			}
+					return uList;
+				}
+			},
 
-			// field
-			if (this.searchRule==1) {
-				if (!this.selectedField) return uList;
-				for (var i in this.officerList)
-					if (this.officerList[i].interestedFields.includes(this.selectedField.id)) {
-						var chosenOne = this.officerList[i];
-						chosenOne.unit = this.unitList.find(u => u.id == chosenOne.unit_id).name;
-						uList.push(chosenOne);
+			// get officer's info as a array
+			infoList() {
+				return [
+					this.officerInfo.name,
+					this.officerInfo.number,
+					this.officerInfo.position,
+					this.officerInfo.unit,
+					this.officerInfo.degree,
+					this.officerInfo.phone,
+					this.officerInfo.VNUmail,
+					this.officerInfo.otherMail,
+					this.officerInfo.website,
+					this.officerInfo.address
+				]
+			},
+
+			// fields names of officer info
+			infoFields() {
+				return [
+					'name:',
+					'number',
+					'position',
+					'unit',
+					'degree',
+					'phone',
+					'VNUmail',
+					'otherMail',
+					'website',
+					'address'
+				]
+			},
+
+			// titles of officer info table
+			infoTitleList() {
+				return [
+					'Mã cán bộ',
+					'Chức vụ',
+					'Đơn vị',
+					'Học hàm, học vị',
+					'Số điện thoại',
+					'VNU email',
+					'Email khác',
+					'Website',
+					'Địa chỉ'
+				]
+			},
+
+			// array of icon
+			infoIconList() {
+				return [
+					"fa fa-id-card-o",
+					"fa fa-briefcase",
+					"fa fa-flag",
+					"fa fa-graduation-cap",
+					"fa fa-phone",
+					"fa fa-envelope",
+					"fa fa-envelope-o",
+					"fa fa-paper-plane",
+					"fa fa-map-marker"
+				]
+			},
+		},
+
+		methods: {
+			// build the object of fields base on data
+			recursive(rawNode, rawData) {
+				var node = {id: rawNode.research_id, isSelected: false, name: decodeURIComponent(escape(rawNode.name)), children: []}
+				for (var idx in rawData) {
+					if (rawData[idx].parent_id == rawNode.research_id) {
+						node.children.push(this.recursive(rawData[idx], rawData))
 					}
-				return uList;
+				}
+				return node;
+			},
+
+			// build the check tree base on field array
+			setupFieldTree(item, selected) {
+				selected = selected || this.officerInfo.interestedFields.map(f => f.id).includes(item.id);
+				item.isSelected = selected;
+				for (var i in item.children)
+					this.setupFieldTree(item.children[i], selected);
+			},
+
+			// switch search mode
+			// 0 - search by unit
+			// 1 - search by field
+			openSearchItem(index) {
+				let Ubtn = document.getElementsByClassName('unit-search-btn')[0];
+				let Fbtn = document.getElementsByClassName('field-search-btn')[0];
+				Fbtn.className = Fbtn.className.replace(" active", "");
+				Ubtn.className = Ubtn.className.replace(" active", "");
+				this.searchRule = index;
+				// select unit
+				if (index==0) {
+					Ubtn.className += " active";
+				}
+				// select field
+				if (index==1) {
+					Fbtn.className += " active";
+				}
+			},
+
+			// select a unit to show officer
+			selectUnit(i) {
+				this.selectedUnit = i;
+			},
+
+			// select a field to show officer
+			selectField(item) {
+				if (this.selectedField) {
+					let oldSelected = document.getElementById(this.selectedField.id);
+					oldSelected.className = oldSelected.className.replace(" selected", "");
+				}
+				document.getElementById(item.id).className += " selected";
+				this.selectedField = {id: item.id, name: item.name};
+			},
+
+			// select a officer to show his/her details
+			selectOfficer(id) {
+				this.selectedOfficer = id;
+				for (let i in this.officerList) {
+					if (this.officerList[i].id == id) {
+						this.officerInfo = this.officerList[i];
+						break;
+					}
+				}
+				// lấy avatar từ API
+				this.$http.post('http://localhost/uFaculty/staff/StaffController/getAvatar',{
+					staff_id: id
+				}).then(function (data) {
+					this.avatar_src = 'data:image/jpeg;base64,'+data.body.data;
+				})
+				this.$http.post('http://localhost/uFaculty/Staff/StaffController/getInterestField',{
+					staff_id: this.officerInfo.id
+				}).then(function (data) {
+					this.officerInfo.interestedFields = [];
+					for (let i in data.body.data) {
+						this.officerInfo.interestedFields.push({id: data.body.data[i].research_id, name: data.body.data[i].name});
+					}
+					// console.log(this.officerInfo.interestedFields);
+					this.setupFieldTree(this.treeData, false);
+
+					this.$http.post('http://localhost/uFaculty/topic/TopicControl/getTopicByStaffID',{
+						staff_id: this.officerInfo.id
+					})
+							.then(function (data) {
+								this.officerInfo.researchTopics = [];
+								for (let i in data.body.data) {
+									this.officerInfo.researchTopics.push({
+										topic_id: data.body.data[i].topic_id,
+										name: decodeURIComponent(escape(data.body.data[i].topic_name)),
+										description: decodeURIComponent(escape(data.body.data[i].description))
+									})
+								}
+								this.useMode = 1;
+							})
+				})
+			},
+
+			// select a topic to show it
+			selectTopic(i) {
+				if (this.selectedTopic>-1)
+					document.getElementsByClassName('topic-name')[this.selectedTopic].className =
+							document.getElementsByClassName('topic-name')[this.selectedTopic].className.replace(" active", "");
+				this.selectedTopic = i;
+				if (i<0) return;
+				document.getElementsByClassName('topic-name')[i].className += " active";
+			},
+
+			// from show officer's details back to main page
+			back() {
+				this.useMode = 0;
 			}
-		},
-
-		infoList() {
-			return [
-				this.officerInfo.name,
-				this.officerInfo.number,
-				this.officerInfo.position,
-				this.officerInfo.unit,
-				this.officerInfo.degree,
-				this.officerInfo.phone,
-				this.officerInfo.VNUmail,
-				this.officerInfo.otherMail,
-				this.officerInfo.website,
-				this.officerInfo.address
-			]
-		},
-
-		infoFields() {
-			return [
-				'name:',
-				'number',
-				'position',
-				'unit',
-				'degree',
-				'phone',
-				'VNUmail',
-				'otherMail',
-				'website',
-				'address'
-			]
-		},
-
-		infoTitleList() {
-			return [
-				'Mã cán bộ',
-				'Chức vụ',
-				'Đơn vị',
-				'Học hàm, học vị',
-				'Số điện thoại',
-				'VNU email',
-				'Email khác',
-				'Website',
-				'Địa chỉ'
-			]
-		},
-
-		infoIconList() {
-			return [
-				"fa fa-id-card-o",
-				"fa fa-briefcase",
-				"fa fa-flag",
-				"fa fa-graduation-cap",
-				"fa fa-phone",
-				"fa fa-envelope",
-				"fa fa-envelope-o",
-				"fa fa-paper-plane",
-				"fa fa-map-marker"
-			]
-		},
-
-	},
-
-	methods: {
-		initRandomList() {
-
-		},
-
-		setupFieldTree(item, selected) {
-			selected = selected || this.officerInfo.interestedFields.map(f => f.id).includes(item.id);
-			item.isSelected = selected;
-			for (var i in item.children)
-				this.setupFieldTree(item.children[i], selected);
-		},
-
-		openSearchItem(index) {
-			let Ubtn = document.getElementsByClassName('unit-search-btn')[0];
-			let Fbtn = document.getElementsByClassName('field-search-btn')[0];
-
-			Fbtn.className = Fbtn.className.replace(" active", "");
-			Ubtn.className = Ubtn.className.replace(" active", "");
-
-			this.searchRule = index;
-
-			// select unit
-			if (index==0) {
-				Ubtn.className += " active";
-			}
-
-			// select field
-			if (index==1) {
-				Fbtn.className += " active";
-			}
-		},
-
-		selectUnit(i) {
-			this.selectedUnit = i;
-		},
-
-		selectField(item) {
-			if (this.selectedField) {
-				let oldSelected = document.getElementById(this.selectedField.id);
-				oldSelected.className = oldSelected.className.replace(" selected", "");
-			}
-
-			document.getElementById(item.id).className += " selected";
-			this.selectedField = {id: item.id, name: item.name};
-		},
-
-		selectOfficer(id) {
-			this.selectedOfficer = id;
-			// this.avatar_src = ...
-			// this.officerInfo = ....
-			this.useMode = 1;
-		},
-
-		selectTopic(i) {
-			if (this.selectedTopic>-1)
-				document.getElementsByClassName('topic-name')[this.selectedTopic].className =
-				document.getElementsByClassName('topic-name')[this.selectedTopic].className.replace(" active", "");
-			this.selectedTopic = i;
-			if (i<0) return;
-			document.getElementsByClassName('topic-name')[i].className += " active";
-		},
-
-		back() {
-			this.useMode = 0;
 		}
 	}
-}
 </script>
 
 <style scoped>
-	@import "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css";
-
 	.header {
 		width: 100%;
 		height: 50px;
-		background-color: #555273;
+		background-color: #0F2557;
 		top: 0;
 		left: 0;
 		position: fixed;
 		color: #e2eff1;
+		z-index: 1;
 	}
-
+	.header img{
+		margin-left: 40px;
+	}
+	.title-page{
+		height: 30px;
+	}
 	.navbar {
 		border: 1px solid #e7e7e7;
 		margin-bottom: 10px;
@@ -518,23 +507,6 @@ export default {
 		padding: .5rem 1rem;
 		color: inherit;
 		cursor: pointer;
-	}
-
-	.avatar {
-		width: 32px;
-		height: 32px;
-		border-radius: 50%!important;
-	}
-
-	.account-name {
-		padding: .40rem!important;
-		margin: 0px 5px;
-	}
-
-	.account {
-		float: right;
-		margin-top: 1px;
-		background-color: inherit;
 	}
 
 	.backward-btn {
@@ -589,20 +561,20 @@ export default {
 		display: inline-block;
 	}
 
-	.content-bound .tab-item:hover {background-color: #e3dfb5;}
+	.content-bound .tab-item:hover {background-color: #6bb7cc;}
 
 	.content-bound .tabs-navigation span.active {
 		font-weight: bold;
-		background-color: #FFCCCC;
-		color: #3E5252;
-		border-top: 3px solid #FF4D4D;
+		background-color: #58b368;
+		color: #ffffff;
+		border-top: 3px solid #0dbd1f;
 	}
 
 	.search-container {
 		transition: 0.2s;
 		border: 2px solid;
 		border-color: #d9e9f2 transparent #d9e9f2 #d9e9f2;
-		height: 380px;
+		max-height: 380px;
 		overflow: auto;
 		/* padding: 15px 5px 5px 15px; */
 	}
@@ -687,7 +659,7 @@ export default {
 	.table-bound th {
 		padding: 9px 0px;
 		text-align: center;
-		background-color: #4CAF50;
+		background-color: #17b978;
 		color: white;
 		font-size: 14px;
 	}
@@ -713,7 +685,7 @@ export default {
 	a {text-decoration: none;}
 
 	.container {
-		margin: 25px 50px 0px 50px;
+		margin: 25px 50px 0px 100px;
 	}
 
 	.info-container {
@@ -777,8 +749,8 @@ export default {
 	.big-field-title {
 		font-size: 17px;
 		font-weight: bold;
-		background-color: #ffcccc;
-		border-top: 3px solid #ff4d4d;
+		background-color: #17b978;
+		border-top: 3px solid #26b926;
 		padding: 7px 15px;
 		display: inline-block;
 		width: 274px;
@@ -795,14 +767,14 @@ export default {
 		overflow: hidden;
 		vertical-align: middle;
 		text-align: center;
-		border-top: 3px solid #ff8a5c;
-		background-color: #ffc8b3;
+		background-color: #17b978;
+		border-top: 3px solid #26b926;
 	}
 
 	.name-field {
 		transition: 0.2s;
 		border: 2px solid;
-		border-color: #ffcccc #ffcccc #ffcccc #ffcccc;
+		border-color: #17b978 #17b978 #17b978 #17b978;
 		width: 300px;
 		height: 300px;
 		background-color: #f8f8f8;
@@ -817,7 +789,7 @@ export default {
 		overflow: auto;
 		background-color: #f8f8f8;
 		border: 2px solid;
-		border-color: #ffc8b3 #ffc8b3 #ffc8b3 #ffc8b3;
+		border-color: #17b978 #17b978 #17b978 #17b978;
 		padding: 0px 13px;
 	}
 
@@ -846,7 +818,7 @@ export default {
 		border-radius: 8px;
 	}
 
-	.officer-info ::-webkit-scrollbar-thumb:hover {background: #3EB3F6;}
+	.officer-info ::-webkit-scrollbar-thumb:hover {background: #4c9ede;}
 
 	ul {
 		margin: 0px;
@@ -873,5 +845,7 @@ export default {
 		font-size: 15px;
 	}
 
+
 	*{line-height: 1.5;}
+
 </style>

@@ -7,26 +7,26 @@
             <form class="form-horizontal" @submit.prevent="changePass" v-on:keyup.enter="changePass">
 
                 <div class="form-group">
-                    <label class="control-label" for="old_password">Mật khẩu cũ:</label>
+                    <label class="control-label">Mật khẩu cũ:</label>
                     <div v-bind:class="{ 'has-error' : errors.has('password') }">
                         <input name="old_password" v-model="old_password" v-validate="'required|min:6'" class="form-control" type="password">
-                        <span v-show="errors.has('password')" class="text-danger">{{ errors.first('old_password') }}</span>
+                        <span v-show="errors.has('old_password')" class="text-danger">{{ errors.first('old_password') }}</span>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="control-label" for="new_password">Mật khẩu mới:</label>
+                    <label class="control-label">Mật khẩu mới:</label>
                     <div v-bind:class="{ 'has-error' : errors.has('password') }">
                         <input name="new_password" v-model="new_password" v-validate="'required|min:6'" class="form-control" type="password">
-                        <span v-show="errors.has('password')" class="text-danger">{{ errors.first('new_password') }}</span>
+                        <span v-show="errors.has('new_password')" class="text-danger">{{ errors.first('new_password') }}</span>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="control-label" for="re_new_password">Nhập lại mật khẩu mới:</label>
+                    <label class="control-label">Nhập lại mật khẩu mới:</label>
                     <div v-bind:class="{ 'has-error' : errors.has('password') }">
                         <input name="re_new_password" v-model="re_new_password" v-validate="'required|min:6'" class="form-control" type="password">
-                        <span v-show="errors.has('password')" class="text-danger">{{ errors.first('re_new_password') }}</span>
+                        <span v-show="errors.has('re_new_password')" class="text-danger">{{ errors.first('re_new_password') }}</span>
                     </div>
                 </div>
 
@@ -34,13 +34,25 @@
 
             <center><a class="button login-btn" v-on:click="changePass">Xác nhận</a></center>
         </div>
-        <div>
-            <label name="notification" id="notification"></label>
+        <div class="msg-success" id="success-block" style="display: none">
+            <b>Thành công!</b> Thay đổi mật khẩu thành công.
         </div>
+        <div class="msg-error" id="error-block" style="display: none">
+            <b>Lỗi!</b> Mật khẩu cũ không chính xác.
+        </div>
+        <div class="msg-error-pass" id="error-pass-block" style="display: none">
+            <b>Lỗi!</b> Nhập lại mật khẩu mới chưa trùng với mật khẩu mới.
+        </div>
+        <div class="msg-warning" id="warning-block" style="display: none">
+            <b>Cảnh báo!</b> Mật khẩu mới trùng với mật khẩu cũ.
+        </div>
+
     </div>
 </template>
 
 <script>
+
+
     export default {
         name: "ChangePassword",
         data() {
@@ -51,22 +63,56 @@
                 re_new_password: ''
             }
         },
+        created() {
+            let token = this.$cookie.get('user');
+            if (token == null) {
+                this.$router.push('/login');
+            }
+            else {
+                var decoded_token = this.$jwtDec.decode(token);
+                this.username = decoded_token.username;
+            }
+        },
         methods: {
-            changePass(){
-                // if(this.re_new_password == this.new_password){
-                //     var url = 'http://localhost/uFaculty/account/AccountController/changePassword';
-                //     this.$http.post(url,{
-                //         username: this.username,
-                //         old_password: this.old_password,
-                //         new_password: this.new_password,
-                //         re_new_password: this.re_new_password
-                //     }).then(function (data) {
-                //         console.log(data);
-                //     })
-                // } else {
-				//
-                // }
 
+            // change the password
+            changePass(){
+                var msg_success = document.getElementById("success-block");
+                var msg_error = document.getElementById("error-block");
+                var msg_error_pass = document.getElementById("error-pass-block");
+                var msg_warning = document.getElementById("warning-block");
+                if(this.new_password == this.old_password){
+                    msg_warning.style.display = "";
+                    setTimeout(function(){ msg_warning.style.display = "none" }, 3000);
+                } else {
+                    if(this.re_new_password == this.new_password){
+                        // console.log(this.username);
+                        var url = 'http://localhost/uFaculty/account/AccountController/changePassword';
+                        this.$http.post(url,{
+                            username: this.username,
+                            old_password: this.old_password,
+                            new_password: this.new_password
+                        }).then(function (data) {
+                            //console.log(data.body);
+                            let status = data.body.status;
+                            if (status == 1) {
+                                msg_success.style.display = "";
+                                setTimeout(function(){ msg_success.style.display = "none" }, 3000);
+                            }
+                            if (status == 0) {
+                                msg_warning.style.display = "";
+                                setTimeout(function(){ msg_warning.style.display = "none" }, 3000);
+                            }
+                            if (status == -1) {
+                                msg_error.style.display = "";
+                                setTimeout(function(){ msg_error.style.display = "none" }, 3000);
+                            }
+                        })
+                    }else {
+                        msg_error_pass.style.display = "";
+                        setTimeout(function(){ msg_error_pass.style.display = "none" }, 3000);
+                    }
+                }
             }
         }
     }
@@ -74,8 +120,6 @@
 </script>
 
 <style scoped>
-    @import "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css";
-    @import ""https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"";
 
     div {display: block;}
 
@@ -118,24 +162,64 @@
 
     .button:active {background-color: #3e8e3e;}
 
-    .student-login-btn {
-        display: inline-block;
-        margin: 5px 0px;
-        color: #3366ff;
-        text-decoration: underline;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    .student-login-btn:hover {color: #0040ff;}
-
     .text-danger {
         color: #a94442;
         display: block;
         margin-top: 5px;
         margin-bottom: 10px;
     }
-
+    .msg-success{
+        margin: 20px 0;
+        padding: 20px 20px 20px 20px;
+        min-height: 22px;
+        display: inline-block;
+        border: 1px solid #cce6bb;
+        background:#def6cf;
+        color: #265708 !important;
+    }
+    .msg-success b {
+        background:#def6cf;
+        color: #265708 !important;
+    }
+    .msg-error{
+        margin: 20px 0;
+        padding: 20px 20px 20px 20px;
+        min-height: 22px;
+        display: inline-block;
+        border: 1px solid #f5d1d1;
+        background: #fdd;
+        color: #800 !important;
+    }
+    .msg-error b {
+        background: #fdd;
+        color: #800 !important;
+    }
+    .msg-error-pass{
+        margin: 20px 0;
+        padding: 20px 20px 20px 20px;
+        min-height: 22px;
+        display: inline-block;
+        border: 1px solid #f5d1d1;
+        background: #fdd;
+        color: #800 !important;
+    }
+    .msg-error-pass b {
+        background: #fdd;
+        color: #800 !important;
+    }
+    .msg-warning{
+        margin: 20px 0;
+        padding: 20px 20px 20px 20px;
+        min-height: 22px;
+        display: inline-block;
+        border: 1px solid #dace89;
+        background:#ffb;
+        color: #000 !important;
+    }
+    .msg-warning b {
+        background:#ffb;
+        color: #000 !important;
+    }
     .form-horizontal .control-label {
         padding-top: 7px;
         margin-bottom: 5px;
@@ -180,7 +264,7 @@
     }
 
     .container {
-        background-color: #fff;
+        background-color: #fcfff6;
         font-family: 'Montserrat', sans-serif;
         display: grid;
         grid-template-rows: auto;

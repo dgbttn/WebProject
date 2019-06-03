@@ -1,7 +1,7 @@
 <template>
 	<div id="app">
+<!--		view website via router view-->
 		<router-view/>
-		<!-- <ChangePassword /> -->
 	</div>
 </template>
 
