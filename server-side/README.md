@@ -1,8 +1,8 @@
 # uFaculties API developed by PHP
 
-B�i t?p l?n m�n WEB ~~
+Bài tập lớn môn WEB ~~
 
-C�i ??t xampp
+Cài đặt xampp
 
-?? to�n b? th? m?c code v�o file C://xampp/htdocs/uFaculty
+Bỏ toàn bộ thư mục code vào file C://xampp/htdocs/uFaculty
 
